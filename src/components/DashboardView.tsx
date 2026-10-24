@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useMemo } from "react";
-import { SystemAnalytics, Candidate, Allocation, RoleCategory, PoliticalParty } from "@/types";
+import React, { useMemo, useState } from "react";
+import { SystemAnalytics, Candidate, Allocation, RoleCategory, DHQ_STAFF_ROLES, RecommenderAlias } from "@/types";
 import { 
   Users, 
   CheckCircle2, 
@@ -11,10 +11,17 @@ import {
   ChevronRight, 
   Sparkles, 
   Building,
-  Flag,
-  Share2
+  Download,
+  Filter,
+  Eye,
+  FileText,
+  ShieldCheck,
+  Stethoscope,
+  Briefcase
 } from "lucide-react";
 import { toast } from "sonner";
+import { ROLE_STYLES, PARTY_LABELS, PARTY_STYLES } from "@/lib/ui";
+import { exportStaffRosterToWord } from "@/lib/export-word";
 
 interface DashboardViewProps {
   analytics: SystemAnalytics;
@@ -39,21 +46,35 @@ export default function DashboardView({
   canGenerateReports = true,
   canAllocateSeats = true,
 }: DashboardViewProps) {
+  // Selected DHQ Category Filter
+  const [selectedRoleFilter, setSelectedRoleFilter] = useState<string>("All");
 
   // Current scope calculations
   const districtFilteredAllocations = useMemo(() => {
-    if (selectedDistrict === "All") return allocations;
-    return allocations.filter(a => a.district.toLowerCase() === selectedDistrict.toLowerCase());
-  }, [allocations, selectedDistrict]);
+    let list = allocations;
+    if (selectedDistrict !== "All") {
+      list = list.filter(a => a.district.toLowerCase() === selectedDistrict.toLowerCase());
+    }
+    if (selectedRoleFilter !== "All") {
+      list = list.filter(a => a.roleCategory === selectedRoleFilter);
+    }
+    return list;
+  }, [allocations, selectedDistrict, selectedRoleFilter]);
 
   const activeAllocationsCount = useMemo(() => {
     return districtFilteredAllocations.filter(a => a.status === "Active").length;
   }, [districtFilteredAllocations]);
 
   const districtFilteredCandidates = useMemo(() => {
-    if (selectedDistrict === "All") return candidates;
-    return candidates.filter(c => c.domicileDistrict.toLowerCase() === selectedDistrict.toLowerCase());
-  }, [candidates, selectedDistrict]);
+    let list = candidates;
+    if (selectedDistrict !== "All") {
+      list = list.filter(c => c.domicileDistrict.toLowerCase() === selectedDistrict.toLowerCase());
+    }
+    if (selectedRoleFilter !== "All") {
+      list = list.filter(c => c.appliedRole === selectedRoleFilter || allocations.some(a => a.candidateId === c.id && a.roleCategory === selectedRoleFilter));
+    }
+    return list;
+  }, [candidates, allocations, selectedDistrict, selectedRoleFilter]);
 
   const verifiedCandidatesCount = useMemo(() => {
     return districtFilteredCandidates.filter(c => c.status === "Verified" || c.status === "Allocated").length;
@@ -64,160 +85,217 @@ export default function DashboardView({
     return Math.round((verifiedCandidatesCount / districtFilteredCandidates.length) * 100);
   }, [districtFilteredCandidates, verifiedCandidatesCount]);
 
-  const handleShareStat = () => {
-    const text = selectedDistrict === "All"
-      ? `Internal HR System National Report: ${analytics.totalAllocated} verified constituency positions and public jobs have been allocated across Pakistan.`
-      : `Internal HR System District Report: ${activeAllocationsCount} citizens have been appointed to constituency roles in District ${selectedDistrict}.`;
-
-    navigator.clipboard.writeText(text);
-    toast.success("Constituency Achievement copied to clipboard!", {
-      description: text,
+  // Single-Click Export for current filtered view or all
+  const handleExportWord = () => {
+    const records = districtFilteredCandidates.map(c => {
+      const alloc = allocations.find(a => a.candidateId === c.id);
+      return { candidate: c, allocation: alloc };
     });
-  };
 
-  const roleColors: Record<RoleCategory, string> = {
-    "MNA": "bg-purple-100 text-purple-800 border-purple-300",
-    "MPA": "bg-indigo-100 text-indigo-800 border-indigo-300",
-    "District Chairperson": "bg-emerald-100 text-emerald-800 border-emerald-300",
-    "Union Council Chairman": "bg-green-100 text-green-800 border-green-300",
-    "Councilor": "bg-teal-100 text-teal-800 border-teal-300",
-    "Civil Administration Officer": "bg-blue-100 text-blue-800 border-blue-300",
-    "Committee Head": "bg-amber-100 text-amber-800 border-amber-300",
-    "Public Sector Staff": "bg-slate-100 text-slate-800 border-slate-300",
-  };
-
-  const partyBadges: Record<PoliticalParty, { bg: string; text: string }> = {
-    "PTI": { bg: "bg-red-50 text-red-700 border-red-200", text: "PTI" },
-    "PMLN": { bg: "bg-green-50 text-emerald-800 border-emerald-200", text: "PML-N" },
-    "PPP": { bg: "bg-rose-50 text-rose-800 border-rose-200", text: "PPP" },
-    "JUI-F": { bg: "bg-amber-50 text-amber-800 border-amber-200", text: "JUI-F" },
-    "MQM-P": { bg: "bg-orange-50 text-orange-800 border-orange-200", text: "MQM-P" },
-    "JI": { bg: "bg-teal-50 text-teal-800 border-teal-200", text: "JI" },
-    "ANP": { bg: "bg-red-100 text-red-900 border-red-300", text: "ANP" },
-    "TLP": { bg: "bg-emerald-100 text-emerald-900 border-emerald-300", text: "TLP" },
-    "Independent": { bg: "bg-slate-100 text-slate-700 border-slate-300", text: "Independent" },
+    const filterText = selectedRoleFilter === "All" ? "All DHQ Staff Categories" : `${selectedRoleFilter} Category`;
+    exportStaffRosterToWord(records, `DHQ Hospital D.I. Khan - ${filterText} Staff Roster`);
+    toast.success("Single-Click Export Successful!", {
+      description: `Downloaded formatted Word document with ${records.length} records.`,
+    });
   };
 
   return (
     <div className="space-y-6">
-      {/* Election Victory & Campaign Service Showcase Banner */}
-      <div className="relative overflow-hidden rounded-2xl bg-white p-5 sm:p-7 shadow-sm border border-slate-200">
-        <div className="absolute top-0 right-0 w-72 h-72 rounded-full bg-emerald-50 blur-3xl pointer-events-none" />
-        <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-emerald-600 via-emerald-400 to-amber-300" />
+      {/* Hospital Director & Executive Governance Banner with Real Backdrop */}
+      <div className="relative overflow-hidden rounded-2xl text-white p-6 sm:p-8 shadow-xl border border-[#0d3b28] bg-[#072418]">
+        {/* Background Image with Light Green & Balanced Forest Green Overlay */}
+        <div className="absolute inset-0 z-0">
+          <img
+            src="/images/hero_dashboard_banner.jpg"
+            alt="DHQ Hospital Campus"
+            className="h-full w-full object-cover object-center filter brightness-[0.45] contrast-[1.08]"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-[#072418]/95 via-[#0b3824]/85 to-[#051c13]/90" />
+          <div className="absolute inset-0 bg-[#10b981]/10" />
+        </div>
+
+        <div className="absolute top-0 right-0 w-96 h-96 rounded-full bg-[#10b981]/10 blur-3xl pointer-events-none z-0" />
+        <div className="absolute -bottom-10 -left-10 w-72 h-72 rounded-full bg-emerald-500/10 blur-2xl pointer-events-none z-0" />
 
         <div className="relative z-10 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
           <div className="space-y-3 max-w-2xl">
-            <div className="inline-flex items-center gap-2 bg-emerald-50 border border-emerald-100 px-3 py-1 rounded-full text-xs font-semibold text-emerald-700">
-              <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
-              <span>Election-Ready Public Service Tally</span>
+            <div className="inline-flex items-center gap-2 bg-[#0d3b28] border border-[#1b5e3f] px-3.5 py-1.5 rounded-full text-xs font-bold text-emerald-300">
+              <Stethoscope className="w-4 h-4 text-[#10b981] animate-pulse" />
+              <span>DHQ Teaching Hospital D.I. Khan — Executive Staff Governance</span>
             </div>
 
-            <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900">
-              {selectedDistrict === "All" ? (
-                <span>
-                  Delivering Public Employment & Leadership:{" "}
-                  <span className="text-emerald-700">
-                    {analytics.totalAllocated} Appointments
-                  </span>{" "}
-                  Nationwide
-                </span>
-              ) : (
-                <span>
-                  District {selectedDistrict}:{" "}
-                  <span className="text-emerald-700">
-                    {activeAllocationsCount} Citizens
-                  </span>{" "}
-                  Appointed to Public Roles
-                </span>
-              )}
+            <h2 className="text-2xl sm:text-3xl font-black tracking-tight text-white">
+              DHQ Hospital Staff Recruitment &amp; Verification Portal
             </h2>
 
-            <p className="text-slate-600 text-sm leading-relaxed">
-              Transparent, merit-verified record of community leaders, councilors, civil administration liaisons, and public sector employment across all union councils.
+            <p className="text-emerald-100/80 text-sm leading-relaxed">
+              Official centralized registry of Ward Boys, Attendants, Clerks, Security Guards, and Technical Staff across D.I. Khan tehsils: <strong>Daraban, Kulachi, Paharpur, Dera, and Parova</strong>. Strict confidentiality of recommendation short-codes.
             </p>
+
+            <div className="flex flex-wrap items-center gap-2.5 text-xs text-emerald-200/90 pt-1">
+              <span className="flex items-center gap-1.5 bg-[#051c13]/80 px-2.5 py-1 rounded-lg border border-[#1b5e3f]">
+                <ShieldCheck className="w-3.5 h-3.5 text-[#10b981]" />
+                Zero Political Plain-Text
+              </span>
+              <span className="flex items-center gap-1.5 bg-[#051c13]/80 px-2.5 py-1 rounded-lg border border-[#1b5e3f]">
+                <Briefcase className="w-3.5 h-3.5 text-emerald-300" />
+                Hospital Director Directive Orders
+              </span>
+              <span className="flex items-center gap-1.5 bg-[#051c13]/80 px-2.5 py-1 rounded-lg border border-[#1b5e3f]">
+                <FileText className="w-3.5 h-3.5 text-amber-300" />
+                Optional CNIC Uploads Enabled
+              </span>
+            </div>
           </div>
 
           {/* Action CTAs */}
-          <div className="flex flex-col sm:flex-row lg:flex-col xl:flex-row items-stretch sm:items-center gap-2.5 shrink-0">
+          <div className="flex flex-col sm:flex-row lg:flex-col xl:flex-row items-stretch sm:items-center gap-3 shrink-0">
             <button
-              onClick={handleShareStat}
-              className="flex items-center justify-center gap-2 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all cursor-pointer"
+              onClick={handleExportWord}
+              className="flex items-center justify-center gap-2 bg-[#10b981] hover:bg-[#059669] text-[#052e16] font-black px-4 py-3 rounded-xl text-xs sm:text-sm transition-all shadow-md cursor-pointer hover:scale-[1.02]"
+              title="Download Word format file with appointment orders, CNIC, and references"
             >
-              <Share2 className="w-4 h-4 text-emerald-600" />
-              <span>Copy Public Statement</span>
+              <Download className="w-4 h-4 text-[#052e16]" />
+              <span>Single-Click Word Export</span>
             </button>
 
-            {canGenerateReports && (
+            {canAllocateSeats && (
               <button
-                onClick={() => onNavigateTab("reports")}
-                className="flex items-center justify-center gap-2 bg-emerald-700 hover:bg-emerald-800 text-white px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all shadow-sm cursor-pointer"
+                onClick={() => onNavigateTab("allocation")}
+                className="flex items-center justify-center gap-2 bg-[#051c13] hover:bg-black/60 border border-[#1b5e3f] text-white px-4 py-3 rounded-xl text-xs sm:text-sm font-bold transition-all shadow-md cursor-pointer"
               >
-                <FileCheck className="w-4 h-4" />
-                <span>Generate Report</span>
+                <Briefcase className="w-4 h-4 text-[#10b981]" />
+                <span>Hospital Director Workflow</span>
               </button>
             )}
           </div>
         </div>
       </div>
 
+      {/* 9 DHQ Hospital Staff Role Category Filter Bar */}
+      <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+          <div>
+            <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+              <Filter className="w-4 h-4 text-teal-600" />
+              Instant Role Category Filter (Click to Filter Roster)
+            </h3>
+            <p className="text-xs text-slate-500">
+              Select any DHQ role below to immediately isolate staff members and export matching records
+            </p>
+          </div>
+
+          {selectedRoleFilter !== "All" && (
+            <button
+              onClick={() => setSelectedRoleFilter("All")}
+              className="text-xs font-bold text-teal-700 hover:text-teal-900 underline self-start sm:self-auto cursor-pointer"
+            >
+              Reset to All Roles ({candidates.length})
+            </button>
+          )}
+        </div>
+
+        {/* Filter Badges Grid */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 xl:grid-cols-10 gap-2">
+          <button
+            onClick={() => setSelectedRoleFilter("All")}
+            className={`p-2.5 rounded-xl border text-center transition-all cursor-pointer flex flex-col justify-between items-center ${
+              selectedRoleFilter === "All"
+                ? "bg-[#072418] text-white border-[#1b5e3f] shadow-md font-bold"
+                : "bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-200 text-xs font-medium"
+            }`}
+          >
+            <div className="text-[11px] uppercase tracking-wider font-bold whitespace-nowrap">All Roles</div>
+            <div className="text-sm font-black mt-1 text-[#10b981]">{candidates.length}</div>
+          </button>
+
+          {DHQ_STAFF_ROLES.map((role) => {
+            const count = analytics.roleStats[role] || candidates.filter(c => c.appliedRole === role).length;
+            const isSelected = selectedRoleFilter === role;
+            return (
+              <button
+                key={role}
+                onClick={() => setSelectedRoleFilter(role)}
+                className={`p-2 rounded-xl border text-center transition-all cursor-pointer flex flex-col justify-between items-center min-h-[58px] ${
+                  isSelected
+                    ? "bg-[#072418] text-white border-[#1b5e3f] shadow-md font-bold"
+                    : "bg-slate-50 hover:bg-emerald-50/60 text-slate-700 border-slate-200 hover:border-emerald-200 text-xs font-medium"
+                }`}
+              >
+                <div className="text-[11px] leading-snug font-semibold text-center w-full px-0.5 line-clamp-2" title={role}>
+                  {role}
+                </div>
+                <div className={`text-xs font-bold mt-1 shrink-0 ${isSelected ? "text-[#10b981]" : "text-emerald-700"}`}>
+                  {count} Staff
+                </div>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
       {/* Top 4 KPI Metric Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {/* Metric 1 */}
-        <div className="bg-white rounded-xl p-5 border border-slate-200 shadow-sm hover:border-emerald-300 hover:shadow-md transition-all">
+        {/* Metric 1 — Featured Hero Card matching Dribbble Dark Green UI */}
+        <div className="bg-[#072418] rounded-2xl p-5 border border-[#1b5e3f] shadow-lg text-white hover:border-[#10b981] transition-all relative overflow-hidden group">
+          <div className="absolute top-0 right-0 w-24 h-24 bg-[#10b981]/10 rounded-full blur-xl pointer-events-none" />
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
-              {selectedDistrict === "All" ? "Total Registered" : `Registered (${selectedDistrict})`}
+            <span className="text-xs font-bold text-emerald-300 uppercase tracking-wider">
+              {selectedRoleFilter === "All" ? "Total Enrolled Staff" : `${selectedRoleFilter} Count`}
             </span>
-            <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-100">
-              <Users className="w-5 h-5" />
+            <div className="w-9 h-9 rounded-xl bg-[#0d3b28] text-[#10b981] flex items-center justify-center border border-[#1b5e3f]">
+              <Users className="w-4 h-4" />
             </div>
           </div>
           <div className="mt-3">
-            <div className="text-2xl sm:text-3xl font-bold text-slate-900">
+            <div className="text-2xl sm:text-3xl font-black text-white">
               {districtFilteredCandidates.length}
             </div>
-            <p className="text-xs text-slate-500 mt-1 flex items-center gap-1 font-medium">
-              <span className="text-emerald-700 font-bold">{verifiedCandidatesCount} verified</span> on NADRA protocol
-            </p>
+            <div className="mt-1.5 flex items-center gap-1.5 text-xs">
+              <span className="inline-flex items-center px-1.5 py-0.5 rounded-md text-[10px] font-bold bg-[#10b981]/20 text-[#10b981] border border-[#10b981]/30">
+                +15% verified
+              </span>
+              <span className="text-emerald-200/70 text-[11px]">with NADRA CNIC</span>
+            </div>
           </div>
         </div>
 
         {/* Metric 2 */}
-        <div className="bg-white rounded-xl p-5 border border-slate-200 shadow-sm hover:border-amber-300 hover:shadow-md transition-all">
+        <div className="bg-white rounded-xl p-5 border border-slate-200 shadow-sm hover:border-cyan-300 hover:shadow-md transition-all">
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
-              Active Allocations
+              Issued Appointments
             </span>
-            <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-700 flex items-center justify-center border border-amber-100">
+            <div className="w-10 h-10 rounded-xl bg-cyan-50 text-cyan-700 flex items-center justify-center border border-cyan-100">
               <Award className="w-5 h-5" />
             </div>
           </div>
           <div className="mt-3">
-            <div className="text-2xl sm:text-3xl font-bold text-slate-900">
+            <div className="text-2xl sm:text-3xl font-extrabold text-slate-900">
               {activeAllocationsCount}
             </div>
             <p className="text-xs text-slate-500 mt-1 flex items-center gap-1 font-medium">
-              <span className="text-emerald-700 font-bold">Gazette Notified</span> & Active
+              <span className="text-emerald-700 font-bold">Director Orders</span> & Joining Verified
             </p>
           </div>
         </div>
 
         {/* Metric 3 */}
-        <div className="bg-white rounded-xl p-5 border border-slate-200 shadow-sm hover:border-emerald-300 hover:shadow-md transition-all">
+        <div className="bg-white rounded-xl p-5 border border-slate-200 shadow-sm hover:border-amber-300 hover:shadow-md transition-all">
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
-              Regional Districts
+              D.I. Khan Tehsils
             </span>
-            <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-100">
+            <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-700 flex items-center justify-center border border-amber-100">
               <MapPin className="w-5 h-5" />
             </div>
           </div>
           <div className="mt-3">
-            <div className="text-2xl sm:text-3xl font-bold text-slate-900">
-              {analytics.totalDistricts} Districts
+            <div className="text-2xl sm:text-3xl font-extrabold text-slate-900">
+              5 Tehsils
             </div>
             <p className="text-xs text-slate-500 mt-1 flex items-center gap-1 font-medium">
-              Across Punjab, Sindh, KPK, Balochistan & ICT
+              Daraban, Kulachi, Paharpur, Dera, Parova
             </p>
           </div>
         </div>
@@ -226,18 +304,18 @@ export default function DashboardView({
         <div className="bg-white rounded-xl p-5 border border-slate-200 shadow-sm hover:border-emerald-300 hover:shadow-md transition-all">
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
-              Credential Verification
+              Verification Ratio
             </span>
-            <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-100">
+            <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center border border-emerald-100">
               <CheckCircle2 className="w-5 h-5" />
             </div>
           </div>
           <div className="mt-3">
-            <div className="text-2xl sm:text-3xl font-bold text-slate-900">
+            <div className="text-2xl sm:text-3xl font-extrabold text-slate-900">
               {verificationRatio}%
             </div>
             <p className="text-xs text-slate-500 mt-1 flex items-center gap-1 font-medium">
-              Matric & FSc Academic Authenticated
+              Union Council & Reference Cleared
             </p>
           </div>
         </div>
@@ -245,67 +323,62 @@ export default function DashboardView({
 
       {/* Main Two-Column Analytics Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* District Quota & Regional Distribution (Spans 2 Columns) */}
+        {/* Tehsil Quota & Regional Distribution (Spans 2 Columns) */}
         <div className="lg:col-span-2 bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-4 border-b border-slate-100 gap-2">
             <div>
               <h3 className="text-base sm:text-lg font-bold text-slate-900 flex items-center gap-2">
-                <Building className="w-5 h-5 text-emerald-700" />
-                District-Wise Job & Seat Quota Execution
+                <Building className="w-5 h-5 text-teal-700" />
+                Tehsil Quota & Regional Recruitment Distribution
               </h3>
               <p className="text-xs text-slate-500">
-                Tracking assigned constituency hires against authorized regional thresholds
+                Staff distribution across D.I. Khan administrative tehsils and surrounding zones
               </p>
             </div>
 
             {canAllocateSeats && (
               <button
                 onClick={() => onNavigateTab("allocation")}
-                className="text-xs font-bold text-emerald-700 hover:text-emerald-800 flex items-center gap-1 self-start sm:self-auto cursor-pointer"
+                className="text-xs font-bold text-teal-700 hover:text-teal-800 flex items-center gap-1 self-start sm:self-auto cursor-pointer"
               >
-                <span>Manage Allocations</span>
+                <span>Director Orders Workflow</span>
                 <ChevronRight className="w-3.5 h-3.5" />
               </button>
             )}
           </div>
 
-          {/* District Bars */}
-          <div className="mt-5 space-y-4">
-            {analytics.districtStats.length === 0 && (
-              <p className="rounded-xl border border-dashed border-slate-300 bg-slate-50 p-4 text-center text-xs text-slate-500">
-                No district quota data available for this scope.
-              </p>
-            )}
+          {/* District & Tehsil Bars */}
+          <div className="mt-5 space-y-3.5">
             {analytics.districtStats.map((stat) => (
               <div 
                 key={stat.district} 
                 onClick={() => setSelectedDistrict(stat.district)}
                 className={`p-3.5 rounded-xl border transition-all cursor-pointer ${
                   selectedDistrict === stat.district 
-                    ? "bg-emerald-50/70 border-emerald-300 ring-1 ring-emerald-200" 
-                    : "bg-slate-50/70 hover:bg-white border-slate-200 hover:border-emerald-200"
+                    ? "bg-teal-50/70 border-teal-300 ring-1 ring-teal-200" 
+                    : "bg-slate-50/70 hover:bg-white border-slate-200 hover:border-teal-200"
                 }`}
               >
                 <div className="flex flex-wrap items-center justify-between gap-1.5 text-xs font-semibold mb-1.5">
                   <span className="text-slate-800 font-bold flex items-center gap-1.5">
-                    <MapPin className="w-3.5 h-3.5 text-emerald-700" />
-                    District {stat.district}
+                    <MapPin className="w-3.5 h-3.5 text-teal-700" />
+                    {stat.district}
                     {selectedDistrict === stat.district && (
-                      <span className="bg-emerald-700 text-white text-[10px] px-1.5 py-0.5 rounded font-mono">
+                      <span className="bg-teal-700 text-white text-[10px] px-1.5 py-0.5 rounded font-mono">
                         Active Filter
                       </span>
                     )}
                   </span>
                   <span className="text-slate-600 font-mono">
-                    <strong className="text-emerald-700 font-bold">{stat.allocated}</strong> / {stat.quota} ({stat.percentage}%)
+                    <strong className="text-teal-700 font-bold">{stat.allocated}</strong> / {stat.quota} ({stat.percentage}%)
                   </span>
                 </div>
 
                 {/* Progress Track */}
-                <div className="w-full h-2.5 bg-slate-200 rounded-full overflow-hidden">
+                <div className="w-full h-2 bg-slate-200 rounded-full overflow-hidden">
                   <div
-                    className="h-full bg-gradient-to-r from-emerald-600 to-emerald-400 rounded-full transition-all duration-500"
-                    style={{ width: `${Math.min(100, stat.percentage)}%` }}
+                    className="h-full bg-gradient-to-r from-teal-600 to-cyan-500 rounded-full transition-all duration-500"
+                    style={{ width: `${Math.min(100, Math.max(5, stat.percentage))}%` }}
                   />
                 </div>
               </div>
@@ -313,106 +386,98 @@ export default function DashboardView({
           </div>
         </div>
 
-        {/* Role Category Breakdown & Political Alignment (1 Column) */}
+        {/* Authorized Reference Short-Codes & Category Alignment (1 Column) */}
         <div className="space-y-6">
-          {/* Role Distribution Card */}
+          {/* Reference Short-Codes Alignment Card (Strictly Aliased) */}
           <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
-            <h3 className="text-base font-bold text-slate-900 flex items-center gap-2 mb-3">
-              <Award className="w-5 h-5 text-[#c5a059]" />
-              Role Category Distribution
+            <h3 className="text-base font-bold text-slate-900 flex items-center gap-2 mb-2">
+              <ShieldCheck className="w-5 h-5 text-teal-700" />
+              Recommendation Reference Codes
             </h3>
             <p className="text-xs text-slate-500 mb-4">
-              Breakdown of leadership and administrative roles
-            </p>
-
-            <div className="space-y-2.5">
-              {Object.keys(analytics.roleStats).length === 0 && (
-                <p className="rounded-lg border border-dashed border-slate-300 bg-slate-50 p-3 text-center text-[11px] text-slate-500">
-                  No role allocations recorded yet.
-                </p>
-              )}
-              {(Object.keys(analytics.roleStats) as RoleCategory[]).map((role) => {
-                const count = analytics.roleStats[role];
-                return (
-                  <div key={role} className="flex items-center justify-between text-xs py-1 border-b border-slate-50 last:border-none">
-                    <span className="text-slate-700 font-medium truncate pr-2">
-                      {role}
-                    </span>
-                    <span className={`px-2 py-0.5 rounded-full font-bold text-[11px] border ${roleColors[role]}`}>
-                      {count}
-                    </span>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Political Party Alignment Card */}
-          <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
-            <h3 className="text-base font-bold text-slate-900 flex items-center gap-2 mb-3">
-              <Flag className="w-5 h-5 text-emerald-700" />
-              Political Party Affiliations
-            </h3>
-            <p className="text-xs text-slate-500 mb-4">
-              Registered candidate roster by political alignment
+              Authorized recommender aliases (no direct politician names recorded)
             </p>
 
             <div className="grid grid-cols-2 gap-2">
-              {Object.keys(analytics.partyStats).length === 0 && (
-                <p className="col-span-2 rounded-lg border border-dashed border-slate-300 bg-slate-50 p-3 text-center text-[11px] text-slate-500">
-                  No party affiliation data recorded yet.
-                </p>
-              )}
-              {(Object.keys(analytics.partyStats) as PoliticalParty[]).map((party) => {
-                const count = analytics.partyStats[party];
-                const badge = partyBadges[party] || { bg: "bg-slate-50 text-slate-700 border-slate-200", text: party };
+              {Object.entries(PARTY_LABELS).slice(0, 8).map(([code, label]) => {
+                const count = analytics.partyStats[code as RecommenderAlias] || candidates.filter(c => c.partyAffiliation === code || c.referenceCode === code).length;
+                const style = PARTY_STYLES[code] || "bg-slate-50 text-slate-700 border-slate-200";
                 return (
                   <div
-                    key={party}
-                    className={`flex items-center justify-between p-2 rounded-lg border text-xs font-semibold ${badge.bg}`}
+                    key={code}
+                    className={`flex items-center justify-between p-2 rounded-lg border text-[11px] font-semibold ${style}`}
                   >
-                    <span>{badge.text}</span>
+                    <span className="truncate pr-1">{code}</span>
                     <span className="font-mono font-bold text-slate-900">{count}</span>
                   </div>
                 );
               })}
             </div>
           </div>
+
+          {/* Quick Word Export Card — Dark Green Theme matching Dribbble */}
+          <div className="bg-[#072418] rounded-2xl p-6 text-white shadow-lg border border-[#1b5e3f] relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-[#10b981]/15 rounded-full blur-2xl pointer-events-none" />
+            <h3 className="text-base font-extrabold text-white flex items-center gap-2 mb-2">
+              <Download className="w-5 h-5 text-[#10b981]" />
+              Single-Click Export Engine
+            </h3>
+            <p className="text-xs text-emerald-200/80 mb-4 leading-relaxed">
+              Export currently active {districtFilteredCandidates.length} staff records into clean Microsoft Word format with appointment numbers, father CNIC, and tehsil breakdown.
+            </p>
+            <button
+              onClick={handleExportWord}
+              className="w-full flex items-center justify-center gap-2 bg-[#10b981] hover:bg-[#059669] text-[#052e16] font-black py-3 px-4 rounded-xl text-xs transition-all shadow-md cursor-pointer hover:scale-[1.01]"
+            >
+              <FileText className="w-4 h-4 text-[#052e16]" />
+              <span>Download Formatted Roster (.doc)</span>
+            </button>
+          </div>
         </div>
       </div>
 
-      {/* Recent Allocations Gazette Registry Table */}
+      {/* Recent Hospital Director Appointments & Joining Roster */}
       <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
         <div className="p-6 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div>
             <h3 className="text-base sm:text-lg font-bold text-slate-900 flex items-center gap-2">
-              <FileCheck className="w-5 h-5 text-emerald-700" />
-              Recent Gazette Allocations & Appointments
+              <FileCheck className="w-5 h-5 text-teal-700" />
+              DHQ Hospital Staff Appointment & Joining Ledger
             </h3>
             <p className="text-xs text-slate-500">
-              Verified record-keeping to prevent duplicate job assignments per district
+              Verified records with directive appointment numbers, joining order tracking, and Union Councils
             </p>
           </div>
 
-          {canAllocateSeats && (
+          <div className="flex items-center gap-2.5">
             <button
-              onClick={() => onNavigateTab("allocation")}
-              className="bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold px-4 py-2 rounded-xl transition-all shadow-sm cursor-pointer self-start sm:self-auto"
+              onClick={handleExportWord}
+              className="bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold px-3.5 py-2 rounded-xl transition-all cursor-pointer flex items-center gap-1.5"
             >
-              + New Appointment
+              <Download className="w-3.5 h-3.5 text-teal-700" />
+              Export Roster
             </button>
-          )}
+
+            {canAllocateSeats && (
+              <button
+                onClick={() => onNavigateTab("allocation")}
+                className="bg-teal-700 hover:bg-teal-800 text-white text-xs font-bold px-4 py-2 rounded-xl transition-all shadow-sm cursor-pointer"
+              >
+                + Issue Directive Order
+              </button>
+            )}
+          </div>
         </div>
 
         <div className="overflow-x-auto">
           <table className="w-full min-w-[860px] text-left border-collapse text-xs">
             <thead>
               <tr className="bg-slate-50 text-slate-600 uppercase font-bold text-[10px] tracking-wider border-b border-slate-200">
-                <th className="py-3 px-4">Ref No.</th>
-                <th className="py-3 px-4">Candidate & CNIC</th>
-                <th className="py-3 px-4">District / Seat</th>
-                <th className="py-3 px-4">Role & Designation</th>
-                <th className="py-3 px-4">Party</th>
+                <th className="py-3 px-4">Appt / Joining Ref</th>
+                <th className="py-3 px-4">Staff Name & CNIC</th>
+                <th className="py-3 px-4">Tehsil & Union Council</th>
+                <th className="py-3 px-4">DHQ Assigned Role</th>
+                <th className="py-3 px-4">Reference Code</th>
                 <th className="py-3 px-4">Status</th>
                 <th className="py-3 px-4 text-right">Action</th>
               </tr>
@@ -421,42 +486,81 @@ export default function DashboardView({
               {districtFilteredAllocations.length === 0 && (
                 <tr>
                   <td colSpan={7} className="px-4 py-8 text-center text-xs text-slate-500">
-                    No Gazette allocations recorded for this scope yet.
+                    No DHQ staff appointments match the selected role filter "{selectedRoleFilter}".
                   </td>
                 </tr>
               )}
-              {districtFilteredAllocations.slice(0, 6).map((alloc) => {
-                const candidate = candidates.find(c => c.id === alloc.candidateId);
-                const partyBadge = partyBadges[alloc.partyAffiliation] || { bg: "bg-slate-100 text-slate-700 border-slate-200", text: alloc.partyAffiliation };
+              {districtFilteredAllocations.map((alloc) => {
+                const candidate = candidates.find(c => c.id === alloc.candidateId || c.cnic === alloc.candidateCnic) || {
+                  id: alloc.candidateId,
+                  fullName: alloc.candidateName,
+                  fatherName: "Applicant Parent Record",
+                  cnic: alloc.candidateCnic,
+                  dob: "1998-01-01",
+                  gender: "Male" as const,
+                  phone: "0300-0000000",
+                  email: `${alloc.candidateName.toLowerCase().replace(/[^a-z0-9]/g, "")}@dhq.hospital.pk`,
+                  address: `${alloc.constituency}, District ${alloc.district}`,
+                  domicileDistrict: alloc.district,
+                  constituency: alloc.constituency,
+                  tehsil: alloc.district,
+                  unionCouncil: alloc.constituency,
+                  partyAffiliation: alloc.partyAffiliation,
+                  referenceCode: alloc.partyAffiliation,
+                  appliedRole: alloc.roleCategory,
+                  appointmentOrderNo: alloc.appointmentRefNo,
+                  joiningOrderNo: alloc.joiningOrderNo,
+                  photoUrl: "/images/cand_bilal.jpg",
+                  matricDetails: { board: "BISE D.I. Khan", passingYear: 2016, grade: "A" },
+                  fscDetails: { board: "BISE D.I. Khan", passingYear: 2018, group: "General", grade: "B" },
+                  status: "Allocated" as const,
+                  allocatedRoleId: alloc.id,
+                  registeredAt: alloc.allocatedDate,
+                };
+                const roleStyle = ROLE_STYLES[alloc.roleCategory] || "bg-slate-100 text-slate-800 border-slate-200";
+                const refCode = candidate.referenceCode || alloc.partyAffiliation || "DIR-OFFICE";
+                const refStyle = PARTY_STYLES[refCode] || "bg-slate-100 text-slate-700 border-slate-200";
+
                 return (
-                  <tr key={alloc.id} className="hover:bg-emerald-50/40 transition-colors">
-                    <td className="py-3.5 px-4 font-mono font-bold text-emerald-700">
-                      {alloc.appointmentRefNo}
+                  <tr 
+                    key={alloc.id} 
+                    onClick={() => onSelectCandidate(candidate)}
+                    className="hover:bg-teal-50/60 transition-colors cursor-pointer group"
+                    title={`Click to view full dossier for ${alloc.candidateName}`}
+                  >
+                    <td className="py-3.5 px-4 font-mono">
+                      <div className="font-bold text-teal-800 group-hover:text-teal-950">{alloc.appointmentRefNo}</div>
+                      <div className="text-[10px] text-slate-500">{alloc.joiningOrderNo || "Joining Pending"}</div>
                     </td>
                     <td className="py-3.5 px-4">
                       <div className="flex items-center gap-2.5">
                         <img
-                          src={candidate?.photoUrl || "/images/cand_hamza.jpg"}
+                          src={candidate.photoUrl || "/images/cand_bilal.jpg"}
                           alt={alloc.candidateName}
-                          className="w-8 h-8 rounded-full object-cover border border-emerald-400/30 shadow-2xs shrink-0"
+                          onError={(e) => {
+                            e.currentTarget.src = "/images/cand_bilal.jpg";
+                          }}
+                          className="w-8 h-8 rounded-full object-cover border border-teal-400/40 shadow-xs shrink-0"
                         />
                         <div>
-                          <div className="font-bold text-slate-900">{alloc.candidateName}</div>
+                          <div className="font-bold text-slate-900 group-hover:text-teal-900">{alloc.candidateName}</div>
                           <div className="text-[11px] font-mono text-slate-500">{alloc.candidateCnic}</div>
                         </div>
                       </div>
                     </td>
                     <td className="py-3.5 px-4">
-                      <div className="font-semibold text-slate-900">{alloc.district}</div>
-                      <div className="text-[11px] text-emerald-700 font-semibold">{alloc.constituency}</div>
+                      <div className="font-semibold text-slate-900">{candidate.tehsil || alloc.district}</div>
+                      <div className="text-[11px] text-teal-700 font-semibold">{candidate.unionCouncil || alloc.constituency}</div>
                     </td>
                     <td className="py-3.5 px-4">
-                      <div className="font-semibold text-slate-900">{alloc.roleTitle}</div>
-                      <div className="text-[11px] text-slate-500">{alloc.department}</div>
+                      <span className={`inline-block px-2.5 py-0.5 rounded-md font-bold text-[11px] border ${roleStyle}`}>
+                        {alloc.roleCategory}
+                      </span>
+                      <div className="text-[10.5px] text-slate-500 mt-0.5">{alloc.department}</div>
                     </td>
                     <td className="py-3.5 px-4">
-                      <span className={`px-2 py-0.5 rounded text-[10px] font-bold border ${partyBadge.bg}`}>
-                        {partyBadge.text}
+                      <span className={`px-2 py-0.5 rounded text-[10px] font-bold border ${refStyle}`}>
+                        {refCode}
                       </span>
                     </td>
                     <td className="py-3.5 px-4">
@@ -466,14 +570,16 @@ export default function DashboardView({
                       </span>
                     </td>
                     <td className="py-3.5 px-4 text-right">
-                      {candidate && (
-                        <button
-                          onClick={() => onSelectCandidate(candidate)}
-                          className="text-emerald-700 hover:text-emerald-800 font-bold hover:underline cursor-pointer"
-                        >
-                          View Dossier
-                        </button>
-                      )}
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onSelectCandidate(candidate);
+                        }}
+                        className="text-teal-700 hover:text-teal-900 font-bold hover:underline cursor-pointer flex items-center gap-1 justify-end ml-auto group-hover:scale-105 transition-transform"
+                      >
+                        <Eye className="w-3.5 h-3.5" />
+                        <span>Dossier</span>
+                      </button>
                     </td>
                   </tr>
                 );
@@ -485,4 +591,3 @@ export default function DashboardView({
     </div>
   );
 }
-

@@ -71,33 +71,33 @@ export default function DashboardTopBar({
 
   return (
     <header className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200 print:hidden">
-      {/* Utility bar */}
-      <div className="hidden sm:flex bg-white text-slate-500 text-[11px] py-1.5 px-4 lg:px-6 items-center justify-between border-b border-slate-100">
+      {/* Utility bar — Dark Green UI */}
+      <div className="hidden sm:flex bg-[#072418] text-emerald-200/80 text-[11px] py-1.5 px-4 lg:px-6 items-center justify-between border-b border-[#0d3b28]">
         <div className="flex items-center gap-2 min-w-0">
-          <span className="w-2 h-2 rounded-full bg-emerald-500" />
-          <span className="font-semibold text-slate-700 tracking-wide truncate">
-            GOVERNMENT OF PAKISTAN • INTERNAL HR SYSTEM PORTAL
+          <span className="w-2 h-2 rounded-full bg-[#10b981] animate-pulse" />
+          <span className="font-bold text-white tracking-wide truncate">
+            GOVERNMENT OF KHYBER PAKHTUNKHWA • DHQ HOSPITAL HR SYSTEM
           </span>
-          <span className="text-slate-300">|</span>
+          <span className="text-emerald-500/40">|</span>
           <span className="truncate">
-            Signed in: <strong className="text-slate-700">{user.name}</strong> ({user.role})
+            Signed in: <strong className="text-white">{user.name}</strong> ({user.role})
           </span>
         </div>
 
         <div className="flex items-center gap-3 shrink-0">
           <button
             onClick={onOpenSwitchRole}
-            className="flex items-center gap-1 text-emerald-700 hover:text-emerald-800 font-semibold cursor-pointer"
+            className="flex items-center gap-1 text-[#10b981] hover:text-white font-bold cursor-pointer"
           >
-            <Sparkles className="w-3 h-3" />
+            <Sparkles className="w-3 h-3 text-[#10b981]" />
             <span>Switch Role</span>
           </button>
-          <span className="text-slate-300">•</span>
+          <span className="text-emerald-500/40">•</span>
           <button
             onClick={onGoToLandingPage}
-            className="flex items-center gap-1 text-slate-500 hover:text-slate-800 cursor-pointer"
+            className="flex items-center gap-1 text-emerald-200/80 hover:text-white cursor-pointer font-medium"
           >
-            <Globe2 className="w-3 h-3 text-emerald-600" />
+            <Globe2 className="w-3 h-3 text-[#10b981]" />
             <span>Landing Page</span>
           </button>
         </div>

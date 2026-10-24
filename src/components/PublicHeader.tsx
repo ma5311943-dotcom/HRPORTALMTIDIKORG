@@ -23,37 +23,37 @@ export default function PublicHeader({ activePage = "home" }: PublicHeaderProps)
 
   return (
     <>
-      <div className="bg-pak-900 text-white">
+      <div className="bg-[#072418] text-white border-b border-[#0d3b28]">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-1.5 sm:px-6 lg:px-8">
           <div className="flex min-w-0 items-center gap-2">
             <img
               src="/images/state_emblem.jpg"
               alt="State Emblem of Pakistan"
-              className="h-4 w-4 shrink-0 rounded-full border border-white/30 object-cover"
+              className="h-4 w-4 shrink-0 rounded-full border border-[#1b5e3f] object-cover"
             />
-            <span className="truncate text-[10px] font-semibold tracking-wide text-white/90 sm:text-[11px]">
-              GOVERNMENT OF PAKISTAN • CONSTITUENCY ADMINISTRATION SYSTEM
+            <span className="truncate text-[10px] font-bold tracking-wide text-white sm:text-[11px]">
+              GOVERNMENT OF KHYBER PAKHTUNKHWA • HEALTH DEPARTMENT
             </span>
-            <span className="hidden text-white/30 xl:inline">•</span>
-            <span className="hidden text-[11px] text-white/60 xl:inline">
-              Islamic Republic of Pakistan
+            <span className="hidden text-emerald-600 xl:inline">•</span>
+            <span className="hidden text-[11px] text-emerald-200/80 xl:inline">
+              DHQ Teaching Hospital D.I. Khan
             </span>
           </div>
 
           <div className="flex shrink-0 items-center gap-3 font-mono text-[10px] sm:text-[11px]">
             <div className="flex items-center gap-1.5 text-emerald-200">
-              <ShieldCheck className="h-3.5 w-3.5 shrink-0 text-emerald-300" />
-              <span className="hidden sm:inline">ECP &amp; NADRA Integrated</span>
+              <ShieldCheck className="h-3.5 w-3.5 shrink-0 text-[#10b981]" />
+              <span className="hidden sm:inline">DHQ Hospital Recruitment</span>
             </div>
-            <span className="hidden text-white/20 sm:inline">|</span>
-            <span className="hidden text-white/60 md:inline">Official 2026 Portal</span>
+            <span className="hidden text-emerald-700 sm:inline">|</span>
+            <span className="hidden text-emerald-300/70 md:inline">Session 2026</span>
           </div>
         </div>
       </div>
 
       <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/95 shadow-sm backdrop-blur-md">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-2.5 sm:px-6 lg:px-8">
-          <Link href="/" className="group flex shrink-0 items-center gap-2.5" aria-label="Internal HR System home">
+          <Link href="/" className="group flex shrink-0 items-center gap-2.5" aria-label="DHQ Hospital HR Home">
             <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
               <img
                 src="/images/state_emblem.jpg"
@@ -64,14 +64,14 @@ export default function PublicHeader({ activePage = "home" }: PublicHeaderProps)
             <div>
               <div className="flex items-center gap-1.5">
                 <span className="text-sm font-bold tracking-tight text-slate-900 transition-colors group-hover:text-emerald-800 sm:text-lg">
-                  Internal HR <span className="text-emerald-700">System</span>
+                  DHQ Hospital <span className="text-emerald-700">HR</span>
                 </span>
                 <span className="hidden rounded-full border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wide text-emerald-800 sm:inline-block">
-                  Official
+                  D.I. Khan
                 </span>
               </div>
               <p className="hidden text-[11px] font-medium leading-none text-slate-500 md:block">
-                Constituency Human Resources &amp; Analytics
+                Teaching Hospital Staff Recruitment &amp; Management Portal
               </p>
             </div>
           </Link>
@@ -94,24 +94,24 @@ export default function PublicHeader({ activePage = "home" }: PublicHeaderProps)
           <div className="flex shrink-0 items-center gap-2">
             <Link
               href="/signup"
-              className={`hidden items-center gap-1.5 whitespace-nowrap rounded-xl border px-3 py-2 text-xs font-semibold transition-all sm:inline-flex ${
+              className={`hidden items-center gap-1.5 whitespace-nowrap rounded-xl border px-3.5 py-2 text-xs font-bold transition-all sm:inline-flex ${
                 activePage === "signup"
-                  ? "border-emerald-800 bg-emerald-700 text-white shadow-sm"
-                  : "border-emerald-200 bg-white text-emerald-800 hover:border-emerald-400 hover:bg-emerald-50"
+                  ? "border-[#1b5e3f] bg-[#072418] text-white shadow-sm"
+                  : "border-slate-200 bg-white text-slate-700 hover:border-[#10b981] hover:bg-emerald-50"
               }`}
             >
-              <UserPlus className="h-3.5 w-3.5" />
+              <UserPlus className="h-3.5 w-3.5 text-emerald-600" />
               <span>Register</span>
             </Link>
             <Link
               href="/login"
-              className={`inline-flex items-center gap-1.5 whitespace-nowrap rounded-xl px-3.5 py-2 text-xs font-bold shadow-sm transition-all hover:shadow-md ${
+              className={`inline-flex items-center gap-1.5 whitespace-nowrap rounded-xl px-4 py-2 text-xs font-bold shadow-md transition-all hover:scale-[1.02] ${
                 activePage === "login"
-                  ? "bg-emerald-800 text-white"
-                  : "bg-emerald-700 text-white hover:bg-emerald-800"
+                  ? "bg-[#10b981] text-[#052e16] font-black"
+                  : "bg-[#072418] hover:bg-[#10b981] text-white hover:text-[#052e16] border border-[#1b5e3f]"
               }`}
             >
-              <Lock className="h-3.5 w-3.5 text-white/80" />
+              <Lock className="h-3.5 w-3.5" />
               <span>Sign In</span>
             </Link>
 

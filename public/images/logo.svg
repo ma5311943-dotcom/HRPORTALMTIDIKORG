@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img" aria-label="Shuhada-e-Derajat Family Healthcare Initiative">
+  <defs>
+    <linearGradient id="ds-green" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#046a38"/>
+      <stop offset="1" stop-color="#01411c"/>
+    </linearGradient>
+    <linearGradient id="ds-gold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#fde68a"/>
+      <stop offset="0.5" stop-color="#eab308"/>
+      <stop offset="1" stop-color="#a16207"/>
+    </linearGradient>
+  </defs>
+  <circle cx="100" cy="100" r="96" fill="#ffffff" stroke="url(#ds-gold)" stroke-width="6"/>
+  <circle cx="100" cy="100" r="88" fill="url(#ds-green)"/>
+  <circle cx="100" cy="100" r="68" fill="#013817" stroke="url(#ds-gold)" stroke-width="2.5"/>
+  <!-- Crescent -->
+  <path d="M118 52 A46 46 0 1 0 118 148 A38 38 0 1 1 118 52 Z" fill="#ffffff"/>
+  <!-- Star -->
+  <polygon points="132,84 136.5,96.5 150,96.5 139,104.5 143,117 132,109.5 121,117 125,104.5 114,96.5 127.5,96.5" fill="#ffffff"/>
+  <!-- Care cross badge -->
+  <circle cx="100" cy="150" r="12" fill="#b91c1c" stroke="url(#ds-gold)" stroke-width="2"/>
+  <path d="M93 150 H107 M100 143 V157" stroke="#ffffff" stroke-width="4" stroke-linecap="round"/>
+  <!-- Laurels -->
+  <path d="M36 104 C34 130 52 154 76 164" fill="none" stroke="url(#ds-gold)" stroke-width="3" stroke-linecap="round"/>
+  <path d="M164 104 C166 130 148 154 124 164" fill="none" stroke="url(#ds-gold)" stroke-width="3" stroke-linecap="round"/>
+</svg>

@@ -51,9 +51,9 @@ export default function SeatAllocationView({
   const [selectedCandidateId, setSelectedCandidateId] = useState<string>(
     preSelectedCandidate?.id || ""
   );
-  const [roleCategory, setRoleCategory] = useState<RoleCategory>("Councilor");
+  const [roleCategory, setRoleCategory] = useState<RoleCategory>("Ward Boy");
   const [roleTitle, setRoleTitle] = useState("");
-  const [department, setDepartment] = useState("Local Government & Community Development");
+  const [department, setDepartment] = useState("DHQ Teaching Hospital D.I. Khan");
   const [district, setDistrict] = useState<string>(preSelectedCandidate?.domicileDistrict || districts[0]?.name || "Lahore");
   const [constituency, setConstituency] = useState<string>(preSelectedCandidate?.constituency || "NA-117");
   const [tenureMonths, setTenureMonths] = useState<number>(24);
@@ -215,27 +215,44 @@ export default function SeatAllocationView({
 
   return (
     <div className="space-y-6">
-      {/* Top Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-4 border-b border-slate-200 gap-4">
-        <div>
-          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 flex items-center gap-2">
-            <Award className="w-6 h-6 text-emerald-700" />
-            Political System & Regional Seat Allocation
-          </h2>
-          <p className="text-xs text-slate-500">
-            Systematic appointment tracking, role allocation logic, and duplicate assignment prevention
-          </p>
+      {/* Top Header with Visual Staff Allocation Imagery */}
+      <div className="relative overflow-hidden rounded-2xl border border-teal-900/40 p-6 text-white shadow-lg">
+        {/* Background Image with Light Green & Emerald Overlay */}
+        <div className="absolute inset-0 z-0">
+          <img
+            src="/images/tab_seat_allocation.jpg"
+            alt="Seat and Staff Allocation"
+            className="h-full w-full object-cover object-center filter brightness-[0.28] contrast-[1.1]"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-teal-950/95 via-emerald-950/85 to-slate-950/90 mix-blend-multiply" />
+          <div className="absolute inset-0 bg-teal-500/15" />
         </div>
 
-        {canAllocateSeats && (
-          <button
-            onClick={() => setShowAllocateModal(true)}
-            className="flex items-center gap-2 bg-emerald-700 hover:bg-emerald-800 text-white px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold shadow-md transition-all cursor-pointer self-start sm:self-auto"
-          >
-            <Sparkles className="w-4 h-4 text-[#c5a059]" />
-            <span>+ Allocate Seat / Job</span>
-          </button>
-        )}
+        <div className="relative z-10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[11px] font-semibold text-emerald-100 backdrop-blur-sm mb-2">
+              <span className="h-2 w-2 rounded-full bg-cyan-400 animate-pulse" />
+              <span>Hospital Director Executive Orders • Appointment Division</span>
+            </div>
+            <h2 className="text-xl sm:text-2xl font-extrabold text-white flex items-center gap-2">
+              <Award className="w-6 h-6 text-cyan-300" />
+              DHQ Hospital Staff — Appointment &amp; Job Allocation
+            </h2>
+            <p className="text-xs text-teal-100/80 mt-1 max-w-xl">
+              Issue verified appointment &amp; joining order numbers, allocate official DHQ designations, and enforce strict duplicate prevention.
+            </p>
+          </div>
+
+          {canAllocateSeats && (
+            <button
+              onClick={() => setShowAllocateModal(true)}
+              className="flex shrink-0 items-center gap-2 bg-cyan-500 hover:bg-cyan-400 text-slate-950 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold shadow-md transition-all cursor-pointer self-start sm:self-auto hover:scale-[1.02]"
+            >
+              <Sparkles className="w-4 h-4 text-slate-950" />
+              <span>+ Allocate Seat / Job</span>
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Allocation Modal Form */}
@@ -252,7 +269,7 @@ export default function SeatAllocationView({
               <div className="min-w-0">
                 <h3 className="text-sm sm:text-base font-bold text-slate-900">New Official Seat / Job Allocation</h3>
                 <p className="text-[11px] text-slate-500">
-                  Assign verified candidates to legislative, municipal, or administration positions
+                  Assign verified applicants to DHQ hospital staff positions
                 </p>
               </div>
               <button
@@ -315,14 +332,15 @@ export default function SeatAllocationView({
                     onChange={(e) => setRoleCategory(e.target.value as RoleCategory)}
                     className="w-full text-xs p-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none font-bold text-slate-800"
                   >
-                    <option value="MNA">MNA (Member National Assembly)</option>
-                    <option value="MPA">MPA (Member Provincial Assembly)</option>
-                    <option value="District Chairperson">District Chairperson</option>
-                    <option value="Union Council Chairman">Union Council Chairman</option>
-                    <option value="Councilor">Municipal / Ward Councilor</option>
-                    <option value="Civil Administration Officer">Civil Administration Officer</option>
-                    <option value="Committee Head">Constituency Committee Head</option>
-                    <option value="Public Sector Staff">Public Sector Staff / Trainee</option>
+                    <option value="Ward Boy">Ward Boy</option>
+                    <option value="Helper Boy">Helper Boy</option>
+                    <option value="Stretcher Puller">Stretcher Puller</option>
+                    <option value="Security Guard">Security Guard</option>
+                    <option value="Male Ward Attendant">Male Ward Attendant</option>
+                    <option value="Female Ward Attendant">Female Ward Attendant</option>
+                    <option value="Junior Clerk">Junior Clerk</option>
+                    <option value="Reception">Reception</option>
+                    <option value="Computer Operator">Computer Operator</option>
                   </select>
                 </div>
 
@@ -333,7 +351,7 @@ export default function SeatAllocationView({
                   <input
                     type="text"
                     required
-                    placeholder="e.g. UC Chairman Ward 12 / Youth Coordinator"
+                    placeholder="e.g. Ward Boy Grade-I / Senior Computer Operator"
                     value={roleTitle}
                     onChange={(e) => setRoleTitle(e.target.value)}
                     className="w-full text-xs p-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none"

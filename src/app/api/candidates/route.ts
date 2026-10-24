@@ -17,15 +17,16 @@ const VALID_STATUSES: CandidateStatus[] = [
   "Under Review",
 ];
 const VALID_PARTIES: PoliticalParty[] = [
-  "PTI",
-  "PMLN",
-  "PPP",
-  "JUI-F",
-  "MQM-P",
-  "JI",
-  "ANP",
-  "TLP",
-  "Independent",
+  "DIR-OFFICE",
+  "REF-NA-01",
+  "REF-NA-02",
+  "REF-PA-01",
+  "REF-PA-02",
+  "REF-DIST-01",
+  "REF-NZM-01",
+  "REF-NZM-02",
+  "MERIT-OPEN",
+  "DEPT-DIRECT",
 ];
 
 function asString(value: unknown, fallback = ""): string {
@@ -141,28 +142,29 @@ export async function POST(req: NextRequest) {
       typeof body.partyAffiliation === "string" &&
       VALID_PARTIES.includes(body.partyAffiliation as PoliticalParty)
         ? (body.partyAffiliation as PoliticalParty)
-        : "Independent";
+        : "DIR-OFFICE";
 
-    const email = asString(body.email) || `${rawCnic}@candidates.internalhr.gov.pk`;
+    const email = asString(body.email) || `${rawCnic}@dhq.hospital.pk`;
     const requestedPhotoUrl = asString(body.photoUrl);
     const photoUrl =
       requestedPhotoUrl.startsWith("/") && !requestedPhotoUrl.startsWith("//")
         ? requestedPhotoUrl
-        : "/images/candidate_portrait.jpg";
+        : "/images/cand_bilal.jpg";
     const matricDetails =
       body.matricDetails && typeof body.matricDetails === "object"
         ? (body.matricDetails as Candidate["matricDetails"])
-        : { board: "Not Provided", passingYear: 0, grade: "N/A" };
+        : { board: "BISE D.I. Khan", passingYear: 2020, grade: "A" };
     const fscDetails =
       body.fscDetails && typeof body.fscDetails === "object"
         ? (body.fscDetails as Candidate["fscDetails"])
-        : { board: "Not Provided", passingYear: 0, group: "N/A", grade: "N/A" };
+        : { board: "BISE D.I. Khan", passingYear: 2022, group: "General", grade: "B" };
 
     const newCandidate = await db.createCandidate({
       fullName,
       fatherName: asString(body.fatherName, "Not Specified"),
       cnic,
-      dob: asString(body.dob),
+      fatherCnic: asString(body.fatherCnic) || undefined,
+      dob: asString(body.dob, "1998-05-15"),
       gender:
         body.gender === "Female" || body.gender === "Other"
           ? body.gender
@@ -171,12 +173,18 @@ export async function POST(req: NextRequest) {
       email,
       address:
         asString(body.address) ||
-        `${asString(body.tehsil, "Urban Center")}, ${domicileDistrict}`,
+        `${asString(body.tehsil, "Dera")}, Dera Ismail Khan`,
       domicileDistrict,
       constituency,
-      tehsil: asString(body.tehsil, "Urban Center"),
+      tehsil: asString(body.tehsil, "Dera"),
       unionCouncil: asString(body.unionCouncil) || undefined,
       partyAffiliation: party,
+      referenceCode: asString(body.referenceCode) || party,
+      appliedRole: asString(body.appliedRole) as any || undefined,
+      appointmentOrderNo: asString(body.appointmentOrderNo) || undefined,
+      joiningOrderNo: asString(body.joiningOrderNo) || undefined,
+      cnicFrontUrl: asString(body.cnicFrontUrl) || undefined,
+      cnicBackUrl: asString(body.cnicBackUrl) || undefined,
       photoUrl,
       matricDetails,
       fscDetails,

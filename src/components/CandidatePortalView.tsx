@@ -67,9 +67,20 @@ export default function CandidatePortalView({
 
   return (
     <div className="space-y-5">
-      <section className="bg-flag-green relative overflow-hidden rounded-2xl p-5 text-white shadow-sm sm:p-6">
-        <div className="pointer-events-none absolute -right-16 -top-16 h-52 w-52 rounded-full border border-white/10" />
-        <div className="relative flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+      <section className="relative overflow-hidden rounded-2xl p-5 text-white shadow-sm sm:p-6">
+        {/* Background Image with light green overlay */}
+        <div className="absolute inset-0 z-0">
+          <img
+            src="/images/hero_dashboard_banner.jpg"
+            alt="DHQ Hospital Portal"
+            className="h-full w-full object-cover object-center filter brightness-[0.35]"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-emerald-950/90 via-teal-900/85 to-slate-950/90 mix-blend-multiply" />
+          <div className="absolute inset-0 bg-emerald-600/15" />
+        </div>
+
+        <div className="pointer-events-none absolute -right-16 -top-16 z-0 h-52 w-52 rounded-full border border-white/10" />
+        <div className="relative z-10 flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-4">
             <img
               src={candidate.photoUrl || "/images/candidate_portrait.jpg"}

@@ -123,29 +123,41 @@ export default function LandingPage({
     <div className="min-h-screen bg-[#f7f8f6] font-sans text-slate-900">
       <PublicHeader activePage="home" />
 
-      {/* HERO — deep green field with white typography, echoing the national flag */}
-      <section id="overview" className="bg-flag-green relative overflow-hidden text-white">
-        <div className="pointer-events-none absolute -right-24 -top-24 h-96 w-96 rounded-full border border-white/10" />
-        <div className="pointer-events-none absolute -right-10 top-10 h-64 w-64 rounded-full border border-white/10" />
-        <div className="pointer-events-none absolute bottom-0 left-0 h-72 w-72 rounded-full bg-white/5 blur-3xl" />
+      {/* HERO — Pure Dark Green & Hospital Imagery (Dribbble Forest Green #072418) */}
+      <section id="overview" className="relative overflow-hidden bg-[#072418] text-white">
+        {/* Background image + true dark-green depth gradient */}
+        <div className="absolute inset-0 z-0">
+          <img
+            src="/images/landing_hero_governance.jpg"
+            alt="DHQ Hospital"
+            className="h-full w-full object-cover object-center filter brightness-[0.45] contrast-[1.05]"
+          />
+          {/* Pure dark-green vignette: #051c13 on edges, #072418 in center, zero blue */}
+          <div className="absolute inset-0 bg-gradient-to-r from-[#051c13]/95 via-[#072418]/85 to-[#0b3824]/90" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#10b981]/20 via-transparent to-black/50" />
+        </div>
 
-        <div className="relative mx-auto max-w-7xl px-4 py-12 sm:px-6 sm:py-16 lg:px-8 lg:py-20">
+        {/* decorative ambient glow & subtle rings */}
+        <div className="pointer-events-none absolute -right-24 -top-24 z-0 h-96 w-96 rounded-full border border-[#1b5e3f]/40" />
+        <div className="pointer-events-none absolute bottom-0 left-0 z-0 h-72 w-72 rounded-full bg-[#10b981]/15 blur-3xl" />
+
+        <div className="relative z-10 mx-auto max-w-7xl px-4 py-12 sm:px-6 sm:py-16 lg:px-8 lg:py-20">
           <div className="grid grid-cols-1 items-center gap-10 lg:grid-cols-12 lg:gap-12">
             <div className="space-y-5 text-center lg:col-span-7 lg:text-left">
               <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3.5 py-1.5 text-[11px] font-semibold text-emerald-50 backdrop-blur-sm">
                 <span className="h-2 w-2 animate-pulse rounded-full bg-pak-gold" />
-                <span>Constituency Human Capital Framework • Pakistan 2026</span>
+                <span>DHQ Teaching Hospital D.I. Khan • Staff Recruitment 2026</span>
               </div>
 
               <h1 className="text-3xl font-bold leading-tight tracking-tight text-white sm:text-4xl lg:text-[2.9rem] xl:text-5xl">
-                Constituency Human Capital,
-                <span className="block text-pak-gold-soft">Verified &amp; Delivered.</span>
+                DHQ Hospital Staff Recruitment,
+                <span className="block text-pak-gold-soft">Verified &amp; Transparent.</span>
               </h1>
 
               <p className="mx-auto max-w-2xl text-sm leading-relaxed text-emerald-50/85 sm:text-base lg:mx-0">
-                A unified sovereign portal connecting National Assembly constituencies, NADRA CNIC
-                verification, district employment quotas, and official Gazette appointment
-                notifications.
+                Official centralized recruitment system for 9 DHQ staff categories across 5 D.I. Khan tehsils:
+                <strong> Daraban, Kulachi, Paharpur, Dera, and Parova</strong>. Featuring NADRA verification,
+                Hospital Director appointment orders, and zero political plain text.
               </p>
 
               <div className="flex flex-col items-center justify-center gap-2.5 pt-2 sm:flex-row lg:justify-start">
@@ -261,50 +273,50 @@ export default function LandingPage({
             </div>
           </div>
 
-          {/* Live metrics */}
+          {/* Live metrics — Dark Green Glassmorphic Balance (#072418, zero blue) */}
           <div className="mx-auto mt-10 grid max-w-5xl grid-cols-2 gap-3 sm:mt-14 sm:gap-4 md:grid-cols-4">
-            <div className="rounded-2xl border border-white/20 bg-white p-4 text-center shadow-sm sm:p-5">
-              <div className="text-2xl font-bold text-emerald-800 sm:text-3xl">
+            <div className="rounded-2xl border border-[#1b5e3f] bg-[#072418]/95 backdrop-blur-md p-4 text-center shadow-xl transition-all hover:border-[#10b981] sm:p-5">
+              <div className="text-2xl font-black text-[#10b981] sm:text-3xl">
                 {stats.totalCandidates}+
               </div>
-              <div className="mt-1 text-[10px] font-semibold uppercase tracking-wider text-slate-600 sm:text-xs">
+              <div className="mt-1 text-[10px] font-bold uppercase tracking-wider text-emerald-100 sm:text-xs">
                 Candidates Registered
               </div>
-              <div className="mt-0.5 text-[10px] font-medium text-slate-500">
+              <div className="mt-0.5 text-[10px] font-medium text-emerald-300/70">
                 {totalVerified} NADRA-Verified
               </div>
             </div>
 
-            <div className="rounded-2xl border border-white/20 bg-white p-4 text-center shadow-sm sm:p-5">
-              <div className="text-2xl font-bold text-emerald-800 sm:text-3xl">
+            <div className="rounded-2xl border border-[#1b5e3f] bg-[#072418]/95 backdrop-blur-md p-4 text-center shadow-xl transition-all hover:border-[#10b981] sm:p-5">
+              <div className="text-2xl font-black text-emerald-300 sm:text-3xl">
                 {districts.length}
               </div>
-              <div className="mt-1 text-[10px] font-semibold uppercase tracking-wider text-slate-600 sm:text-xs">
+              <div className="mt-1 text-[10px] font-bold uppercase tracking-wider text-emerald-100 sm:text-xs">
                 Districts Covered
               </div>
-              <div className="mt-0.5 text-[10px] font-medium text-slate-500">
+              <div className="mt-0.5 text-[10px] font-medium text-emerald-300/70">
                 All 4 Provinces + ICT
               </div>
             </div>
 
-            <div className="rounded-2xl border border-white/20 bg-white p-4 text-center shadow-sm sm:p-5">
-              <div className="text-2xl font-bold text-amber-700 sm:text-3xl">{totalAllocated}</div>
-              <div className="mt-1 text-[10px] font-semibold uppercase tracking-wider text-slate-600 sm:text-xs">
+            <div className="rounded-2xl border border-[#1b5e3f] bg-[#072418]/95 backdrop-blur-md p-4 text-center shadow-xl transition-all hover:border-amber-400 sm:p-5">
+              <div className="text-2xl font-black text-amber-400 sm:text-3xl">{totalAllocated}</div>
+              <div className="mt-1 text-[10px] font-bold uppercase tracking-wider text-emerald-100 sm:text-xs">
                 Official Allocations
               </div>
-              <div className="mt-0.5 text-[10px] font-medium text-slate-500">
+              <div className="mt-0.5 text-[10px] font-medium text-amber-200/70">
                 Active Gazette Appointments
               </div>
             </div>
 
-            <div className="rounded-2xl border border-white/20 bg-white p-4 text-center shadow-sm sm:p-5">
-              <div className="text-2xl font-bold text-emerald-800 sm:text-3xl">
+            <div className="rounded-2xl border border-[#1b5e3f] bg-[#072418]/95 backdrop-blur-md p-4 text-center shadow-xl transition-all hover:border-[#10b981] sm:p-5">
+              <div className="text-2xl font-black text-[#10b981] sm:text-3xl">
                 {quotaAlignment}%
               </div>
-              <div className="mt-1 text-[10px] font-semibold uppercase tracking-wider text-slate-600 sm:text-xs">
+              <div className="mt-1 text-[10px] font-bold uppercase tracking-wider text-emerald-100 sm:text-xs">
                 Quota Alignment
               </div>
-              <div className="mt-0.5 text-[10px] font-medium text-slate-500">
+              <div className="mt-0.5 text-[10px] font-medium text-emerald-300/70">
                 Merit-Compliant Allocation
               </div>
             </div>
@@ -498,40 +510,43 @@ export default function LandingPage({
         </div>
       </section>
 
-      {/* ROLE PORTALS */}
-      <section id="roles" className="border-b border-slate-200 bg-[#f7f8f6] py-16 sm:py-20">
+      {/* ROLE PORTALS — Sophisticated Dark Green & Neutral Harmonized Section */}
+      <section id="roles" className="border-b border-emerald-100/80 bg-[#f4f7f4] py-16 sm:py-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mx-auto mb-10 max-w-3xl text-center sm:mb-12">
-            <span className="rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-[11px] font-semibold uppercase tracking-wider text-emerald-800">
+            <span className="rounded-full border border-emerald-200 bg-emerald-100/60 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-emerald-900">
               Constitutional Hierarchy
             </span>
-            <h2 className="mt-3 text-2xl font-bold tracking-tight text-slate-900 sm:text-4xl">
+            <h2 className="mt-3 text-2xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">
               Role-Based Portals &amp; Access Points
             </h2>
             <p className="mt-2 text-sm text-slate-600">
-              Every parliamentary and civil administrative role has dedicated credentials and
+              Every hospital governance and civil administrative role has dedicated credentials and
               tailored authorizations.
               <br className="hidden sm:block" />
-              <span className="mt-1 inline-block rounded-lg bg-white px-2 py-1 font-mono text-[11px] font-semibold text-emerald-800 ring-1 ring-slate-200">
+              <span className="mt-1 inline-block rounded-lg bg-emerald-50 px-2.5 py-1 font-mono text-[11px] font-bold text-emerald-900 ring-1 ring-emerald-200">
                 Demo rule: enter the role key as both username and password
               </span>
             </p>
           </div>
 
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {Object.entries(ROLE_PRESETS).map(([key, preset]) => (
               <div
                 key={key}
-                className="group relative flex flex-col justify-between overflow-hidden rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:border-emerald-300 hover:shadow-lg"
+                className="group relative flex flex-col justify-between overflow-hidden rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm transition-all hover:-translate-y-1 hover:border-emerald-500/50 hover:shadow-xl"
               >
+                {/* Top decorative contrast strip */}
+                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-600 via-teal-500 to-emerald-400" />
+
                 <div>
                   <div className="mb-3 flex items-center justify-between gap-2">
                     <span
-                      className={`truncate rounded px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider ${preset.badgeColor}`}
+                      className={`truncate rounded-md px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${preset.badgeColor}`}
                     >
                       {preset.badge}
                     </span>
-                    <span className="shrink-0 rounded border border-slate-200 bg-slate-50 px-2 py-0.5 font-mono text-[10px] font-semibold text-slate-500">
+                    <span className="shrink-0 rounded-md border border-[#1b5e3f] bg-[#072418] px-2 py-0.5 font-mono text-[10px] font-bold text-[#10b981]">
                       {key}
                     </span>
                   </div>
@@ -554,14 +569,14 @@ export default function LandingPage({
                     {preset.description}
                   </p>
 
-                  <div className="mb-4 space-y-1 rounded-xl border border-slate-200 bg-slate-50 p-2.5 font-mono text-[11px]">
+                  <div className="mb-4 space-y-1 rounded-xl border border-slate-200/90 bg-emerald-50/40 p-2.5 font-mono text-[11px]">
                     <div className="flex justify-between gap-2 text-slate-500">
                       <span>User / Email</span>
-                      <strong className="truncate text-slate-700">{key}</strong>
+                      <strong className="truncate text-slate-800">{key}</strong>
                     </div>
                     <div className="flex justify-between gap-2 text-slate-500">
                       <span>Password</span>
-                      <strong className="truncate text-slate-700">{key}</strong>
+                      <strong className="truncate text-slate-800">{key}</strong>
                     </div>
                   </div>
                 </div>
@@ -573,15 +588,15 @@ export default function LandingPage({
                       e.preventDefault();
                       onOpenLogin(key);
                     }}
-                    className="flex w-full items-center justify-center gap-1.5 rounded-xl bg-emerald-700 py-2 text-xs font-bold text-white shadow-sm transition-all hover:bg-emerald-800"
+                    className="flex w-full items-center justify-center gap-1.5 rounded-xl bg-[#072418] hover:bg-[#10b981] text-white hover:text-[#052e16] py-2.5 text-xs font-bold shadow-md transition-all cursor-pointer group/btn"
                   >
                     <span>Instant Login</span>
-                    <ArrowRight className="h-3.5 w-3.5" />
+                    <ArrowRight className="h-3.5 w-3.5 text-[#10b981] group-hover/btn:text-[#052e16] group-hover/btn:translate-x-0.5 transition-all" />
                   </Link>
 
                   <Link
                     href={`/login?role=${key}`}
-                    className="w-full rounded-lg border border-slate-200 py-1.5 text-center text-xs font-semibold text-slate-600 transition-all hover:border-emerald-300 hover:bg-emerald-50 hover:text-emerald-800"
+                    className="w-full rounded-lg border border-slate-200 py-1.5 text-center text-xs font-semibold text-slate-600 transition-all hover:border-[#10b981] hover:bg-emerald-50/70 hover:text-emerald-900"
                   >
                     Open Login Portal
                   </Link>

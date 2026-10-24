@@ -55,11 +55,13 @@
 /* Universal pointer cursor for interactive elements */
 button,
 [role="button"],
+a,
 a[href],
 select,
 summary,
 label[for],
 [data-clickable="true"],
+[tabindex="0"]:not(input):not(textarea),
 input[type="submit"],
 input[type="button"],
 input[type="reset"],

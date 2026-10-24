@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Candidate, District, PoliticalParty } from "@/types";
+import { Candidate, District, PoliticalParty, RoleCategory, DHQ_STAFF_ROLES } from "@/types";
 import {
   UserPlus,
   Search,
@@ -9,6 +9,9 @@ import {
   Camera,
   Upload,
   ShieldAlert,
+  Briefcase,
+  FileText,
+  StickyNote,
 } from "lucide-react";
 import { toast } from "sonner";
 import { CANDIDATE_STATUS_STYLES, PARTY_LABELS, PARTY_STYLES } from "@/lib/ui";
@@ -42,6 +45,7 @@ export default function CandidateRegistrationView({
   const [fullName, setFullName] = useState("");
   const [fatherName, setFatherName] = useState("");
   const [cnic, setCnic] = useState("");
+  const [fatherCnic, setFatherCnic] = useState("");
   const [dob, setDob] = useState("");
   const [gender, setGender] = useState<"Male" | "Female" | "Other">("Male");
   const [phone, setPhone] = useState("");
@@ -51,21 +55,32 @@ export default function CandidateRegistrationView({
   const [constituency, setConstituency] = useState(districts[0]?.constituencies[0] || "NA-117");
   const [tehsil, setTehsil] = useState("");
   const [unionCouncil, setUnionCouncil] = useState("");
-  const [partyAffiliation, setPartyAffiliation] = useState<PoliticalParty>("PTI");
+  const [partyAffiliation, setPartyAffiliation] = useState<PoliticalParty>("MERIT-OPEN");
+  const [referenceCode, setReferenceCode] = useState("");
+  const [appliedRole, setAppliedRole] = useState<RoleCategory>("Ward Boy");
+  const [notes, setNotes] = useState("");
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
 
-  // Education Records
-  const [matricBoard, setMatricBoard] = useState("BISE Lahore");
-  const [matricYear] = useState<number>(2016);
-  const [matricGrade, setMatricGrade] = useState("A+");
-  const [matricDoc, setMatricDoc] = useState("matric_verified.pdf");
+  // CNIC Document Uploads
+  const [cnicFrontFile, setCnicFrontFile] = useState<File | null>(null);
+  const [cnicBackFile, setCnicBackFile] = useState<File | null>(null);
+  const [cnicFrontName, setCnicFrontName] = useState("");
+  const [cnicBackName, setCnicBackName] = useState("");
 
-  const [fscBoard, setFscBoard] = useState("BISE Lahore");
+  // Education Records
+  const [matricBoard, setMatricBoard] = useState("");
+  const [matricYear] = useState<number>(2016);
+  const [matricGrade, setMatricGrade] = useState("");
+  const [matricDocFile, setMatricDocFile] = useState<File | null>(null);
+  const [matricDocName, setMatricDocName] = useState("");
+
+  const [fscBoard, setFscBoard] = useState("");
   const [fscYear] = useState<number>(2018);
   const [fscGroup, setFscGroup] = useState("Pre-Engineering");
-  const [fscGrade, setFscGrade] = useState("A");
-  const [fscDoc, setFscDoc] = useState("fsc_verified.pdf");
+  const [fscGrade, setFscGrade] = useState("");
+  const [fscDocFile, setFscDocFile] = useState<File | null>(null);
+  const [fscDocName, setFscDocName] = useState("");
 
   const [higherDegree, setHigherDegree] = useState("");
   const [higherInstitute, setHigherInstitute] = useState("");
@@ -73,21 +88,44 @@ export default function CandidateRegistrationView({
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Auto-mask CNIC (XXXXX-XXXXXXX-X)
-  const handleCnicChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const digits = e.target.value.replace(/\D/g, "").slice(0, 13);
-    let formatted = digits;
-    if (digits.length > 5 && digits.length <= 12) {
-      formatted = `${digits.slice(0, 5)}-${digits.slice(5)}`;
-    } else if (digits.length > 12) {
-      formatted = `${digits.slice(0, 5)}-${digits.slice(5, 12)}-${digits.slice(12)}`;
+  const maskCnic = (raw: string) => {
+    const digits = raw.replace(/\D/g, "").slice(0, 13);
+    if (digits.length > 12) return `${digits.slice(0, 5)}-${digits.slice(5, 12)}-${digits.slice(12)}`;
+    if (digits.length > 5) return `${digits.slice(0, 5)}-${digits.slice(5)}`;
+    return digits;
+  };
+  const handleCnicChange = (e: React.ChangeEvent<HTMLInputElement>) => setCnic(maskCnic(e.target.value));
+  const handleFatherCnicChange = (e: React.ChangeEvent<HTMLInputElement>) => setFatherCnic(maskCnic(e.target.value));
+
+  // Generic doc file picker helper
+  const makeDocHandler = (
+    setFile: (f: File) => void,
+    setName: (n: string) => void,
+    label: string
+  ) => (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const allowed = ["application/pdf", "image/jpeg", "image/png", "image/webp"];
+    if (!allowed.includes(file.type)) {
+      toast.error(`${label}: unsupported format`, { description: "Upload PDF, JPG, PNG or WEBP." });
+      e.target.value = "";
+      return;
     }
-    setCnic(formatted);
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error(`${label}: file too large`, { description: "Maximum 10 MB." });
+      e.target.value = "";
+      return;
+    }
+    setFile(file);
+    setName(file.name);
+    toast.info(`${label} selected`, { description: file.name });
   };
 
   const resetForm = () => {
     setFullName("");
     setFatherName("");
     setCnic("");
+    setFatherCnic("");
     setDob("");
     setGender("Male");
     setPhone("");
@@ -97,16 +135,16 @@ export default function CandidateRegistrationView({
     setConstituency(districts[0]?.constituencies[0] || "NA-117");
     setTehsil("");
     setUnionCouncil("");
-    setPartyAffiliation("PTI");
+    setPartyAffiliation("MERIT-OPEN");
+    setReferenceCode("");
+    setAppliedRole("Ward Boy");
+    setNotes("");
     setPhotoFile(null);
     setPhotoPreview(null);
-    setMatricBoard("BISE Lahore");
-    setMatricGrade("A+");
-    setMatricDoc("matric_verified.pdf");
-    setFscBoard("BISE Lahore");
-    setFscGroup("Pre-Engineering");
-    setFscGrade("A");
-    setFscDoc("fsc_verified.pdf");
+    setCnicFrontFile(null); setCnicFrontName("");
+    setCnicBackFile(null); setCnicBackName("");
+    setMatricBoard(""); setMatricGrade(""); setMatricDocFile(null); setMatricDocName("");
+    setFscBoard(""); setFscGroup("Pre-Engineering"); setFscGrade(""); setFscDocFile(null); setFscDocName("");
     setHigherDegree("");
     setHigherInstitute("");
   };
@@ -175,29 +213,33 @@ export default function CandidateRegistrationView({
         fullName,
         fatherName,
         cnic,
+        fatherCnic: fatherCnic || undefined,
         dob: dob || "1995-01-01",
         gender,
         phone,
-        email: email || `${fullName.toLowerCase().replace(/\s+/g, ".")}@constituency.pk`,
+        email: email || `${fullName.toLowerCase().replace(/\s+/g, ".")}@dhq.pk`,
         address,
         domicileDistrict,
         constituency,
         tehsil: tehsil || "Urban Center",
         unionCouncil: unionCouncil || "UC Unassigned",
         partyAffiliation,
+        referenceCode: referenceCode || undefined,
+        appliedRole,
+        notes: notes || undefined,
         photoUrl: "/images/candidate_portrait.jpg",
         matricDetails: {
-          board: matricBoard,
+          board: matricBoard || "—",
           passingYear: Number(matricYear),
-          grade: matricGrade,
-          documentUrl: matricDoc,
+          grade: matricGrade || "—",
+          documentUrl: matricDocName || undefined,
         },
         fscDetails: {
-          board: fscBoard,
+          board: fscBoard || "—",
           passingYear: Number(fscYear),
           group: fscGroup,
-          grade: fscGrade,
-          documentUrl: fscDoc,
+          grade: fscGrade || "—",
+          documentUrl: fscDocName || undefined,
         },
         higherEducation: higherDegree ? [
           {
@@ -234,14 +276,27 @@ export default function CandidateRegistrationView({
         });
         const photoData = await photoRes.json().catch(() => null);
         if (photoRes.ok) {
-          registeredCandidate = {
-            ...registeredCandidate,
-            photoUrl: photoData.data.photoUrl,
-          };
+          registeredCandidate = { ...registeredCandidate, photoUrl: photoData.data.photoUrl };
         } else {
-          photoWarning = ` Photograph upload failed: ${photoData?.error || "try again from the candidate dossier."}`;
+          photoWarning = ` Photo upload failed: ${photoData?.error || "retry from dossier."}`;
         }
       }
+      // Upload CNIC docs if selected (best-effort, non-blocking)
+      const docUploads: Promise<void>[] = [];
+      for (const [field, file] of [["cnicFront", cnicFrontFile], ["cnicBack", cnicBackFile],
+      ["matricDoc", matricDocFile], ["fscDoc", fscDocFile]] as [string, File | null][]) {
+        if (file) {
+          const fd = new FormData();
+          fd.append("file", file);
+          fd.append("field", field);
+          docUploads.push(
+            fetch(`/api/candidates/${registeredCandidate.id}/documents`, { method: "POST", body: fd })
+              .then(() => undefined)
+              .catch(() => undefined)
+          );
+        }
+      }
+      await Promise.allSettled(docUploads);
 
       onCandidateCreated(registeredCandidate);
       toast.success("Candidate Registered Successfully!", {
@@ -262,7 +317,7 @@ export default function CandidateRegistrationView({
 
   // Filter candidates list
   const filteredCandidates = candidates.filter((c) => {
-    const matchesSearch = 
+    const matchesSearch =
       c.fullName.toLowerCase().includes(searchQuery.toLowerCase()) ||
       c.cnic.includes(searchQuery) ||
       c.constituency.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -294,11 +349,10 @@ export default function CandidateRegistrationView({
         {canRegisterCandidates && (
           <button
             onClick={() => (showForm ? closeForm() : setShowForm(true))}
-            className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all shadow-md cursor-pointer ${
-              showForm
+            className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all shadow-md cursor-pointer ${showForm
                 ? "bg-slate-200 text-slate-800 hover:bg-slate-300"
                 : "bg-emerald-700 hover:bg-emerald-800 text-white"
-            }`}
+              }`}
           >
             <UserPlus className="w-4 h-4" />
             <span>{showForm ? "Cancel Registration" : "+ Enroll New Candidate"}</span>
@@ -316,11 +370,11 @@ export default function CandidateRegistrationView({
             <div className="flex items-center gap-2">
               <span className="w-3 h-3 rounded-full bg-emerald-700" />
               <h3 className="font-bold text-slate-900 text-base sm:text-lg">
-                Constituency Candidate Enrollment Form
+                DHQ Hospital Staff Enrollment Form
               </h3>
             </div>
             <span className="text-xs font-mono text-emerald-700 font-bold bg-emerald-50 px-2 py-1 rounded border border-emerald-200 shrink-0">
-              Form Reg-2026/PK
+              Form DHQ-2026/HR
             </span>
           </div>
 
@@ -402,6 +456,19 @@ export default function CandidateRegistrationView({
 
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1">
+                  Father / Husband CNIC
+                </label>
+                <input
+                  type="text"
+                  placeholder="35201-7654321-1"
+                  value={fatherCnic}
+                  onChange={handleFatherCnicChange}
+                  className="w-full text-xs p-2.5 font-mono border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-600 focus:outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">
                   Mobile Number <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -420,7 +487,7 @@ export default function CandidateRegistrationView({
                 </label>
                 <input
                   type="email"
-                  placeholder="candidate@example.com"
+                  placeholder="staff@dhq.pk"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="w-full text-xs p-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-600 focus:outline-none"
@@ -429,13 +496,31 @@ export default function CandidateRegistrationView({
             </div>
           </div>
 
-          {/* Section 2: Regional, Domicile & Party Affiliation */}
+          {/* Section 2: Role, Domicile & HR Reference */}
           <div className="pt-2 border-t border-slate-100">
             <h4 className="text-xs font-bold uppercase text-emerald-700 tracking-wider mb-3 flex items-center gap-1.5">
-              <span>Step 2: Domicile, Constituency & Political Affiliation</span>
+              <Briefcase className="w-3.5 h-3.5" />
+              <span>Step 2: Applied Role, Domicile &amp; HR Reference</span>
             </h4>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {/* Applied Role — most critical field */}
+              <div className="sm:col-span-2 lg:col-span-1">
+                <label className="block text-xs font-bold text-slate-700 mb-1">
+                  Applied Role / Post <span className="text-red-500">*</span>
+                </label>
+                <select
+                  required
+                  value={appliedRole}
+                  onChange={(e) => setAppliedRole(e.target.value as RoleCategory)}
+                  className="w-full text-xs p-2.5 border-2 border-emerald-300 bg-emerald-50 rounded-lg focus:ring-2 focus:ring-emerald-600 focus:outline-none font-bold text-emerald-800"
+                >
+                  {DHQ_STAFF_ROLES.map((r) => (
+                    <option key={r} value={r}>{r}</option>
+                  ))}
+                </select>
+              </div>
+
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1">
                   Domicile District <span className="text-red-500">*</span>
@@ -455,7 +540,7 @@ export default function CandidateRegistrationView({
 
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1">
-                  Constituency Seat <span className="text-red-500">*</span>
+                  Constituency / Zone
                 </label>
                 <select
                   value={constituency}
@@ -463,9 +548,7 @@ export default function CandidateRegistrationView({
                   className="w-full text-xs p-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-600 focus:outline-none font-bold text-emerald-700"
                 >
                   {selectedDistrictObj?.constituencies.map((c) => (
-                    <option key={c} value={c}>
-                      {c}
-                    </option>
+                    <option key={c} value={c}>{c}</option>
                   ))}
                 </select>
               </div>
@@ -476,7 +559,7 @@ export default function CandidateRegistrationView({
                 </label>
                 <input
                   type="text"
-                  placeholder="e.g. Model Town / Cantonment"
+                  placeholder="e.g. Daraban / Kulachi / Paharpur"
                   value={tehsil}
                   onChange={(e) => setTehsil(e.target.value)}
                   className="w-full text-xs p-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-600 focus:outline-none"
@@ -489,14 +572,49 @@ export default function CandidateRegistrationView({
                 </label>
                 <input
                   type="text"
-                  placeholder="e.g. UC-182"
+                  placeholder="e.g. UC-04"
                   value={unionCouncil}
                   onChange={(e) => setUnionCouncil(e.target.value)}
                   className="w-full text-xs p-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-600 focus:outline-none"
                 />
               </div>
 
-              <div className="sm:col-span-3">
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">
+                  Recommender / Reference Code
+                </label>
+                <select
+                  value={partyAffiliation}
+                  onChange={(e) => setPartyAffiliation(e.target.value as PoliticalParty)}
+                  className="w-full text-xs p-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-600 focus:outline-none font-bold text-slate-800"
+                >
+                  <option value="MERIT-OPEN">MERIT-OPEN (Open Merit)</option>
+                  <option value="DIR-OFFICE">DIR-OFFICE (Director Office)</option>
+                  <option value="REF-NA-01">REF-NA-01 (MNA Ref. #1)</option>
+                  <option value="REF-NA-02">REF-NA-02 (MNA Ref. #2)</option>
+                  <option value="REF-PA-01">REF-PA-01 (MPA Ref. #1)</option>
+                  <option value="REF-PA-02">REF-PA-02 (MPA Ref. #2)</option>
+                  <option value="REF-DIST-01">REF-DIST-01 (District Ref.)</option>
+                  <option value="REF-NZM-01">REF-NZM-01 (Nazim Ref. #1)</option>
+                  <option value="REF-NZM-02">REF-NZM-02 (Nazim Ref. #2)</option>
+                  <option value="DEPT-DIRECT">DEPT-DIRECT (Dept. Direct)</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">
+                  Reference Sub-Code / Detail
+                </label>
+                <input
+                  type="text"
+                  placeholder="Optional short code e.g. NZM-DI-02"
+                  value={referenceCode}
+                  onChange={(e) => setReferenceCode(e.target.value)}
+                  className="w-full text-xs p-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-600 focus:outline-none font-mono"
+                />
+              </div>
+
+              <div className="sm:col-span-2 lg:col-span-3">
                 <label className="block text-xs font-bold text-slate-700 mb-1">
                   Complete Residential Address <span className="text-red-500">*</span>
                 </label>
@@ -508,27 +626,6 @@ export default function CandidateRegistrationView({
                   onChange={(e) => setAddress(e.target.value)}
                   className="w-full text-xs p-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-600 focus:outline-none"
                 />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">
-                  Political Affiliation
-                </label>
-                <select
-                  value={partyAffiliation}
-                  onChange={(e) => setPartyAffiliation(e.target.value as PoliticalParty)}
-                  className="w-full text-xs p-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-600 focus:outline-none font-bold text-slate-800"
-                >
-                  <option value="PTI">PTI (Pakistan Tehreek-e-Insaf)</option>
-                  <option value="PMLN">PML-N (Pakistan Muslim League N)</option>
-                  <option value="PPP">PPP (Pakistan Peoples Party)</option>
-                  <option value="JUI-F">JUI-F (Jamiat Ulema-e-Islam)</option>
-                  <option value="MQM-P">MQM-P (Muttahida Qaumi Movement)</option>
-                  <option value="JI">JI (Jamaat-e-Islami)</option>
-                  <option value="ANP">ANP (Awami National Party)</option>
-                  <option value="TLP">TLP (Tehreek-e-Labbaik Pakistan)</option>
-                  <option value="Independent">Independent Candidate</option>
-                </select>
               </div>
             </div>
           </div>
@@ -576,18 +673,23 @@ export default function CandidateRegistrationView({
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2">
-                  <div className="flex-1">
-                    <label className="block text-[11px] font-semibold text-slate-600 mb-1">
-                      Certificate Proof File
-                    </label>
+                <div>
+                  <label className="block text-[11px] font-semibold text-slate-600 mb-1">
+                    Certificate / DMC Scan (PDF/JPG)
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <span className="inline-flex items-center gap-1.5 bg-slate-700 hover:bg-slate-800 text-white text-[11px] font-bold px-3 py-1.5 rounded transition-all">
+                      <FileText className="w-3 h-3" />
+                      {matricDocName ? "Change File" : "Upload File"}
+                    </span>
+                    <span className="text-[11px] text-slate-500 truncate max-w-[140px]">{matricDocName || "No file chosen"}</span>
                     <input
-                      type="text"
-                      value={matricDoc}
-                      onChange={(e) => setMatricDoc(e.target.value)}
-                      className="w-full text-xs p-2 border border-slate-300 rounded bg-white text-slate-600 font-mono"
+                      type="file"
+                      accept=".pdf,image/jpeg,image/png,image/webp"
+                      onChange={makeDocHandler((f) => setMatricDocFile(f), setMatricDocName, "Matric Certificate")}
+                      className="hidden"
                     />
-                  </div>
+                  </label>
                 </div>
               </div>
 
@@ -645,14 +747,21 @@ export default function CandidateRegistrationView({
 
                 <div>
                   <label className="block text-[11px] font-semibold text-slate-600 mb-1">
-                    Certificate Proof File
+                    Certificate / DMC Scan (PDF/JPG)
                   </label>
-                  <input
-                    type="text"
-                    value={fscDoc}
-                    onChange={(e) => setFscDoc(e.target.value)}
-                    className="w-full text-xs p-2 border border-slate-300 rounded bg-white text-slate-600 font-mono"
-                  />
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <span className="inline-flex items-center gap-1.5 bg-slate-700 hover:bg-slate-800 text-white text-[11px] font-bold px-3 py-1.5 rounded transition-all">
+                      <FileText className="w-3 h-3" />
+                      {fscDocName ? "Change File" : "Upload File"}
+                    </span>
+                    <span className="text-[11px] text-slate-500 truncate max-w-[140px]">{fscDocName || "No file chosen"}</span>
+                    <input
+                      type="file"
+                      accept=".pdf,image/jpeg,image/png,image/webp"
+                      onChange={makeDocHandler((f) => setFscDocFile(f), setFscDocName, "FSc Certificate")}
+                      className="hidden"
+                    />
+                  </label>
                 </div>
               </div>
             </div>
@@ -687,35 +796,92 @@ export default function CandidateRegistrationView({
             </div>
           </div>
 
-          {/* Section 4: Photograph Upload & Verification */}
-          <div className="pt-2 border-t border-slate-100 flex flex-col sm:flex-row items-center gap-6">
-            <div className="flex items-center gap-4">
-              <div className="w-20 h-20 rounded-2xl border-2 border-dashed border-emerald-200 overflow-hidden bg-emerald-50 flex items-center justify-center relative">
-                {photoPreview ? (
-                  <img src={photoPreview} alt="Preview" className="w-full h-full object-cover" />
-                ) : (
-                  <Camera className="w-6 h-6 text-emerald-700" />
-                )}
-              </div>
+          {/* Section 4: CNIC Documents & Passport Photo */}
+          <div className="pt-2 border-t border-slate-100">
+            <h4 className="text-xs font-bold uppercase text-emerald-700 tracking-wider mb-3 flex items-center gap-1.5">
+              <Upload className="w-3.5 h-3.5" />
+              <span>Step 4: Identity Documents &amp; Passport Photo</span>
+            </h4>
 
-              <div className="space-y-1">
-                <label className="inline-flex items-center gap-2 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold px-3 py-2 rounded-lg cursor-pointer transition-all shadow-sm">
-                  <Upload className="w-3.5 h-3.5" />
-                  <span>Upload Passport Photo</span>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 items-start">
+              {/* CNIC Front */}
+              <div className="bg-slate-50 p-3 rounded-xl border border-slate-200">
+                <p className="text-[11px] font-bold text-slate-700 mb-2">CNIC — Front Side</p>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <span className="inline-flex items-center gap-1.5 bg-slate-700 hover:bg-slate-800 text-white text-[11px] font-bold px-3 py-1.5 rounded transition-all">
+                    <FileText className="w-3 h-3" />
+                    {cnicFrontName ? "Change" : "Upload"}
+                  </span>
+                  <span className="text-[11px] text-slate-500 truncate max-w-[120px]">{cnicFrontName || "No file chosen"}</span>
                   <input
                     type="file"
-                    accept="image/jpeg,image/png,image/webp"
-                    onChange={handlePhotoUpload}
+                    accept=".pdf,image/jpeg,image/png,image/webp"
+                    onChange={makeDocHandler((f) => setCnicFrontFile(f), setCnicFrontName, "CNIC Front")}
                     className="hidden"
                   />
                 </label>
-                <p className="text-[11px] text-slate-400">
-                  Compressed with sharp and stored as binary data in the internal database. PNG, JPG or WEBP up to 8 MB.
-                </p>
+                <p className="text-[10px] text-slate-400 mt-1">PDF, JPG or PNG, max 10 MB</p>
+              </div>
+
+              {/* CNIC Back */}
+              <div className="bg-slate-50 p-3 rounded-xl border border-slate-200">
+                <p className="text-[11px] font-bold text-slate-700 mb-2">CNIC — Back Side</p>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <span className="inline-flex items-center gap-1.5 bg-slate-700 hover:bg-slate-800 text-white text-[11px] font-bold px-3 py-1.5 rounded transition-all">
+                    <FileText className="w-3 h-3" />
+                    {cnicBackName ? "Change" : "Upload"}
+                  </span>
+                  <span className="text-[11px] text-slate-500 truncate max-w-[120px]">{cnicBackName || "No file chosen"}</span>
+                  <input
+                    type="file"
+                    accept=".pdf,image/jpeg,image/png,image/webp"
+                    onChange={makeDocHandler((f) => setCnicBackFile(f), setCnicBackName, "CNIC Back")}
+                    className="hidden"
+                  />
+                </label>
+                <p className="text-[10px] text-slate-400 mt-1">PDF, JPG or PNG, max 10 MB</p>
+              </div>
+
+              {/* Passport Photo */}
+              <div className="flex items-center gap-4">
+                <div className="w-20 h-20 rounded-2xl border-2 border-dashed border-emerald-200 overflow-hidden bg-emerald-50 flex items-center justify-center shrink-0">
+                  {photoPreview ? (
+                    <img src={photoPreview} alt="Preview" className="w-full h-full object-cover" />
+                  ) : (
+                    <Camera className="w-6 h-6 text-emerald-700" />
+                  )}
+                </div>
+                <div className="space-y-1">
+                  <label className="inline-flex items-center gap-2 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold px-3 py-2 rounded-lg cursor-pointer transition-all shadow-sm">
+                    <Upload className="w-3.5 h-3.5" />
+                    <span>Passport Photo</span>
+                    <input
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp"
+                      onChange={handlePhotoUpload}
+                      className="hidden"
+                    />
+                  </label>
+                  <p className="text-[11px] text-slate-400">JPG/PNG/WEBP, max 8 MB</p>
+                </div>
               </div>
             </div>
+          </div>
 
-            <div className="sm:ml-auto flex flex-wrap items-center justify-center gap-3">
+          {/* Section 5: Notes & Submit */}
+          <div className="pt-2 border-t border-slate-100">
+            <h4 className="text-xs font-bold uppercase text-emerald-700 tracking-wider mb-3 flex items-center gap-1.5">
+              <StickyNote className="w-3.5 h-3.5" />
+              <span>Step 5: Additional Notes &amp; Submit</span>
+            </h4>
+            <textarea
+              rows={3}
+              placeholder="Any remarks, medical notes, disability status, or special instructions..."
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              className="w-full text-xs p-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-600 focus:outline-none resize-none"
+            />
+            <div className="flex flex-wrap items-center justify-end gap-3 mt-3">
               <button
                 type="button"
                 onClick={closeForm}
@@ -723,13 +889,12 @@ export default function CandidateRegistrationView({
               >
                 Cancel
               </button>
-
               <button
                 type="submit"
                 disabled={isSubmitting}
                 className="bg-emerald-700 hover:bg-emerald-800 text-white px-6 py-2.5 rounded-xl text-xs sm:text-sm font-bold shadow-md transition-all cursor-pointer disabled:opacity-50"
               >
-                {isSubmitting ? "Verifying & Saving..." : "Confirm & Save Candidate"}
+                {isSubmitting ? "Saving to DHQ HR System..." : "✓ Confirm & Save Staff Record"}
               </button>
             </div>
           </div>

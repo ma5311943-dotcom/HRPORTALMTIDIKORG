@@ -16,39 +16,42 @@ export function cn(...values: Array<string | false | null | undefined>): string 
  * Green is reserved for "official / primary" states. Party and role colours are
  * intentionally varied but muted so dashboards do not become a wall of green.
  */
-export const PARTY_STYLES: Record<PoliticalParty, string> = {
-  PTI: "bg-rose-50 text-rose-800 border-rose-200",
-  PMLN: "bg-lime-50 text-lime-800 border-lime-200",
-  PPP: "bg-red-50 text-red-800 border-red-200",
-  "JUI-F": "bg-amber-50 text-amber-800 border-amber-200",
-  "MQM-P": "bg-orange-50 text-orange-800 border-orange-200",
-  JI: "bg-teal-50 text-teal-800 border-teal-200",
-  ANP: "bg-red-50 text-red-900 border-red-200",
-  TLP: "bg-emerald-50 text-emerald-900 border-emerald-200",
-  Independent: "bg-slate-100 text-slate-700 border-slate-200",
+export const PARTY_STYLES: Record<string, string> = {
+  "DIR-OFFICE": "bg-cyan-50 text-cyan-800 border-cyan-200",
+  "REF-NA-01": "bg-emerald-50 text-emerald-800 border-emerald-200",
+  "REF-NA-02": "bg-teal-50 text-teal-800 border-teal-200",
+  "REF-PA-01": "bg-sky-50 text-sky-800 border-sky-200",
+  "REF-PA-02": "bg-blue-50 text-blue-800 border-blue-200",
+  "REF-DIST-01": "bg-amber-50 text-amber-800 border-amber-200",
+  "REF-NZM-01": "bg-indigo-50 text-indigo-800 border-indigo-200",
+  "REF-NZM-02": "bg-purple-50 text-purple-800 border-purple-200",
+  "MERIT-OPEN": "bg-slate-100 text-slate-800 border-slate-300",
+  "DEPT-DIRECT": "bg-rose-50 text-rose-800 border-rose-200",
 };
 
-export const PARTY_LABELS: Record<PoliticalParty, string> = {
-  PTI: "PTI",
-  PMLN: "PML-N",
-  PPP: "PPP",
-  "JUI-F": "JUI-F",
-  "MQM-P": "MQM-P",
-  JI: "JI",
-  ANP: "ANP",
-  TLP: "TLP",
-  Independent: "Independent",
+export const PARTY_LABELS: Record<string, string> = {
+  "DIR-OFFICE": "Ref: Hospital Director",
+  "REF-NA-01": "Code: REF-NA-01",
+  "REF-NA-02": "Code: REF-NA-02",
+  "REF-PA-01": "Code: REF-PA-01",
+  "REF-PA-02": "Code: REF-PA-02",
+  "REF-DIST-01": "Code: REF-DIST-01",
+  "REF-NZM-01": "Code: REF-NZM-01",
+  "REF-NZM-02": "Code: REF-NZM-02",
+  "MERIT-OPEN": "Open Merit",
+  "DEPT-DIRECT": "Dept Direct Order",
 };
 
 export const ROLE_STYLES: Record<RoleCategory, string> = {
-  MNA: "bg-emerald-50 text-emerald-800 border-emerald-200",
-  MPA: "bg-teal-50 text-teal-800 border-teal-200",
-  "District Chairperson": "bg-amber-50 text-amber-800 border-amber-200",
-  "Union Council Chairman": "bg-sky-50 text-sky-800 border-sky-200",
-  Councilor: "bg-indigo-50 text-indigo-800 border-indigo-200",
-  "Civil Administration Officer": "bg-slate-100 text-slate-800 border-slate-200",
-  "Committee Head": "bg-violet-50 text-violet-800 border-violet-200",
-  "Public Sector Staff": "bg-stone-100 text-stone-800 border-stone-200",
+  "Ward Boy": "bg-blue-50 text-blue-800 border-blue-200",
+  "Helper Boy": "bg-indigo-50 text-indigo-800 border-indigo-200",
+  "Stretcher Puller": "bg-amber-50 text-amber-800 border-amber-200",
+  "Security Guard": "bg-slate-100 text-slate-800 border-slate-300",
+  "Male Ward Attendant": "bg-teal-50 text-teal-800 border-teal-200",
+  "Female Ward Attendant": "bg-rose-50 text-rose-800 border-rose-200",
+  "Junior Clerk": "bg-purple-50 text-purple-800 border-purple-200",
+  "Reception": "bg-cyan-50 text-cyan-800 border-cyan-200",
+  "Computer Operator": "bg-emerald-50 text-emerald-800 border-emerald-200",
 };
 
 export const CANDIDATE_STATUS_STYLES: Record<CandidateStatus, string> = {

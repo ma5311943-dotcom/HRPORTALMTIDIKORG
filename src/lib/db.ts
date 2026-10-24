@@ -29,6 +29,7 @@ function mapCandidate(row: CandidateRow): StoredCandidate {
     fullName: row.fullName,
     fatherName: row.fatherName,
     cnic: row.cnic,
+    fatherCnic: row.fatherCnic ?? undefined,
     dob: row.dob,
     gender: row.gender as Candidate["gender"],
     phone: row.phone,
@@ -39,6 +40,12 @@ function mapCandidate(row: CandidateRow): StoredCandidate {
     tehsil: row.tehsil,
     unionCouncil: row.unionCouncil ?? undefined,
     partyAffiliation: row.partyAffiliation,
+    referenceCode: row.referenceCode ?? undefined,
+    appliedRole: (row.appliedRole as RoleCategory) ?? undefined,
+    appointmentOrderNo: row.appointmentOrderNo ?? undefined,
+    joiningOrderNo: row.joiningOrderNo ?? undefined,
+    cnicFrontUrl: row.cnicFrontUrl ?? undefined,
+    cnicBackUrl: row.cnicBackUrl ?? undefined,
     photoUrl: row.photoUrl,
     matricDetails: row.matricDetails,
     fscDetails: row.fscDetails,
@@ -68,6 +75,7 @@ function mapAllocation(row: AllocationRow): Allocation {
     status: row.status,
     allocatedBy: row.allocatedBy,
     appointmentRefNo: row.appointmentRefNo,
+    joiningOrderNo: row.joiningOrderNo ?? undefined,
     salaryOrStipend: row.salaryOrStipend ?? undefined,
     remarks: row.remarks ?? undefined,
     revokedBy: row.revokedBy ?? undefined,
@@ -227,6 +235,13 @@ export const db = {
       constituency: candidate.constituency,
       tehsil: candidate.tehsil,
       unionCouncil: candidate.unionCouncil ?? null,
+      fatherCnic: candidate.fatherCnic ?? null,
+      referenceCode: candidate.referenceCode ?? null,
+      appliedRole: candidate.appliedRole ?? null,
+      appointmentOrderNo: candidate.appointmentOrderNo ?? null,
+      joiningOrderNo: candidate.joiningOrderNo ?? null,
+      cnicFrontUrl: candidate.cnicFrontUrl ?? null,
+      cnicBackUrl: candidate.cnicBackUrl ?? null,
       partyAffiliation: candidate.partyAffiliation,
       photoUrl: candidate.photoUrl,
       matricDetails: candidate.matricDetails,
@@ -377,6 +392,7 @@ export const db = {
     allocatedBy: string;
     salaryOrStipend?: string;
     remarks?: string;
+    joiningOrderNo?: string;
   }): Promise<Allocation> {
     const database = getDb();
     return database.transaction(async (tx) => {
@@ -432,7 +448,7 @@ export const db = {
       const prefix = allocationData.district.substring(0, 3).toUpperCase();
       const year = new Date().getFullYear();
       const serial = String(Number(serialRow?.value ?? 0) + 1).padStart(3, "0");
-      const appointmentRefNo = `EST-${prefix}/${year}/${serial}`;
+      const appointmentRefNo = `DHQ-${prefix}/${year}/${serial}`;
       const now = nowIso();
       const id = `alloc-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 
@@ -452,6 +468,7 @@ export const db = {
         status: "Active",
         allocatedBy: allocationData.allocatedBy,
         appointmentRefNo,
+        joiningOrderNo: allocationData.joiningOrderNo ?? candidate.joiningOrderNo ?? `JOIN-DHQ/${year}/${serial}`,
         salaryOrStipend: allocationData.salaryOrStipend ?? null,
         remarks: allocationData.remarks ?? null,
         revokedBy: null,
@@ -495,6 +512,7 @@ export const db = {
         status: "Active",
         allocatedBy: allocationData.allocatedBy,
         appointmentRefNo,
+        joiningOrderNo: allocationData.joiningOrderNo ?? null,
         salaryOrStipend: allocationData.salaryOrStipend ?? null,
         remarks: allocationData.remarks ?? null,
         revokedBy: null,
@@ -760,14 +778,15 @@ export const db = {
     ).length;
 
     const roleStats: Record<RoleCategory, number> = {
-      MNA: 0,
-      MPA: 0,
-      "District Chairperson": 0,
-      "Union Council Chairman": 0,
-      Councilor: 0,
-      "Civil Administration Officer": 0,
-      "Committee Head": 0,
-      "Public Sector Staff": 0,
+      "Ward Boy": 0,
+      "Helper Boy": 0,
+      "Stretcher Puller": 0,
+      "Security Guard": 0,
+      "Male Ward Attendant": 0,
+      "Female Ward Attendant": 0,
+      "Junior Clerk": 0,
+      "Reception": 0,
+      "Computer Operator": 0,
     };
 
     allocations.forEach((allocation) => {
@@ -777,15 +796,16 @@ export const db = {
     });
 
     const partyStats: Record<PoliticalParty, number> = {
-      PTI: 0,
-      PMLN: 0,
-      PPP: 0,
-      "JUI-F": 0,
-      "MQM-P": 0,
-      JI: 0,
-      ANP: 0,
-      TLP: 0,
-      Independent: 0,
+      "DIR-OFFICE": 0,
+      "REF-NA-01": 0,
+      "REF-NA-02": 0,
+      "REF-PA-01": 0,
+      "REF-PA-02": 0,
+      "REF-DIST-01": 0,
+      "REF-NZM-01": 0,
+      "REF-NZM-02": 0,
+      "MERIT-OPEN": 0,
+      "DEPT-DIRECT": 0,
     };
 
     candidates.forEach((candidate) => {

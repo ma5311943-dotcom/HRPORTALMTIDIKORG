@@ -104,21 +104,38 @@ export default function InternalChatView({
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-4 border-b border-slate-200 gap-2">
-        <div>
-          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 flex items-center gap-2">
-            <MessageSquare className="w-6 h-6 text-emerald-700" />
-            HR Internal Communication & Camp Administration Panel
-          </h2>
-          <p className="text-xs text-slate-500">
-            Encrypted official memorandum dispatch between MNA Offices, Deputy Commissioners, Councilors & Committee Heads
-          </p>
+      {/* Top Header with Visual Memos Backdrop */}
+      <div className="relative overflow-hidden rounded-2xl border border-emerald-900/40 p-6 text-white shadow-lg">
+        {/* Background Image with Light Green & Emerald Overlay */}
+        <div className="absolute inset-0 z-0">
+          <img
+            src="/images/tab_internal_chat_memos.jpg"
+            alt="Internal Memos"
+            className="h-full w-full object-cover object-center filter brightness-[0.28] contrast-[1.1]"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-emerald-950/95 via-teal-900/85 to-slate-950/90 mix-blend-multiply" />
+          <div className="absolute inset-0 bg-emerald-600/15" />
         </div>
 
-        <div className="flex items-center gap-2 text-xs font-mono bg-emerald-50 text-emerald-700 px-3 py-1.5 rounded-lg border border-emerald-200">
-          <Shield className="w-3.5 h-3.5 text-emerald-700" />
-          <span>Internal Government Comms Channel</span>
+        <div className="relative z-10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[11px] font-semibold text-emerald-100 backdrop-blur-sm mb-2">
+              <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
+              <span>DHQ Teaching Hospital • Secure Internal Communications</span>
+            </div>
+            <h2 className="text-xl sm:text-2xl font-extrabold text-white flex items-center gap-2">
+              <MessageSquare className="w-6 h-6 text-emerald-300" />
+              Administrative Memorandums &amp; Directives
+            </h2>
+            <p className="text-xs text-emerald-100/80 mt-1 max-w-xl">
+              Confidential internal correspondence between Hospital Director, Medical Superintendent, and Recruitment Officers.
+            </p>
+          </div>
+
+          <div className="flex items-center gap-2 text-xs font-mono bg-white/10 text-emerald-100 px-3.5 py-2 rounded-xl border border-white/20 backdrop-blur-sm self-start sm:self-auto">
+            <Shield className="w-3.5 h-3.5 text-emerald-300" />
+            <span>Encrypted Hospital Channel</span>
+          </div>
         </div>
       </div>
 

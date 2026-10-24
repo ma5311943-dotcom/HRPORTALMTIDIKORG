@@ -11,7 +11,7 @@ import SeatAllocationView from "@/components/SeatAllocationView";
 import InternalChatView from "@/components/InternalChatView";
 import ReportsView from "@/components/ReportsView";
 import CandidatePortalView from "@/components/CandidatePortalView";
-import CandidateDossierModal from "@/components/CandidateDossierModal";
+
 import AppointmentLetterModal from "@/components/AppointmentLetterModal";
 import { Candidate, District, Allocation, ChatMessage, SystemAnalytics } from "@/types";
 import { UserSession, clearSession } from "@/lib/auth";
@@ -71,7 +71,6 @@ export default function Home() {
   const [loadError, setLoadError] = useState<string | null>(null);
 
   // Modals State
-  const [dossierCandidate, setDossierCandidate] = useState<Candidate | null>(null);
   const [letterAllocation, setLetterAllocation] = useState<Allocation | null>(null);
   const [preSelectedAllocCandidate, setPreSelectedAllocCandidate] = useState<Candidate | null>(null);
 
@@ -283,7 +282,6 @@ export default function Home() {
     setUserSession(null);
     setViewMode("landing");
     setActiveTab("dashboard");
-    setDossierCandidate(null);
     setLetterAllocation(null);
     toast.info("Logged out from Internal HR System");
   };
@@ -505,7 +503,7 @@ export default function Home() {
                   selectedDistrict={selectedDistrict}
                   setSelectedDistrict={setSelectedDistrict}
                   onNavigateTab={navigateToTab}
-                  onSelectCandidate={(cand) => setDossierCandidate(cand)}
+                  onSelectCandidate={(cand) => router.push(`/candidates/${cand.id}`)}
                   canGenerateReports={userSession.permissions.canGenerateReports}
                   canAllocateSeats={userSession.permissions.canAllocateSeats}
                 />
@@ -516,7 +514,7 @@ export default function Home() {
                   candidates={candidates}
                   districts={districts}
                   onCandidateCreated={handleCandidateCreated}
-                  onSelectCandidate={(cand) => setDossierCandidate(cand)}
+                  onSelectCandidate={(cand) => router.push(`/candidates/${cand.id}`)}
                   onAllocateCandidate={handleOpenAllocationForCandidate}
                   canRegisterCandidates={userSession.permissions.canRegisterCandidates}
                   canAllocateSeats={userSession.permissions.canAllocateSeats}
@@ -581,18 +579,7 @@ export default function Home() {
         </footer>
       </div>
 
-      {/* Candidate Dossier Modal */}
-      {dossierCandidate && (
-        <CandidateDossierModal
-          candidate={dossierCandidate}
-          allocation={allocations.find((a) => a.candidateId === dossierCandidate.id && a.status === "Active")}
-          onClose={() => setDossierCandidate(null)}
-          onAllocate={(cand) => {
-            setDossierCandidate(null);
-            handleOpenAllocationForCandidate(cand);
-          }}
-        />
-      )}
+
 
       {/* Official Gazette Appointment Notification Letter Modal */}
       {letterAllocation && (

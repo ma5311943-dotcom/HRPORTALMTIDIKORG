@@ -88,7 +88,14 @@ export const candidates = mysqlTable(
     constituency: varchar("constituency", { length: 64 }).notNull(),
     tehsil: varchar("tehsil", { length: 100 }).notNull(),
     unionCouncil: varchar("union_council", { length: 100 }),
-    partyAffiliation: varchar("party_affiliation", { length: 32 })
+    fatherCnic: varchar("father_cnic", { length: 15 }),
+    referenceCode: varchar("reference_code", { length: 64 }),
+    appliedRole: varchar("applied_role", { length: 64 }),
+    appointmentOrderNo: varchar("appointment_order_no", { length: 100 }),
+    joiningOrderNo: varchar("joining_order_no", { length: 100 }),
+    cnicFrontUrl: longtext("cnic_front_url"),
+    cnicBackUrl: longtext("cnic_back_url"),
+    partyAffiliation: varchar("party_affiliation", { length: 64 })
       .$type<PoliticalParty>()
       .notNull(),
     photoUrl: longtext("photo_url").notNull(),
@@ -154,6 +161,7 @@ export const allocations = mysqlTable(
       .notNull(),
     allocatedBy: varchar("allocated_by", { length: 191 }).notNull(),
     appointmentRefNo: varchar("appointment_ref_no", { length: 100 }).notNull(),
+    joiningOrderNo: varchar("joining_order_no", { length: 100 }),
     salaryOrStipend: varchar("salary_or_stipend", { length: 100 }),
     remarks: varchar("remarks", { length: 1000 }),
     revokedBy: varchar("revoked_by", { length: 191 }),

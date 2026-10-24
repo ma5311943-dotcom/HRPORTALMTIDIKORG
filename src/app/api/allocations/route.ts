@@ -10,14 +10,15 @@ import {
 import type { RoleCategory } from "@/types";
 
 const VALID_ROLE_CATEGORIES: RoleCategory[] = [
-  "MNA",
-  "MPA",
-  "District Chairperson",
-  "Union Council Chairman",
-  "Councilor",
-  "Civil Administration Officer",
-  "Committee Head",
-  "Public Sector Staff",
+  "Ward Boy",
+  "Helper Boy",
+  "Stretcher Puller",
+  "Security Guard",
+  "Male Ward Attendant",
+  "Female Ward Attendant",
+  "Junior Clerk",
+  "Reception",
+  "Computer Operator",
 ];
 
 export async function GET(req: NextRequest) {
@@ -89,19 +90,20 @@ export async function POST(req: NextRequest) {
       department:
         typeof body.department === "string" && body.department.trim()
           ? body.department.trim()
-          : "Constituency Administration Board",
+          : "DHQ Teaching Hospital D.I. Khan",
       district,
       constituency,
       tenureMonths: Number(body.tenureMonths) || 24,
       allocatedBy: session.name,
+      joiningOrderNo: typeof body.joiningOrderNo === "string" ? body.joiningOrderNo : undefined,
       salaryOrStipend:
         typeof body.salaryOrStipend === "string"
           ? body.salaryOrStipend
-          : "Honorarium as per Government Schedule",
+          : "BPS Grade as per DHQ Hospital Rules",
       remarks:
         typeof body.remarks === "string"
           ? body.remarks
-          : "Appointed under Internal HR System program",
+          : "Appointed under DHQ Hospital Executive Directorate Directive",
     });
 
     return NextResponse.json({ success: true, data: allocation }, { status: 201 });

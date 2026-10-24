@@ -94,51 +94,68 @@ export default function ReportsView({
 
   return (
     <div className="space-y-6">
-      {/* Top Controls (Hidden when Printing) */}
-      <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center md:justify-between gap-4 print:hidden">
-        <div>
-          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 flex items-center gap-2">
-            <FileText className="w-6 h-6 text-emerald-700" />
-            Election-Ready Constituency Audit & Employment Reports
-          </h2>
-          <p className="text-xs text-slate-500">
-            Official verifiable documentation ready for public rallies, press releases, and election scrutiny
-          </p>
+      {/* Top Header with Visual Analytics Backdrop */}
+      <div className="relative overflow-hidden rounded-2xl border border-emerald-900/40 p-6 text-white shadow-lg print:hidden">
+        {/* Background Image with Light Green & Emerald Overlay */}
+        <div className="absolute inset-0 z-0">
+          <img
+            src="/images/tab_reports_analytics.jpg"
+            alt="Reports & Analytics"
+            className="h-full w-full object-cover object-center filter brightness-[0.28] contrast-[1.1]"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-emerald-950/95 via-teal-900/85 to-slate-950/90 mix-blend-multiply" />
+          <div className="absolute inset-0 bg-emerald-600/15" />
         </div>
 
-        <div className="flex flex-wrap items-center gap-3">
-          {/* District Selector */}
-          <div className="flex items-center gap-2 bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-200">
-            <MapPin className="w-4 h-4 text-emerald-700" />
-            <select
-              value={selectedDistrict}
-              onChange={(e) => setSelectedDistrict(e.target.value)}
-              className="bg-transparent text-xs font-bold text-slate-800 focus:outline-none cursor-pointer"
-            >
-              <option value="All">All Districts (National Total)</option>
-              {districts.map((d) => (
-                <option key={d.id} value={d.name}>
-                  District {d.name}
-                </option>
-              ))}
-            </select>
+        <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div>
+            <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[11px] font-semibold text-emerald-100 backdrop-blur-sm mb-2">
+              <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
+              <span>DHQ Hospital D.I. Khan • Audit &amp; Official Reporting</span>
+            </div>
+            <h2 className="text-xl sm:text-2xl font-extrabold text-white flex items-center gap-2">
+              <FileText className="w-6 h-6 text-emerald-300" />
+              Hospital Staff Recruitment Audit &amp; HR Reports
+            </h2>
+            <p className="text-xs text-emerald-100/80 mt-1 max-w-xl">
+              Official verifiable records, gazette appointment summaries, and press release documentation for DHQ Teaching Hospital D.I. Khan.
+            </p>
           </div>
 
-          <button
-            onClick={handleCopyPressRelease}
-            className="flex items-center gap-1.5 bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold px-4 py-2.5 rounded-xl transition-all cursor-pointer"
-          >
-            <Copy className="w-3.5 h-3.5 text-slate-600" />
-            <span>Copy Press Release</span>
-          </button>
+          <div className="flex flex-wrap items-center gap-2.5 shrink-0">
+            {/* District Selector */}
+            <div className="flex items-center gap-2 bg-white/10 px-3 py-2 rounded-xl border border-white/20 backdrop-blur-sm">
+              <MapPin className="w-3.5 h-3.5 text-emerald-300" />
+              <select
+                value={selectedDistrict}
+                onChange={(e) => setSelectedDistrict(e.target.value)}
+                className="bg-transparent text-xs font-bold text-white focus:outline-none cursor-pointer [&>option]:text-slate-900"
+              >
+                <option value="All">All Tehsils (D.I. Khan Total)</option>
+                {districts.map((d) => (
+                  <option key={d.id} value={d.name}>
+                    {d.name}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-          <button
-            onClick={handlePrint}
-            className="flex items-center gap-1.5 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold px-4 py-2.5 rounded-xl transition-all shadow-md cursor-pointer"
-          >
-            <Printer className="w-3.5 h-3.5" />
-            <span>Print Official Dossier</span>
-          </button>
+            <button
+              onClick={handleCopyPressRelease}
+              className="flex items-center gap-1.5 bg-white/15 hover:bg-white/25 text-white text-xs font-bold px-3.5 py-2 rounded-xl border border-white/20 backdrop-blur-sm transition-all cursor-pointer"
+            >
+              <Copy className="w-3.5 h-3.5 text-emerald-200" />
+              <span>Copy Release</span>
+            </button>
+
+            <button
+              onClick={handlePrint}
+              className="flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-3.5 py-2 rounded-xl transition-all shadow-md cursor-pointer"
+            >
+              <Printer className="w-3.5 h-3.5" />
+              <span>Print Dossier</span>
+            </button>
+          </div>
         </div>
       </div>
 

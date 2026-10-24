@@ -1,25 +1,54 @@
-export type Province = "Punjab" | "Sindh" | "Khyber Pakhtunkhwa" | "Balochistan" | "Islamabad Capital Territory";
+export type Province = "Khyber Pakhtunkhwa" | "Punjab" | "Sindh" | "Balochistan" | "Islamabad Capital Territory";
 
-export type PoliticalParty = 
-  | "PTI" 
-  | "PMLN" 
-  | "PPP" 
-  | "JUI-F" 
-  | "MQM-P" 
-  | "JI" 
-  | "ANP" 
-  | "TLP" 
-  | "Independent";
+// Reference Short-Codes / Authorized Aliases instead of real political names
+export type RecommenderAlias = 
+  | "DIR-OFFICE"
+  | "REF-NA-01" 
+  | "REF-NA-02" 
+  | "REF-PA-01" 
+  | "REF-PA-02" 
+  | "REF-DIST-01"
+  | "REF-NZM-01" 
+  | "REF-NZM-02" 
+  | "MERIT-OPEN" 
+  | "DEPT-DIRECT";
 
+// Backward-compatible alias for existing political references
+export type PoliticalParty = RecommenderAlias;
+
+// DHQ Hospital Staff Roles (strictly from client voice notes)
 export type RoleCategory = 
-  | "MNA" 
-  | "MPA" 
-  | "District Chairperson" 
-  | "Union Council Chairman" 
-  | "Councilor" 
-  | "Civil Administration Officer" 
-  | "Committee Head" 
-  | "Public Sector Staff";
+  | "Ward Boy" 
+  | "Helper Boy" 
+  | "Stretcher Puller" 
+  | "Security Guard" 
+  | "Male Ward Attendant" 
+  | "Female Ward Attendant" 
+  | "Junior Clerk" 
+  | "Reception" 
+  | "Computer Operator";
+
+export const DHQ_STAFF_ROLES: RoleCategory[] = [
+  "Ward Boy",
+  "Helper Boy",
+  "Stretcher Puller",
+  "Security Guard",
+  "Male Ward Attendant",
+  "Female Ward Attendant",
+  "Junior Clerk",
+  "Reception",
+  "Computer Operator",
+];
+
+export const DI_KHAN_TEHSILS = [
+  "Daraban",
+  "Kulachi",
+  "Paharpur",
+  "Dera",
+  "Parova",
+] as const;
+
+export type DIKhanTehsil = typeof DI_KHAN_TEHSILS[number];
 
 export type CandidateStatus = "Registered" | "Verified" | "Allocated" | "Under Review";
 
@@ -47,16 +76,23 @@ export type Candidate = {
   fullName: string;
   fatherName: string;
   cnic: string; // Format: XXXXX-XXXXXXX-X
+  fatherCnic?: string;
   dob: string;
   gender: "Male" | "Female" | "Other";
   phone: string;
   email: string;
   address: string;
   domicileDistrict: string;
-  constituency: string; // e.g. NA-127 or PP-160
+  constituency: string; // e.g. NA-44 or PA-112
   tehsil: string;
   unionCouncil?: string;
-  partyAffiliation: PoliticalParty;
+  partyAffiliation: RecommenderAlias; // Reference / Recommendation short code
+  referenceCode?: string;
+  appliedRole?: RoleCategory;
+  appointmentOrderNo?: string;
+  joiningOrderNo?: string;
+  cnicFrontUrl?: string;
+  cnicBackUrl?: string;
   photoUrl: string;
   matricDetails: {
     board: string;
@@ -67,7 +103,7 @@ export type Candidate = {
   fscDetails: {
     board: string;
     passingYear: number;
-    group: string; // Pre-Medical, Pre-Engineering, ICS, I.Com, Arts
+    group: string;
     grade: string;
     documentUrl?: string;
   };
@@ -97,12 +133,13 @@ export type Allocation = {
   roleCategory: RoleCategory;
   roleTitle: string;
   department: string;
-  partyAffiliation: PoliticalParty;
+  partyAffiliation: RecommenderAlias;
   allocatedDate: string;
   tenureMonths: number;
   status: "Active" | "Completed" | "Revoked";
   allocatedBy: string;
   appointmentRefNo: string;
+  joiningOrderNo?: string;
   salaryOrStipend?: string;
   remarks?: string;
   revokedBy?: string;
@@ -139,6 +176,6 @@ export type SystemAnalytics = {
     percentage: number;
   }[];
   roleStats: Record<RoleCategory, number>;
-  partyStats: Record<PoliticalParty, number>;
+  partyStats: Record<RecommenderAlias, number>;
   recentAllocations: Allocation[];
 };

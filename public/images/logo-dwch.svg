@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img" aria-label="Derajat Women and Children Hospital - Mother and Child">
+  <defs>
+    <linearGradient id="dw-green" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#059669"/>
+      <stop offset="1" stop-color="#0f766e"/>
+    </linearGradient>
+    <linearGradient id="dw-gold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#fde68a"/>
+      <stop offset="0.5" stop-color="#f59e0b"/>
+      <stop offset="1" stop-color="#b45309"/>
+    </linearGradient>
+  </defs>
+  <circle cx="100" cy="100" r="96" fill="#ffffff" stroke="url(#dw-gold)" stroke-width="6"/>
+  <circle cx="100" cy="100" r="88" fill="url(#dw-green)"/>
+  <circle cx="100" cy="100" r="66" fill="#ffffff" stroke="url(#dw-gold)" stroke-width="3"/>
+  <!-- Mother -->
+  <circle cx="88" cy="68" r="14" fill="#be185d"/>
+  <path d="M62 138 C60 106 70 88 88 86 C106 88 116 106 114 138 Z" fill="#be185d"/>
+  <!-- Child -->
+  <circle cx="118" cy="96" r="10" fill="#047857"/>
+  <path d="M104 138 C102 118 108 108 118 106 C128 108 134 118 132 138 Z" fill="#047857"/>
+  <!-- Protective arc -->
+  <path d="M56 126 C64 152 134 152 144 122" fill="none" stroke="url(#dw-gold)" stroke-width="4" stroke-linecap="round"/>
+  <!-- Bottom label -->
+  <rect x="52" y="152" width="96" height="22" rx="6" fill="#ffffff" stroke="url(#dw-gold)" stroke-width="2"/>
+  <text x="100" y="168" font-family="Arial, Helvetica, sans-serif" font-size="14" font-weight="800" fill="#be185d" text-anchor="middle" letter-spacing="1.5">DWCH</text>
+</svg>
