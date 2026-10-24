@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>CHRAS Internal HR System - Documentation</title>
+<style>
+  @page { size: A4; margin: 0; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: "Segoe UI", "Trebuchet MS", Arial, sans-serif;
+    color: #1f2937;
+    background: #ffffff;
+    font-size: 10pt;
+    line-height: 1.5;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .page {
+    width: 210mm;
+    height: 296mm;
+    padding: 16mm 15mm 15mm;
+    page-break-after: always;
+    position: relative;
+    overflow: hidden;
+    background: #ffffff;
+  }
+  .page:last-child { page-break-after: auto; }
+  .page.cover { padding: 0; background: #013a20; }
+  .green { color: #046a38; }
+  .gold { color: #b08a3e; }
+  .muted { color: #64748b; }
+  .small { font-size: 8.5pt; }
+  .tiny { font-size: 7.5pt; }
+  .bold { font-weight: 700; }
+  .center { text-align: center; }
+  .mt-0 { margin-top: 0; }
+  .mb-0 { margin-bottom: 0; }
+
+  .topbar {
+    display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 2px solid #e6e2d6; padding-bottom: 5px; margin-bottom: 10px;
+  }
+  .topbar .brand { display: flex; align-items: center; gap: 8px; font-weight: 800; color: #013a20; font-size: 9pt; letter-spacing: .4px; }
+  .topbar .brand .mark { width: 18px; height: 18px; border-radius: 50%; background: #046a38; color: #fff; display: inline-flex; align-items: center; justify-content: center; font-size: 9pt; }
+  .topbar .tag { font-size: 7.5pt; letter-spacing: 1.4px; color: #8b7a52; font-weight: 700; }
+
+  .section-kicker { font-size: 7.5pt; letter-spacing: 2px; text-transform: uppercase; color: #b08a3e; font-weight: 800; margin-bottom: 3px; }
+  h1, h2, h3, h4 { margin: 0; color: #013a20; }
+  h1 { font-size: 25pt; line-height: 1.1; letter-spacing: -.5px; }
+  h2 { font-size: 18pt; line-height: 1.15; letter-spacing: -.3px; margin-bottom: 4px; }
+  h3 { font-size: 12.5pt; margin-bottom: 4px; }
+  h4 { font-size: 10pt; margin-bottom: 3px; }
+  p { margin: 0 0 7px; }
+  .lead { font-size: 10.5pt; color: #334155; line-height: 1.6; }
+
+  .rule { height: 3px; width: 52px; background: linear-gradient(90deg,#046a38,#c5a059); border-radius: 4px; margin: 7px 0 12px; }
+  .section-head { margin-bottom: 10px; }
+
+  .cover-inner { position: relative; z-index: 2; height: 100%; padding: 22mm 20mm 16mm; color: #fff; display: flex; flex-direction: column; }
+  .cover-grid {
+    position: absolute; inset: 0; z-index: 0; opacity: .12;
+    background-image: linear-gradient(rgba(255,255,255,.22) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.22) 1px, transparent 1px);
+    background-size: 12mm 12mm;
+  }
+  .cover-glow {
+    position: absolute; width: 150mm; height: 150mm; border-radius: 50%;
+    background: radial-gradient(circle, rgba(197,160,89,.34), rgba(197,160,89,0) 65%);
+    right: -45mm; top: -35mm; z-index: 0;
+  }
+  .cover-bottom {
+    position: absolute; left: 0; right: 0; bottom: 0; height: 34mm;
+    background: linear-gradient(180deg, rgba(0,0,0,0), rgba(0,0,0,.22)); z-index: 1;
+  }
+  .emblem { width: 30mm; height: 30mm; border: 1px solid rgba(255,255,255,.35); border-radius: 50%; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,.06); margin-bottom: 10mm; }
+  .flagline { display: flex; align-items: center; gap: 5mm; margin-bottom: 12mm; }
+  .flagline .bar { width: 17mm; height: 3px; background: #c5a059; border-radius: 3px; }
+  .flagline .text { font-size: 8pt; letter-spacing: 3px; text-transform: uppercase; color: #e7d8b7; font-weight: 700; }
+  .cover h1 { color: #fff; font-size: 52pt; letter-spacing: -1.5px; margin: 0; line-height: .95; }
+  .cover .subtitle { font-size: 15pt; font-weight: 600; color: #dcefe4; margin-top: 6mm; max-width: 150mm; line-height: 1.35; }
+  .cover .doc-title { margin-top: 8mm; font-size: 11pt; color: #c5a059; letter-spacing: 2.6px; text-transform: uppercase; font-weight: 800; }
+  .cover .spacer { flex: 1; }
+  .cover-meta { display: flex; gap: 8mm; flex-wrap: wrap; border-top: 1px solid rgba(255,255,255,.24); padding-top: 6mm; position: relative; z-index: 2; }
+  .cover-meta .item { min-width: 34mm; }
+  .cover-meta .label { font-size: 7pt; letter-spacing: 1.8px; text-transform: uppercase; color: #b9d7c6; font-weight: 800; }
+  .cover-meta .value { font-size: 10pt; color: #fff; font-weight: 700; margin-top: 1mm; }
+  .cover .confidential { position: absolute; bottom: 10mm; left: 20mm; right: 20mm; z-index: 2; display: flex; justify-content: space-between; font-size: 7.5pt; color: #a9c8b6; letter-spacing: .5px; }
+
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 7px; margin: 9px 0 12px; }
+  .stat { border: 1px solid #e3e9e4; border-radius: 9px; padding: 8px 9px; background: linear-gradient(180deg,#fbfdfb,#f3f8f4); }
+  .stat .num { font-size: 19pt; font-weight: 800; color: #046a38; line-height: 1; }
+  .stat .label { font-size: 7.5pt; color: #64748b; font-weight: 700; text-transform: uppercase; letter-spacing: .7px; margin-top: 2px; }
+
+  .callout { border-left: 4px solid #c5a059; background: #fbf8ef; padding: 9px 12px; border-radius: 0 8px 8px 0; margin: 10px 0; page-break-inside: avoid; }
+  .callout strong { color: #7a5b1e; }
+  .callout.green { border-left-color: #046a38; background: #f1f8f3; }
+  .callout.green strong { color: #046a38; }
+
+  .toc { display: grid; grid-template-columns: 1fr 1fr; gap: 5px 18px; margin: 8px 0 12px; }
+  .toc-item { display: flex; align-items: baseline; gap: 7px; border-bottom: 1px dotted #d7ded8; padding: 4px 0; font-size: 9pt; }
+  .toc-item .n { color: #b08a3e; font-weight: 800; width: 13px; }
+  .toc-item .t { color: #334155; font-weight: 600; }
+
+  .cards { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; margin: 8px 0; }
+  .cards.three { grid-template-columns: repeat(3, 1fr); }
+  .card { border: 1px solid #e2e8e4; border-radius: 9px; padding: 9px 10px; background: #fff; page-break-inside: avoid; }
+  .card .icon { width: 21px; height: 21px; border-radius: 6px; background: #e8f3ec; color: #046a38; display: flex; align-items: center; justify-content: center; font-size: 9pt; font-weight: 800; margin-bottom: 5px; }
+  .card h4 { font-size: 9.5pt; }
+  .card p { font-size: 8.3pt; color: #58677a; margin: 0; line-height: 1.45; }
+
+  ul.clean { margin: 4px 0 8px; padding-left: 15px; }
+  ul.clean li { margin-bottom: 4px; font-size: 9.2pt; color: #364152; }
+  ul.clean li::marker { color: #046a38; }
+
+  table { width: 100%; border-collapse: collapse; page-break-inside: auto; }
+  thead { display: table-header-group; }
+  th { background: #013a20; color: #fff; font-size: 7.6pt; text-transform: uppercase; letter-spacing: .5px; text-align: left; padding: 5px 6px; border: 1px solid #013a20; }
+  td { font-size: 8.1pt; padding: 5px 6px; border: 1px solid #e2e8e4; vertical-align: top; color: #334155; }
+  tbody tr:nth-child(even) td { background: #f8fbf9; }
+  tbody tr { page-break-inside: avoid; }
+  td .role-name { font-weight: 800; color: #013a20; display: block; font-size: 8.4pt; }
+  td .person { color: #7b8a99; font-size: 7.4pt; }
+  .tag { display: inline-block; border-radius: 20px; padding: 1px 6px; font-size: 6.8pt; font-weight: 800; letter-spacing: .3px; text-transform: uppercase; }
+  .tag.gold { background: #f6edd7; color: #7a5b1e; border: 1px solid #e6d2a5; }
+  .tag.green { background: #e8f3ec; color: #046a38; border: 1px solid #c8e2d1; }
+  .tag.teal { background: #e6f4f2; color: #0f766e; border: 1px solid #bce3de; }
+  .tag.blue { background: #eaf1fa; color: #1d4ed8; border: 1px solid #c7d9f4; }
+  .tag.slate { background: #eef2f6; color: #334155; border: 1px solid #d6dee8; }
+  .tag.purple { background: #f2ecf8; color: #6b21a8; border: 1px solid #dfcdf0; }
+  .tag.red { background: #fdecec; color: #b91c1c; border: 1px solid #f3caca; }
+
+  .matrix td, .matrix th { text-align: center; }
+  .matrix td:first-child, .matrix th:first-child { text-align: left; }
+  .yes { color: #046a38; font-weight: 900; }
+  .no { color: #b6c0c9; font-weight: 700; }
+
+  .flow { margin-top: 6px; }
+  .flow-step { display: flex; gap: 8px; margin-bottom: 6px; page-break-inside: avoid; }
+  .flow-step .num { flex: 0 0 20px; height: 20px; border-radius: 50%; background: #046a38; color: #fff; font-size: 8pt; font-weight: 800; display: flex; align-items: center; justify-content: center; }
+  .flow-step .body { flex: 1; border-bottom: 1px solid #edf0ed; padding-bottom: 5px; }
+  .flow-step .body h4 { font-size: 9pt; margin: 0 0 1px; }
+  .flow-step .body p { font-size: 8.2pt; margin: 0; color: #58677a; }
+  .flow-step .body .who { color: #046a38; font-weight: 700; }
+
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+
+  .code { background: #0d2a1c; color: #d7f0e0; border-radius: 8px; padding: 8px 10px; font-family: Consolas, "Courier New", monospace; font-size: 7.9pt; line-height: 1.55; white-space: pre-wrap; page-break-inside: avoid; }
+  .code .c { color: #8fbfa4; }
+  .code .g { color: #e8c87a; }
+
+  .footer { position: absolute; left: 15mm; right: 15mm; bottom: 7mm; display: flex; justify-content: space-between; color: #94a3b8; font-size: 7pt; border-top: 1px solid #edf0ee; padding-top: 3px; }
+  .footer .p { color: #046a38; font-weight: 800; }
+
+  .checklist { display: grid; grid-template-columns: 1fr 1fr; gap: 5px 12px; margin: 6px 0; }
+  .check { display: flex; gap: 6px; font-size: 8.6pt; color: #334155; border-bottom: 1px dotted #e2e8e4; padding: 4px 0; }
+  .check .box { width: 12px; height: 12px; border: 1.5px solid #046a38; border-radius: 3px; flex: 0 0 12px; margin-top: 1px; }
+
+  .end-band { margin-top: 12px; background: linear-gradient(135deg,#013a20,#046a38); color: #fff; border-radius: 10px; padding: 13px 15px; page-break-inside: avoid; }
+  .end-band h3 { color: #fff; font-size: 13pt; margin-bottom: 3px; }
+  .end-band p { color: #d7ebe0; font-size: 9pt; margin: 0; }
+  .end-band .confirm { margin-top: 6px; padding-top: 5px; border-top: 1px solid rgba(255,255,255,.22); color: #f0d9a7; font-size: 7.6pt; line-height: 1.45; }
+
+  .note { background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 8px; padding: 7px 10px; font-size: 8.2pt; color: #475569; page-break-inside: avoid; }
+
+  .page-break { break-before: page; }
+  .avoid { page-break-inside: avoid; }
+</style>
+</head>
+<body>
+
+<!-- ================= PAGE 1: COVER ================= -->
+<section class="page cover">
+  <div class="cover-grid"></div>
+  <div class="cover-glow"></div>
+  <div class="cover-bottom"></div>
+  <div class="cover-inner">
+    <div class="flagline">
+      <span class="bar"></span>
+      <span class="text">Government of Pakistan &nbsp;|&nbsp; Constituency Administration</span>
+    </div>
+
+    <div class="emblem">
+      <svg width="46" height="46" viewBox="0 0 64 64" aria-hidden="true">
+        <circle cx="32" cy="32" r="29" fill="none" stroke="#c5a059" stroke-width="1.2" opacity=".65"/>
+        <path d="M41 20a14 14 0 1 0 0 24 15.5 15.5 0 1 1 0-24Z" fill="#ffffff" opacity=".95"/>
+        <path d="m47 25 1.4 4.1 4.3.1-3.4 2.6 1.2 4.1-3.5-2.5-3.5 2.5 1.2-4.1-3.4-2.6 4.3-.1L47 25Z" fill="#c5a059"/>
+      </svg>
+    </div>
+
+    <h1>CHRAS</h1>
+    <div class="subtitle">Constituency Human Resource &amp; Allocation System</div>
+    <div class="doc-title">Internal HR System &nbsp;&middot;&nbsp; Role, Capability &amp; Workflow Documentation</div>
+
+    <div class="spacer"></div>
+
+    <div class="cover-meta">
+      <div class="item">
+        <div class="label">Prepared For</div>
+        <div class="value">Client Review</div>
+      </div>
+      <div class="item">
+        <div class="label">Document</div>
+        <div class="value">Product &amp; Operations Guide</div>
+      </div>
+      <div class="item">
+        <div class="label">Version</div>
+        <div class="value">1.0 &nbsp;|&nbsp; October 2026</div>
+      </div>
+      <div class="item">
+        <div class="label">Status</div>
+        <div class="value">Working Demo / Internal Use</div>
+      </div>
+    </div>
+  </div>
+  <div class="confidential">
+    <span>Confidential &mdash; for client review and internal planning</span>
+    <span>CHRAS &middot; Islamic Republic of Pakistan</span>
+  </div>
+</section>
+
+<!-- ================= PAGE 2: CONTENTS + SUMMARY ================= -->
+<section class="page">
+  <div class="topbar">
+    <div class="brand"><span class="mark">C</span> CHRAS &middot; Internal HR System</div>
+    <div class="tag">PRODUCT DOCUMENTATION</div>
+  </div>
+
+  <div class="section-head">
+    <div class="section-kicker">01 &nbsp;/&nbsp; Introduction</div>
+    <h2>Contents &amp; Executive Summary</h2>
+    <div class="rule"></div>
+  </div>
+
+  <div class="toc">
+    <div class="toc-item"><span class="n">01</span><span class="t">Introduction &amp; Executive Summary</span></div>
+    <div class="toc-item"><span class="n">02</span><span class="t">The Problem and the Solution</span></div>
+    <div class="toc-item"><span class="n">03</span><span class="t">Roles, Names and Capabilities</span></div>
+    <div class="toc-item"><span class="n">04</span><span class="t">Complete End-to-End Workflow</span></div>
+    <div class="toc-item"><span class="n">05</span><span class="t">Permission Matrix</span></div>
+    <div class="toc-item"><span class="n">06</span><span class="t">Platform Modules and Technology</span></div>
+    <div class="toc-item"><span class="n">07</span><span class="t">API, Data and Security Notes</span></div>
+    <div class="toc-item"><span class="n">08</span><span class="t">Run Guide, Acceptance Checklist &amp; Next Steps</span></div>
+  </div>
+
+  <p class="lead">
+    CHRAS is a web-based internal HR platform for constituency-level appointments. It brings candidate
+    registration, document verification, seat allocation, official appointment letters, reporting and
+    internal coordination into one controlled system.
+  </p>
+
+  <div class="stats">
+    <div class="stat"><div class="num">10</div><div class="label">Login Types</div></div>
+    <div class="stat"><div class="num">9</div><div class="label">Officer Roles</div></div>
+    <div class="stat"><div class="num">7</div><div class="label">Workflow Steps</div></div>
+    <div class="stat"><div class="num">12</div><div class="label">Districts Seeded</div></div>
+  </div>
+
+  <div class="callout green">
+    <strong>Motive in one sentence:</strong> Replace scattered registers and manual files with one clear system where every
+    candidate is registered, checked, appointed and tracked &mdash; and no one can hold two active seats by mistake.
+  </div>
+
+  <h3>What the system delivers</h3>
+  <div class="cards">
+    <div class="card">
+      <div class="icon">01</div>
+      <h4>One candidate record</h4>
+      <p>Personal details, CNIC, academics, photograph and allocation history stay in one place.</p>
+    </div>
+    <div class="card">
+      <div class="icon">02</div>
+      <h4>Controlled authority</h4>
+      <p>Each role sees only the modules and buttons allowed by its permissions.</p>
+    </div>
+    <div class="card">
+      <div class="icon">03</div>
+      <h4>Transparent allocation</h4>
+      <p>District and constituency quotas, duplicate-allocation blocking and documented revocation.</p>
+    </div>
+    <div class="card">
+      <div class="icon">04</div>
+      <h4>Candidate self-service</h4>
+      <p>A read-only portal shows the candidate their own status, seat and appointment letter.</p>
+    </div>
+  </div>
+
+  <div class="note" style="margin-top:10px;">
+    <strong>Document scope:</strong> This guide describes the current working build. It is written for a client walkthrough,
+    role confirmation and acceptance discussion. Names shown are demo accounts and can be replaced with real officers
+    during deployment.
+  </div>
+
+  <div class="footer"><span>CHRAS &middot; Internal HR System Documentation</span><span class="p">Page 2</span></div>
+</section>
+
+<!-- ================= PAGE 3: PROBLEM / SOLUTION ================= -->
+<section class="page">
+  <div class="topbar">
+    <div class="brand"><span class="mark">C</span> CHRAS &middot; Internal HR System</div>
+    <div class="tag">WHY THIS SYSTEM EXISTS</div>
+  </div>
+
+  <div class="section-head">
+    <div class="section-kicker">02 &nbsp;/&nbsp; Purpose</div>
+    <h2>The Problem and the Solution</h2>
+    <div class="rule"></div>
+  </div>
+
+  <div class="two-col">
+    <div>
+      <h3 style="color:#b91c1c;">Without a system</h3>
+      <ul class="clean">
+        <li>Candidate files live in registers, Excel sheets and paper folders.</li>
+        <li>Officers cannot quickly see who is verified, allocated or pending.</li>
+        <li>The same person can be appointed to two active roles by mistake.</li>
+        <li>Candidates have no clear way to check their own status.</li>
+        <li>Reports require manual counting and take hours to prepare.</li>
+        <li>There is no consistent record of who cancelled an appointment and why.</li>
+      </ul>
+    </div>
+    <div>
+      <h3 class="green">With CHRAS</h3>
+      <ul class="clean">
+        <li>Every candidate has one digital record from enrolment onward.</li>
+        <li>Dashboard cards and filters show verified, pending and allocated counts.</li>
+        <li>The system blocks a second active allocation for the same candidate.</li>
+        <li>Candidates log in and view their own seat and appointment letter.</li>
+        <li>Reports are generated from live data in a few clicks.</li>
+        <li>Revocation requires a written reason and automatically frees the seat.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="callout">
+    <strong>Simple example:</strong> A candidate registers, an authorised officer verifies the record, an allocator
+    assigns a seat, and the system creates the appointment reference. If the appointment is later cancelled, the
+    reason is stored and the candidate returns to the verified pool.
+  </div>
+
+  <h3>Who uses the platform</h3>
+  <div class="cards three">
+    <div class="card">
+      <div class="icon">A</div>
+      <h4>Administration</h4>
+      <p>Admin, MNA, MPA, District Chairperson, Civil Officer and Committee Head.</p>
+    </div>
+    <div class="card">
+      <div class="icon">B</div>
+      <h4>Field and office staff</h4>
+      <p>UC Chairman, Councilor and Public Sector Staff handle enrolment and record entry.</p>
+    </div>
+    <div class="card">
+      <div class="icon">C</div>
+      <h4>Candidates</h4>
+      <p>Citizens with a read-only portal for their own record, allocation and letter.</p>
+    </div>
+  </div>
+
+  <h3 style="margin-top:10px;">Design principles</h3>
+  <div class="cards">
+    <div class="card"><h4>Role-based access</h4><p>A staff worker can register a candidate but cannot allocate a seat unless the role allows it.</p></div>
+    <div class="card"><h4>One source of truth</h4><p>Dashboard, reports, allocation and candidate portal all read the same stored records.</p></div>
+    <div class="card"><h4>Documented decisions</h4><p>Allocations carry a reference number; cancellations carry a reason and date.</p></div>
+    <div class="card"><h4>Read-only candidate view</h4><p>Candidates can see their own information but cannot change official records.</p></div>
+  </div>
+
+  <div class="footer"><span>CHRAS &middot; Internal HR System Documentation</span><span class="p">Page 3</span></div>
+</section>
+
+<!-- ================= PAGE 4: ROLES TABLE ================= -->
+<section class="page">
+  <div class="topbar">
+    <div class="brand"><span class="mark">C</span> CHRAS &middot; Internal HR System</div>
+    <div class="tag">ROLE CAPABILITIES</div>
+  </div>
+
+  <div class="section-head">
+    <div class="section-kicker">03 &nbsp;/&nbsp; People</div>
+    <h2>Roles, Names and Capabilities</h2>
+    <div class="rule"></div>
+  </div>
+
+  <p class="small muted" style="margin-bottom:7px;">
+    The names below are demo accounts inside the current build. In deployment they represent the client's real officers.
+  </p>
+
+  <table>
+    <thead>
+      <tr>
+        <th style="width:3%;">#</th>
+        <th style="width:20%;">Role / demo person</th>
+        <th style="width:18%;">Main work</th>
+        <th style="width:34%;">What they can do</th>
+        <th style="width:25%;">What they cannot do</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>1</td>
+        <td><span class="role-name">Admin</span><span class="person">Dr. Tariq Jamil Chishti</span><span class="tag gold">Full control</span></td>
+        <td>Overall system control and oversight.</td>
+        <td>Register and verify candidates, allocate seats, cancel appointments, generate reports, send messages, view all records.</td>
+        <td>No restrictions in the current build.</td>
+      </tr>
+      <tr>
+        <td>2</td>
+        <td><span class="role-name">MNA</span><span class="person">Malik Naveed Awan</span><span class="tag green">Elected</span></td>
+        <td>Constituency oversight and appointments.</td>
+        <td>Register and verify candidates, allocate seats, generate reports, send messages.</td>
+        <td>Cannot cancel an appointment; cannot change system-wide settings.</td>
+      </tr>
+      <tr>
+        <td>3</td>
+        <td><span class="role-name">MPA</span><span class="person">Syeda Fatimah Bokhari</span><span class="tag green">Elected</span></td>
+        <td>Provincial oversight and appointments.</td>
+        <td>Register and verify candidates, allocate seats, generate reports, send messages.</td>
+        <td>Cannot cancel an appointment; cannot change system-wide settings.</td>
+      </tr>
+      <tr>
+        <td>4</td>
+        <td><span class="role-name">District Chairperson</span><span class="person">Chaudhry Riaz Gujjar</span><span class="tag teal">District</span></td>
+        <td>District-level hiring and administration.</td>
+        <td>Register and verify candidates, allocate seats, cancel appointments, generate reports, send messages.</td>
+        <td>No district-management screen; no system-wide settings.</td>
+      </tr>
+      <tr>
+        <td>5</td>
+        <td><span class="role-name">Civil Administration Officer</span><span class="person">Kamran Shahbaz</span><span class="tag slate">Civil service</span></td>
+        <td>Civil appointments and official letters.</td>
+        <td>Register and verify candidates, allocate seats, cancel appointments, generate reports, send messages.</td>
+        <td>No restriction on the normal HR workflow.</td>
+      </tr>
+      <tr>
+        <td>6</td>
+        <td><span class="role-name">Committee Head</span><span class="person">Prof. Dr. Nargis Farooq</span><span class="tag purple">Audit</span></td>
+        <td>Independent audit and review.</td>
+        <td>Review candidate records, generate audit reports, send messages.</td>
+        <td>Cannot register candidates; cannot allocate seats.</td>
+      </tr>
+      <tr>
+        <td>7</td>
+        <td><span class="role-name">UC Chairman</span><span class="person">Haji Abdul Rehman Durrani</span><span class="tag teal">Local</span></td>
+        <td>Grassroots enrolment.</td>
+        <td>Register and verify local candidates, send messages.</td>
+        <td>Cannot allocate seats, cancel appointments or generate reports.</td>
+      </tr>
+      <tr>
+        <td>8</td>
+        <td><span class="role-name">Councilor</span><span class="person">Bilal Hassan Abbasi</span><span class="tag teal">Local</span></td>
+        <td>Ward-level enrolment.</td>
+        <td>Register and verify local candidates, send messages.</td>
+        <td>Cannot allocate seats, cancel appointments or generate reports.</td>
+      </tr>
+      <tr>
+        <td>9</td>
+        <td><span class="role-name">Public Sector Staff</span><span class="person">Zubair Ahmad Qazi</span><span class="tag blue">Staff</span></td>
+        <td>Data entry and record checking.</td>
+        <td>Register and verify candidate records, send messages.</td>
+        <td>Cannot allocate seats, cancel appointments or generate reports.</td>
+      </tr>
+      <tr>
+        <td>10</td>
+        <td><span class="role-name">Candidate</span><span class="person">Registered citizen, e.g. Muhammad Hamza Tariq</span><span class="tag green">Read-only</span></td>
+        <td>View own record and appointment.</td>
+        <td>See own profile, status, allocated seat and appointment letter.</td>
+        <td>Cannot edit records, view other candidates, allocate or cancel anything.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout" style="margin-top:8px;">
+    <strong>Important distinction:</strong> being an office worker does not automatically grant allocation rights.
+    Zubair Ahmad Qazi (Staff) can register a candidate but cannot give a seat. Chaudhry Riaz Gujjar (District
+    Chairperson) can register, allocate and cancel. Authority follows the role, not the desk.
+  </div>
+
+  <div class="footer"><span>CHRAS &middot; Internal HR System Documentation</span><span class="p">Page 4</span></div>
+</section>
+
+<!-- ================= PAGE 5: FLOW + MATRIX ================= -->
+<section class="page">
+  <div class="topbar">
+    <div class="brand"><span class="mark">C</span> CHRAS &middot; Internal HR System</div>
+    <div class="tag">END-TO-END FLOW</div>
+  </div>
+
+  <div class="section-head">
+    <div class="section-kicker">04 &nbsp;/&nbsp; Workflow</div>
+    <h2>Complete End-to-End Flow</h2>
+    <div class="rule"></div>
+  </div>
+
+  <div class="flow">
+    <div class="flow-step">
+      <div class="num">1</div>
+      <div class="body"><h4>Apply or register</h4><p>The candidate signs up online, or an authorised officer registers them. CNIC, education, photograph and portal password are saved. <span class="who">Candidate, Staff, UC Chairman, Councilor, MNA, MPA, District Chairperson, Civil Officer, Admin.</span></p></div>
+    </div>
+    <div class="flow-step">
+      <div class="num">2</div>
+      <div class="body"><h4>Check and verify the record</h4><p>The enrolling officer checks identity and documents. Officer enrolment saves the record as <strong>Verified</strong>; self-signup starts as <strong>Registered</strong>. <span class="who">Registering roles above; Committee Head can review but not edit.</span></p></div>
+    </div>
+    <div class="flow-step">
+      <div class="num">3</div>
+      <div class="body"><h4>Allocate a seat or role</h4><p>The allocator selects the candidate, district, constituency, role and tenure. The system blocks a second active seat for the same candidate. <span class="who">Admin, MNA, MPA, District Chairperson, Civil Officer.</span></p></div>
+    </div>
+    <div class="flow-step">
+      <div class="num">4</div>
+      <div class="body"><h4>Issue the appointment letter</h4><p>The system creates an official appointment reference and Gazette-style letter, and marks the candidate <strong>Allocated</strong>. <span class="who">System; allocator can view the letter.</span></p></div>
+    </div>
+    <div class="flow-step">
+      <div class="num">5</div>
+      <div class="body"><h4>Candidate views the result</h4><p>The candidate logs in to a read-only portal and sees their own record, allocated seat and appointment letter. <span class="who">Candidate only.</span></p></div>
+    </div>
+    <div class="flow-step">
+      <div class="num">6</div>
+      <div class="body"><h4>Cancel with a reason, if needed</h4><p>The authorised officer writes a reason. The appointment becomes <strong>Revoked</strong>, the candidate returns to <strong>Verified</strong>, and the seat is freed. <span class="who">Admin, District Chairperson, Civil Officer.</span></p></div>
+    </div>
+    <div class="flow-step">
+      <div class="num">7</div>
+      <div class="body"><h4>Report and coordinate</h4><p>Dashboards show quota use, verification progress and role/party breakdowns. Reports can be generated and staff can message each other. <span class="who">Authorised report roles and all officer roles.</span></p></div>
+    </div>
+  </div>
+
+  <div class="section-head" style="margin-top:10px;">
+    <div class="section-kicker">05 &nbsp;/&nbsp; Permissions</div>
+    <h2>Permission Matrix</h2>
+    <div class="rule"></div>
+  </div>
+
+  <table class="matrix">
+    <thead>
+      <tr>
+        <th style="width:24%;">Role</th>
+        <th>Register / Verify</th>
+        <th>Allocate Seat</th>
+        <th>Cancel</th>
+        <th>Reports</th>
+        <th>Messages</th>
+        <th>Own Portal</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td><strong>Admin</strong></td><td class="yes">&#10003;</td><td class="yes">&#10003;</td><td class="yes">&#10003;</td><td class="yes">&#10003;</td><td class="yes">&#10003;</td><td class="no">&mdash;</td></tr>
+      <tr><td><strong>MNA</strong></td><td class="yes">&#10003;</td><td class="yes">&#10003;</td><td class="no">&mdash;</td><td class="yes">&#10003;</td><td class="yes">&#10003;</td><td class="no">&mdash;</td></tr>
+      <tr><td><strong>MPA</strong></td><td class="yes">&#10003;</td><td class="yes">&#10003;</td><td class="no">&mdash;</td><td class="yes">&#10003;</td><td class="yes">&#10003;</td><td class="no">&mdash;</td></tr>
+      <tr><td><strong>District Chairperson</strong></td><td class="yes">&#10003;</td><td class="yes">&#10003;</td><td class="yes">&#10003;</td><td class="yes">&#10003;</td><td class="yes">&#10003;</td><td class="no">&mdash;</td></tr>
+      <tr><td><strong>Civil Officer</strong></td><td class="yes">&#10003;</td><td class="yes">&#10003;</td><td class="yes">&#10003;</td><td class="yes">&#10003;</td><td class="yes">&#10003;</td><td class="no">&mdash;</td></tr>
+      <tr><td><strong>Committee Head</strong></td><td class="no">&mdash;</td><td class="no">&mdash;</td><td class="no">&mdash;</td><td class="yes">&#10003;</td><td class="yes">&#10003;</td><td class="no">&mdash;</td></tr>
+      <tr><td><strong>UC Chairman</strong></td><td class="yes">&#10003;</td><td class="no">&mdash;</td><td class="no">&mdash;</td><td class="no">&mdash;</td><td class="yes">&#10003;</td><td class="no">&mdash;</td></tr>
+      <tr><td><strong>Councilor</strong></td><td class="yes">&#10003;</td><td class="no">&mdash;</td><td class="no">&mdash;</td><td class="no">&mdash;</td><td class="yes">&#10003;</td><td class="no">&mdash;</td></tr>
+      <tr><td><strong>Public Sector Staff</strong></td><td class="yes">&#10003;</td><td class="no">&mdash;</td><td class="no">&mdash;</td><td class="no">&mdash;</td><td class="yes">&#10003;</td><td class="no">&mdash;</td></tr>
+      <tr><td><strong>Candidate</strong></td><td class="no">&mdash;</td><td class="no">&mdash;</td><td class="no">&mdash;</td><td class="no">&mdash;</td><td class="no">&mdash;</td><td class="yes">&#10003;</td></tr>
+    </tbody>
+  </table>
+
+  <p class="tiny muted" style="margin-top:4px;">This matrix reflects the current user-facing build. Buttons and tabs are hidden or blocked when a role lacks permission.</p>
+
+  <div class="footer"><span>CHRAS &middot; Internal HR System Documentation</span><span class="p">Page 5</span></div>
+</section>
+
+<!-- ================= PAGE 6: MODULES + TECH ================= -->
+<section class="page">
+  <div class="topbar">
+    <div class="brand"><span class="mark">C</span> CHRAS &middot; Internal HR System</div>
+    <div class="tag">PLATFORM MODULES</div>
+  </div>
+
+  <div class="section-head">
+    <div class="section-kicker">06 &nbsp;/&nbsp; Product</div>
+    <h2>Modules and Technology</h2>
+    <div class="rule"></div>
+  </div>
+
+  <div class="cards three">
+    <div class="card"><div class="icon">01</div><h4>Public landing portal</h4><p>Government-style introduction, district quota cards, role information, CNIC verification lookup and registration calls to action.</p></div>
+    <div class="card"><div class="icon">02</div><h4>Authentication</h4><p>Separate officer and candidate sign-in, demo role selection, secure candidate password hashing and session handling.</p></div>
+    <div class="card"><div class="icon">03</div><h4>Analytics dashboard</h4><p>Total registered candidates, active allocations, quota utilisation, verification progress, role and party breakdowns.</p></div>
+    <div class="card"><div class="icon">04</div><h4>Candidate registration</h4><p>Personal details, CNIC, domicile, party affiliation, matric/FSc/higher education and photograph upload preview.</p></div>
+    <div class="card"><div class="icon">05</div><h4>Seat allocation</h4><p>Allocation form, duplicate-seat prevention, searchable appointment register, Gazette letter view and reasoned revocation.</p></div>
+    <div class="card"><div class="icon">06</div><h4>Appointment letters</h4><p>Official reference number, appointee details, role, district, tenure, issuing authority and print-ready layout.</p></div>
+    <div class="card"><div class="icon">07</div><h4>Reports</h4><p>District summaries, party and role breakdowns, verified allocation table and press-release copy action.</p></div>
+    <div class="card"><div class="icon">08</div><h4>Internal messaging</h4><p>Role-prefilled official notices, priority levels, district filters and read/unread tracking.</p></div>
+    <div class="card"><div class="icon">09</div><h4>Candidate portal</h4><p>Read-only personal record, academic history, allocation details and appointment letter access.</p></div>
+  </div>
+
+  <h3 style="margin-top:10px;">Application routes</h3>
+  <table>
+    <thead><tr><th style="width:22%;">Route</th><th style="width:28%;">Purpose</th><th>Access</th></tr></thead>
+    <tbody>
+      <tr><td><strong>/</strong></td><td>Landing page and authenticated dashboard shell</td><td>Public; dashboard after login</td></tr>
+      <tr><td><strong>/login</strong></td><td>Officer and candidate sign-in</td><td>Public</td></tr>
+      <tr><td><strong>/signup</strong></td><td>Candidate self-registration</td><td>Public</td></tr>
+      <tr><td><strong>/api/auth/candidate</strong></td><td>Candidate credential verification</td><td>API</td></tr>
+      <tr><td><strong>/api/candidates</strong></td><td>Candidate list, create and update records</td><td>API</td></tr>
+      <tr><td><strong>/api/allocations</strong></td><td>Appointment list and seat allocation</td><td>API</td></tr>
+      <tr><td><strong>/api/analytics</strong></td><td>Dashboard totals and breakdowns</td><td>API</td></tr>
+    </tbody>
+  </table>
+
+  <h3 style="margin-top:8px;">Technology stack</h3>
+  <div class="three-col">
+    <div class="card"><h4>Frontend</h4><p>Next.js 16 App Router, React 19, TypeScript, Tailwind CSS v4.</p></div>
+    <div class="card"><h4>UI and feedback</h4><p>lucide-react icons, Sonner notifications, canvas-confetti confirmations.</p></div>
+    <div class="card"><h4>Backend and data</h4><p>Next.js route handlers, Node crypto scrypt, JSON file database.</p></div>
+  </div>
+
+  <div class="callout green" style="margin-top:8px;">
+    <strong>Design language:</strong> Pakistan green, white and restrained gold. Green is reserved for official actions and
+    identity; party and role badges use distinct colours so the dashboard remains readable.
+  </div>
+
+  <div class="footer"><span>CHRAS &middot; Internal HR System Documentation</span><span class="p">Page 6</span></div>
+</section>
+
+<!-- ================= PAGE 7: API + SECURITY ================= -->
+<section class="page">
+  <div class="topbar">
+    <div class="brand"><span class="mark">C</span> CHRAS &middot; Internal HR System</div>
+    <div class="tag">TECHNICAL NOTES</div>
+  </div>
+
+  <div class="section-head">
+    <div class="section-kicker">07 &nbsp;/&nbsp; API &amp; Data</div>
+    <h2>API Surface, Data Model and Security</h2>
+    <div class="rule"></div>
+  </div>
+
+  <table>
+    <thead><tr><th style="width:28%;">Endpoint</th><th style="width:18%;">Methods</th><th>Purpose</th></tr></thead>
+    <tbody>
+      <tr><td><strong>/api/candidates</strong></td><td>GET, POST</td><td>List candidates; create a candidate with hashed password.</td></tr>
+      <tr><td><strong>/api/candidates/[id]</strong></td><td>GET, PATCH, DELETE</td><td>Read, update or remove one candidate; password hashes are stripped from responses.</td></tr>
+      <tr><td><strong>/api/allocations</strong></td><td>GET, POST</td><td>Filter allocation register; allocate a seat and generate an appointment reference.</td></tr>
+      <tr><td><strong>/api/allocations/[id]</strong></td><td>PATCH</td><td>Revoke an allocation with a reason; frees the seat and restores candidate status.</td></tr>
+      <tr><td><strong>/api/analytics</strong></td><td>GET</td><td>Dashboard totals with optional district filter.</td></tr>
+      <tr><td><strong>/api/districts</strong></td><td>GET</td><td>District list, quotas and constituency data.</td></tr>
+      <tr><td><strong>/api/messages</strong></td><td>GET, POST, PATCH</td><td>Read messages, send notices, mark messages as read.</td></tr>
+      <tr><td><strong>/api/auth/candidate</strong></td><td>POST</td><td>Verify CNIC and candidate portal password.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="two-col" style="margin-top:9px;">
+    <div>
+      <h3>Core records</h3>
+      <ul class="clean">
+        <li><strong>Candidate:</strong> identity, contact, domicile, party, academics, documents, status and allocated role.</li>
+        <li><strong>District:</strong> province, constituencies, total quota and allocated count.</li>
+        <li><strong>Allocation:</strong> reference number, candidate, role, district, constituency, tenure, issuing authority and status.</li>
+        <li><strong>Message:</strong> sender, role, district, subject, body, priority and read state.</li>
+      </ul>
+    </div>
+    <div>
+      <h3>Status values</h3>
+      <ul class="clean">
+        <li><strong>Candidate:</strong> Registered, Verified, Allocated, Under Review.</li>
+        <li><strong>Allocation:</strong> Active, Revoked, Completed.</li>
+        <li><strong>Priority:</strong> Urgent, Official Notice, Routine, Inquiry.</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3 style="margin-top:6px;">Security and production readiness</h3>
+  <div class="callout">
+    <strong>Implemented now:</strong> candidate passwords are hashed with scrypt and salts; password hashes never leave the
+    server; sessions are stored locally; duplicate active allocations are blocked; revocation requires a stored reason.
+  </div>
+
+  <div class="callout" style="border-left-color:#b91c1c; background:#fdf2f2;">
+    <strong>Before real government deployment:</strong> replace demo officer passwords with real authentication/SSO;
+    add server-side session and role enforcement on every API; move from JSON file storage to PostgreSQL or SQL Server;
+    connect real document storage and NADRA verification; add audit logs, backups, HTTPS and access monitoring.
+  </div>
+
+  <div class="note">
+    <strong>Why this matters:</strong> the current build is complete as a working demo and internal review system. The items
+    above are production hardening, not missing screens in the normal user flow.
+  </div>
+
+  <div class="note" style="margin-top:7px;">
+    <strong>Confirmation point:</strong> officer enrolment currently counts as verification; self-registered candidates
+    start as <em>Registered</em>. If a separate second approval step is required, confirm it before final acceptance.
+  </div>
+
+  <div class="footer"><span>CHRAS &middot; Internal HR System Documentation</span><span class="p">Page 7</span></div>
+</section>
+
+<!-- ================= PAGE 8: RUN + CHECKLIST ================= -->
+<section class="page">
+  <div class="topbar">
+    <div class="brand"><span class="mark">C</span> CHRAS &middot; Internal HR System</div>
+    <div class="tag">HANDOVER &amp; ACCEPTANCE</div>
+  </div>
+
+  <div class="section-head">
+    <div class="section-kicker">08 &nbsp;/&nbsp; Handover</div>
+    <h2>Run Guide, Acceptance Checklist and Next Steps</h2>
+    <div class="rule"></div>
+  </div>
+
+  <div class="two-col">
+    <div>
+      <h3>Run the project</h3>
+      <div class="code"><span class="c"># install dependencies</span>
+npm install
+
+<span class="c"># start development server</span>
+npm run dev
+
+<span class="c"># quality checks</span>
+npx tsc --noEmit
+npm run lint
+npm run build
+
+<span class="c"># open in browser</span>
+http://localhost:3000</div>
+    </div>
+    <div>
+      <h3>Demo login</h3>
+      <table>
+        <thead><tr><th>Login type</th><th>Username</th><th>Password</th></tr></thead>
+        <tbody>
+          <tr><td>Admin</td><td><strong>admin</strong></td><td>admin</td></tr>
+          <tr><td>MNA</td><td><strong>mna</strong></td><td>mna</td></tr>
+          <tr><td>MPA</td><td><strong>mpa</strong></td><td>mpa</td></tr>
+          <tr><td>District Chairperson</td><td><strong>chairperson</strong></td><td>chairperson</td></tr>
+          <tr><td>UC Chairman</td><td><strong>uc_chairman</strong></td><td>uc_chairman</td></tr>
+          <tr><td>Councilor</td><td><strong>councilor</strong></td><td>councilor</td></tr>
+          <tr><td>Civil Officer</td><td><strong>civil_officer</strong></td><td>civil_officer</td></tr>
+          <tr><td>Committee Head</td><td><strong>committee_head</strong></td><td>committee_head</td></tr>
+          <tr><td>Staff</td><td><strong>staff</strong></td><td>staff</td></tr>
+          <tr><td>Candidate</td><td>CNIC</td><td>CNIC digits (demo) or chosen password</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <h3 style="margin-top:9px;">Client acceptance checklist</h3>
+  <div class="checklist">
+    <div class="check"><span class="box"></span><span>Public landing page and candidate verification lookup</span></div>
+    <div class="check"><span class="box"></span><span>Officer and candidate sign-in routes</span></div>
+    <div class="check"><span class="box"></span><span>Candidate self-registration with portal password</span></div>
+    <div class="check"><span class="box"></span><span>Role-based sidebar, tabs and action buttons</span></div>
+    <div class="check"><span class="box"></span><span>Candidate registration with academic record and photograph</span></div>
+    <div class="check"><span class="box"></span><span>Seat allocation with duplicate-seat prevention</span></div>
+    <div class="check"><span class="box"></span><span>Appointment letter and Gazette reference</span></div>
+    <div class="check"><span class="box"></span><span>Reasoned appointment cancellation</span></div>
+    <div class="check"><span class="box"></span><span>Dashboard analytics, quota and party/role breakdowns</span></div>
+    <div class="check"><span class="box"></span><span>Reports and press-release copy action</span></div>
+    <div class="check"><span class="box"></span><span>Internal messaging with read/unread state</span></div>
+    <div class="check"><span class="box"></span><span>Read-only candidate portal</span></div>
+  </div>
+
+  <h3 style="margin-top:9px;">Recommended next steps</h3>
+  <div class="cards">
+    <div class="card"><h4>1. Confirm role policy</h4><p>Client approves who may register, allocate, cancel and report.</p></div>
+    <div class="card"><h4>2. Replace demo accounts</h4><p>Create real officer accounts and remove demo passwords.</p></div>
+    <div class="card"><h4>3. Move to production data</h4><p>Database, backups, document storage and server-side permissions.</p></div>
+    <div class="card"><h4>4. Pilot one district</h4><p>Run a controlled pilot, collect feedback, then roll out province-wide.</p></div>
+  </div>
+
+  <div class="end-band">
+    <h3>Summary for the client</h3>
+    <p>
+      CHRAS gives every role a clear boundary. Staff can register and check records. Authorised officers can allocate
+      and cancel seats. Auditors can review and report. Candidates can only view their own appointment. Every action
+      stays connected to one candidate record, one allocation register and one audit-friendly history.
+    </p>
+  </div>
+
+  <div class="footer"><span>CHRAS &middot; Internal HR System Documentation</span><span class="p">Page 8</span></div>
+</section>
+
+</body>
+</html>

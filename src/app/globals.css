@@ -1,0 +1,273 @@
+@import "tailwindcss";
+
+/*
+  Internal HR System visual system
+  Inspired by the flag of Pakistan: deep green + white, with restrained gold.
+  Green is used for identity and primary actions only; surfaces stay white/neutral.
+*/
+@theme inline {
+  --font-sans: var(--font-jakarta), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-display: var(--font-outfit), var(--font-jakarta), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains), ui-monospace, "SFMono-Regular", Consolas, monospace;
+
+  --color-pak-50: #eff8f2;
+  --color-pak-100: #d9efe3;
+  --color-pak-200: #b4e0c9;
+  --color-pak-300: #82cba7;
+  --color-pak-400: #4bb081;
+  --color-pak-500: #269463;
+  --color-pak-600: #046a38;
+  --color-pak-700: #035a30;
+  --color-pak-800: #024a28;
+  --color-pak-900: #013a20;
+  --color-pak-950: #012413;
+  --color-pak-gold: #c5a059;
+  --color-pak-gold-soft: #f6efdf;
+
+  /* Keep existing emerald utilities aligned with the official green palette. */
+  --color-emerald-50: #eff8f2;
+  --color-emerald-100: #d9efe3;
+  --color-emerald-200: #b4e0c9;
+  --color-emerald-300: #82cba7;
+  --color-emerald-400: #4bb081;
+  --color-emerald-500: #269463;
+  --color-emerald-600: #046a38;
+  --color-emerald-700: #035a30;
+  --color-emerald-800: #024a28;
+  --color-emerald-900: #013a20;
+  --color-emerald-950: #012413;
+}
+
+:root {
+  --pak-green: #046a38;
+  --pak-green-dark: #024a28;
+  --pak-green-deep: #013a20;
+  --pak-green-light: #4bb081;
+  --pak-green-subtle: #eff8f2;
+  --pak-gold: #c5a059;
+  --pak-gold-light: #f6efdf;
+  --surface: #ffffff;
+  --page: #f7f8f6;
+  --border: #e5e9e5;
+  --ink: #101828;
+}
+
+/* Universal pointer cursor for interactive elements */
+button,
+[role="button"],
+a[href],
+select,
+summary,
+label[for],
+[data-clickable="true"],
+input[type="submit"],
+input[type="button"],
+input[type="reset"],
+input[type="checkbox"],
+input[type="radio"],
+input[type="file"],
+.cursor-pointer,
+.clickable-card,
+.role-chip,
+.nav-pill {
+  cursor: pointer;
+}
+
+button:disabled,
+[aria-disabled="true"],
+input:disabled,
+select:disabled,
+textarea:disabled,
+.disabled\:opacity-50:disabled {
+  cursor: not-allowed;
+}
+
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--page);
+  color: var(--ink);
+  overflow-x: hidden;
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+code, kbd, samp, pre {
+  font-family: var(--font-mono);
+}
+
+/* Anchor navigation clears the sticky public header */
+[id] {
+  scroll-margin-top: 5.5rem;
+}
+
+/* Accessible, consistent focus ring */
+:where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+  outline: 2px solid var(--pak-green);
+  outline-offset: 2px;
+}
+
+::selection {
+  background-color: var(--pak-green);
+  color: #ffffff;
+}
+
+/* Structural surfaces */
+.bg-pak-gradient {
+  background:
+    radial-gradient(1100px 600px at 100% -10%, rgba(4, 106, 56, 0.08), transparent 60%),
+    linear-gradient(180deg, #ffffff 0%, #f7f8f6 100%);
+}
+
+.bg-pak-subtle {
+  background: linear-gradient(180deg, #ffffff 0%, #f7f8f6 100%);
+}
+
+.bg-flag-green {
+  background:
+    radial-gradient(900px 500px at 90% 0%, rgba(197, 160, 89, 0.18), transparent 55%),
+    linear-gradient(135deg, #013a20 0%, #024a28 45%, #046a38 100%);
+}
+
+.flag-stripe {
+  background: linear-gradient(90deg, #046a38 0%, #046a38 38%, #ffffff 38%, #ffffff 100%);
+}
+
+.gov-card {
+  background-color: #ffffff;
+  border: 1px solid var(--border);
+  box-shadow: 0 1px 2px 0 rgba(16, 24, 40, 0.04);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.gov-card-hover:hover {
+  border-color: rgba(4, 106, 56, 0.28);
+  box-shadow: 0 12px 28px -18px rgba(16, 24, 40, 0.28);
+}
+
+/* Thin gold rule used as an official accent */
+.gold-rule {
+  height: 3px;
+  background: linear-gradient(90deg, var(--pak-gold), #e7d6ae 60%, transparent);
+  border-radius: 999px;
+}
+
+/* Lightweight enter animations used by dialogs and accordions */
+@keyframes internal-hr-enter {
+  from {
+    opacity: var(--tw-enter-opacity, 1);
+    transform: translate3d(0, var(--tw-enter-translate-y, 0), 0) scale(var(--tw-enter-scale, 1));
+  }
+}
+
+.animate-in {
+  animation-name: internal-hr-enter;
+  animation-duration: 180ms;
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+  animation-fill-mode: both;
+}
+
+.fade-in {
+  --tw-enter-opacity: 0;
+}
+
+.zoom-in-95 {
+  --tw-enter-scale: 0.95;
+}
+
+.slide-in-from-top-2 {
+  --tw-enter-translate-y: -0.5rem;
+}
+
+.slide-in-from-top-4 {
+  --tw-enter-translate-y: -1rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-in {
+    animation: none;
+  }
+
+  html {
+    scroll-behavior: auto !important;
+  }
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* Modal helpers */
+.modal-scroll-lock {
+  overflow: hidden;
+}
+
+/* Custom scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f5f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c3cdc5;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #93a197;
+}
+
+/* Utility to hide scrollbar in tabs or horizontally scrollable bars */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Tables and long content stay usable on small screens */
+.table-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+@media print {
+  body.printing-gazette .dashboard-shell {
+    display: none !important;
+  }
+
+  aside,
+  header,
+  footer,
+  .print\:hidden {
+    display: none !important;
+  }
+
+  main {
+    padding: 0 !important;
+    max-width: none !important;
+  }
+
+  .print\:pl-0 {
+    padding-left: 0 !important;
+  }
+
+  body {
+    background: #ffffff !important;
+  }
+}
