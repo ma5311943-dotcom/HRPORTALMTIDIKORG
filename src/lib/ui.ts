@@ -36,22 +36,22 @@ export const PARTY_STYLES: Record<string, string> = {
 };
 
 export const PARTY_LABELS: Record<string, string> = {
-  "Quota A": "Recommended by Quota A",
-  "Quota B": "Recommended by Quota B",
-  "Quota C": "Recommended by Quota C",
-  "Quota D": "Recommended by Quota D",
-  "Quota E": "Recommended by Quota E",
-  "Quota F": "Recommended by Quota F",
-  "DIR-OFFICE": "Ref: Hospital Director",
-  "REF-NA-01": "Code: REF-A",
-  "REF-NA-02": "Code: REF-B",
-  "REF-PA-01": "Code: REF-C",
-  "REF-PA-02": "Code: REF-D",
-  "REF-DIST-01": "Code: REF-E",
-  "REF-NZM-01": "Code: REF-F",
-  "REF-NZM-02": "Code: REF-G",
+  "Quota A": "Recommended A",
+  "Quota B": "Recommended B",
+  "Quota C": "Recommended C",
+  "Quota D": "Recommended D",
+  "Quota E": "Recommended E",
+  "Quota F": "Recommended F",
+  "DIR-OFFICE": "Recommended Director Office",
+  "REF-NA-01": "Recommended A",
+  "REF-NA-02": "Recommended B",
+  "REF-PA-01": "Recommended C",
+  "REF-PA-02": "Recommended D",
+  "REF-DIST-01": "Recommended E",
+  "REF-NZM-01": "Recommended F",
+  "REF-NZM-02": "Recommended G",
   "MERIT-OPEN": "Open Merit",
-  "DEPT-DIRECT": "Hospital Director Directive",
+  "DEPT-DIRECT": "Direct / Open Merit",
 };
 
 export const ROLE_STYLES: Record<RoleCategory, string> = {

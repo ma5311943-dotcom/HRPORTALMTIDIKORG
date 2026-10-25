@@ -338,10 +338,10 @@ export default function CandidateRegistrationView({
         <div>
           <h2 className="text-xl sm:text-2xl font-bold text-slate-900 flex items-center gap-2">
             <UserPlus className="w-6 h-6 text-emerald-700" />
-            Candidate & Member Registration Roster
+            Staff Application Registry
           </h2>
           <p className="text-xs text-slate-500">
-            Official constituency enrollment, NADRA CNIC validation, and verified academic record storage
+            DHQ Hospital D.I. Khan — Staff registration with CNIC verification and document upload
           </p>
         </div>
 
@@ -354,7 +354,7 @@ export default function CandidateRegistrationView({
               }`}
           >
             <UserPlus className="w-4 h-4" />
-            <span>{showForm ? "Cancel Registration" : "+ Enroll New Candidate"}</span>
+            <span>{showForm ? "Cancel" : "+ Register New Applicant"}</span>
           </button>
         )}
       </div>
@@ -375,12 +375,10 @@ export default function CandidateRegistrationView({
             <span className="text-xs font-mono text-emerald-700 font-bold bg-emerald-50 px-2 py-1 rounded border border-emerald-200 shrink-0">
               Form DHQ-2026/HR
             </span>
-          </div>
-
-          {/* Section 1: Personal & Biometric Details */}
+                    {/* Section 1: Personal Details */}
           <div>
-            <h4 className="text-xs font-bold uppercase text-emerald-700 tracking-wider mb-3 flex items-center gap-1.5">
-              <span>Step 1: Personal & Biometric Identity</span>
+            <h4 className="text-xs font-bold uppercase text-emerald-700 tracking-wider mb-3">
+              1. Personal Information
             </h4>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -391,7 +389,7 @@ export default function CandidateRegistrationView({
                 <input
                   type="text"
                   required
-                  placeholder="e.g. Malik Muhammad Shahbaz"
+                  placeholder="Full name as on CNIC"
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
                   className="w-full text-xs p-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-600 focus:outline-none"
@@ -400,12 +398,12 @@ export default function CandidateRegistrationView({
 
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1">
-                  Father / Husband Name <span className="text-red-500">*</span>
+                  Father Name <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
                   required
-                  placeholder="e.g. Haji Muhammad Sharif"
+                  placeholder="Father / husband name"
                   value={fatherName}
                   onChange={(e) => setFatherName(e.target.value)}
                   className="w-full text-xs p-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-600 focus:outline-none"
@@ -414,7 +412,7 @@ export default function CandidateRegistrationView({
 
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1">
-                  CNIC Number (13 Digits) <span className="text-red-500">*</span>
+                  CNIC <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
@@ -428,13 +426,15 @@ export default function CandidateRegistrationView({
 
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1">
-                  Date of Birth
+                  Mobile Number <span className="text-red-500">*</span>
                 </label>
                 <input
-                  type="date"
-                  value={dob}
-                  onChange={(e) => setDob(e.target.value)}
-                  className="w-full text-xs p-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-600 focus:outline-none"
+                  type="text"
+                  required
+                  placeholder="0300-1234567"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  className="w-full text-xs p-2.5 font-mono border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-600 focus:outline-none"
                 />
               </div>
 
@@ -455,58 +455,28 @@ export default function CandidateRegistrationView({
 
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1">
-                  Father / Husband CNIC
+                  Date of Birth
                 </label>
                 <input
-                  type="text"
-                  placeholder="35201-7654321-1"
-                  value={fatherCnic}
-                  onChange={handleFatherCnicChange}
-                  className="w-full text-xs p-2.5 font-mono border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-600 focus:outline-none"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">
-                  Mobile Number <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  required
-                  placeholder="0300-1234567"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  className="w-full text-xs p-2.5 font-mono border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-600 focus:outline-none"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">
-                  Email Address
-                </label>
-                <input
-                  type="email"
-                  placeholder="staff@dhq.pk"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  type="date"
+                  value={dob}
+                  onChange={(e) => setDob(e.target.value)}
                   className="w-full text-xs p-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-600 focus:outline-none"
                 />
               </div>
             </div>
-          </div>
+          </div>  </div>
 
-          {/* Section 2: Role, Domicile & HR Reference */}
+          {/* Section 2: Role, District & Reference */}
           <div className="pt-2 border-t border-slate-100">
-            <h4 className="text-xs font-bold uppercase text-emerald-700 tracking-wider mb-3 flex items-center gap-1.5">
-              <Briefcase className="w-3.5 h-3.5" />
-              <span>Step 2: Applied Role, Domicile &amp; HR Reference</span>
+            <h4 className="text-xs font-bold uppercase text-emerald-700 tracking-wider mb-3">
+              2. Post Applied &amp; Recommendation
             </h4>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {/* Applied Role — most critical field */}
               <div className="sm:col-span-2 lg:col-span-1">
                 <label className="block text-xs font-bold text-slate-700 mb-1">
-                  Applied Role / Post <span className="text-red-500">*</span>
+                  Category (Post Applied) <span className="text-red-500">*</span>
                 </label>
                 <select
                   required
@@ -522,7 +492,7 @@ export default function CandidateRegistrationView({
 
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1">
-                  Domicile District <span className="text-red-500">*</span>
+                  District <span className="text-red-500">*</span>
                 </label>
                 <select
                   value={domicileDistrict}
@@ -530,35 +500,18 @@ export default function CandidateRegistrationView({
                   className="w-full text-xs p-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-600 focus:outline-none font-semibold text-slate-800"
                 >
                   {districts.map((d) => (
-                    <option key={d.id} value={d.name}>
-                      District {d.name} ({d.province})
-                    </option>
+                    <option key={d.id} value={d.name}>{d.name}</option>
                   ))}
                 </select>
               </div>
 
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1">
-                  Constituency / Zone
-                </label>
-                <select
-                  value={constituency}
-                  onChange={(e) => setConstituency(e.target.value)}
-                  className="w-full text-xs p-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-600 focus:outline-none font-bold text-emerald-700"
-                >
-                  {selectedDistrictObj?.constituencies.map((c) => (
-                    <option key={c} value={c}>{c}</option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">
-                  Tehsil / Sub-Division
+                  Tehsil
                 </label>
                 <input
                   type="text"
-                  placeholder="e.g. Daraban / Kulachi / Paharpur"
+                  placeholder="e.g. Daraban / Kulachi / Dera"
                   value={tehsil}
                   onChange={(e) => setTehsil(e.target.value)}
                   className="w-full text-xs p-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-600 focus:outline-none"
@@ -567,59 +520,32 @@ export default function CandidateRegistrationView({
 
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1">
-                  Union Council (UC)
-                </label>
-                <input
-                  type="text"
-                  placeholder="e.g. UC-04"
-                  value={unionCouncil}
-                  onChange={(e) => setUnionCouncil(e.target.value)}
-                  className="w-full text-xs p-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-600 focus:outline-none"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">
-                  Recommended By (Quota / Directive)
+                  Recommended By <span className="text-red-500">*</span>
                 </label>
                 <select
                   value={partyAffiliation}
                   onChange={(e) => setPartyAffiliation(e.target.value as PoliticalParty)}
                   className="w-full text-xs p-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-600 focus:outline-none font-bold text-slate-800"
                 >
-                  <option value="Quota A">Recommended by Quota A</option>
-                  <option value="Quota B">Recommended by Quota B</option>
-                  <option value="Quota C">Recommended by Quota C</option>
-                  <option value="Quota D">Recommended by Quota D</option>
-                  <option value="Quota E">Recommended by Quota E</option>
-                  <option value="Quota F">Recommended by Quota F</option>
-                  <option value="MERIT-OPEN">Open Merit (Direct)</option>
-                  <option value="DIR-OFFICE">Hospital Director Directive (DIR-OFFICE)</option>
-                  <option value="DEPT-DIRECT">Department Direct (DEPT-DIRECT)</option>
+                  <option value="Quota A">Recommended A</option>
+                  <option value="Quota B">Recommended B</option>
+                  <option value="Quota C">Recommended C</option>
+                  <option value="Quota D">Recommended D</option>
+                  <option value="Quota E">Recommended E</option>
+                  <option value="Quota F">Recommended F</option>
+                  <option value="MERIT-OPEN">Open Merit</option>
+                  <option value="DIR-OFFICE">Director Office</option>
                 </select>
               </div>
 
-              <div>
+              <div className="sm:col-span-2">
                 <label className="block text-xs font-bold text-slate-700 mb-1">
-                  Reference Code / File Detail
-                </label>
-                <input
-                  type="text"
-                  placeholder="Optional reference identifier e.g. HR-REF-A-01"
-                  value={referenceCode}
-                  onChange={(e) => setReferenceCode(e.target.value)}
-                  className="w-full text-xs p-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-600 focus:outline-none font-mono"
-                />
-              </div>
-
-              <div className="sm:col-span-2 lg:col-span-3">
-                <label className="block text-xs font-bold text-slate-700 mb-1">
-                  Complete Residential Address <span className="text-red-500">*</span>
+                  Home Address <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
                   required
-                  placeholder="Street address, Mohallah, House number"
+                  placeholder="Street, Mohallah, House number"
                   value={address}
                   onChange={(e) => setAddress(e.target.value)}
                   className="w-full text-xs p-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-600 focus:outline-none"
@@ -902,20 +828,9 @@ export default function CandidateRegistrationView({
             </div>
           </div>
 
-          {/* Section 5: Notes & Submit */}
+          {/* Submit */}
           <div className="pt-2 border-t border-slate-100">
-            <h4 className="text-xs font-bold uppercase text-emerald-700 tracking-wider mb-3 flex items-center gap-1.5">
-              <StickyNote className="w-3.5 h-3.5" />
-              <span>Step 5: Additional Notes &amp; Submit</span>
-            </h4>
-            <textarea
-              rows={3}
-              placeholder="Any remarks, medical notes, disability status, or special instructions..."
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-              className="w-full text-xs p-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-600 focus:outline-none resize-none"
-            />
-            <div className="flex flex-wrap items-center justify-end gap-3 mt-3">
+            <div className="flex flex-wrap items-center justify-end gap-3">
               <button
                 type="button"
                 onClick={closeForm}
@@ -928,7 +843,7 @@ export default function CandidateRegistrationView({
                 disabled={isSubmitting}
                 className="bg-emerald-700 hover:bg-emerald-800 text-white px-6 py-2.5 rounded-xl text-xs sm:text-sm font-bold shadow-md transition-all cursor-pointer disabled:opacity-50"
               >
-                {isSubmitting ? "Saving to DHQ HR System..." : "✓ Confirm & Save Staff Record"}
+                {isSubmitting ? "Saving..." : "✓ Save Application"}
               </button>
             </div>
           </div>
@@ -990,7 +905,7 @@ export default function CandidateRegistrationView({
                   src={cand.photoUrl}
                   alt={cand.fullName}
                   onError={(e) => {
-                    e.currentTarget.src = "/images/councilor_portrait.jpg";
+                    e.currentTarget.src = "/images/cand_hamza.jpg";
                   }}
                   className="w-14 h-14 rounded-xl object-cover border border-slate-200 bg-slate-100 flex-shrink-0 shadow-xs"
                 />
