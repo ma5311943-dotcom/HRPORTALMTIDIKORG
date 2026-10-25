@@ -324,10 +324,9 @@ export default function CandidateRegistrationView({
       c.phone.includes(searchQuery);
 
     const matchesDistrict = filterDistrict === "All" || c.domicileDistrict === filterDistrict;
-    const matchesParty = filterParty === "All" || c.partyAffiliation === filterParty;
     const matchesStatus = filterStatus === "All" || c.status === filterStatus;
 
-    return matchesSearch && matchesDistrict && matchesParty && matchesStatus;
+    return matchesSearch && matchesDistrict && matchesStatus;
   });
 
   const selectedDistrictObj = districts.find(d => d.name === domicileDistrict);
@@ -928,24 +927,6 @@ export default function CandidateRegistrationView({
                   {d.name}
                 </option>
               ))}
-            </select>
-
-            {/* Party Filter */}
-            <select
-              value={filterParty}
-              onChange={(e) => setFilterParty(e.target.value)}
-              className="text-xs p-2.5 border border-slate-300 rounded-xl bg-white font-semibold text-slate-700"
-            >
-              <option value="All">All Parties</option>
-              <option value="PTI">PTI</option>
-              <option value="PMLN">PML-N</option>
-              <option value="PPP">PPP</option>
-              <option value="JUI-F">JUI-F</option>
-              <option value="MQM-P">MQM-P</option>
-              <option value="JI">JI</option>
-              <option value="ANP">ANP</option>
-              <option value="TLP">TLP</option>
-              <option value="Independent">Independent</option>
             </select>
 
             {/* Status Filter */}

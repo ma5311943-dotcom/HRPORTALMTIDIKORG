@@ -354,7 +354,7 @@ function LoginPanel() {
                 {/* quick chips + submit on same row */}
                 <div className="flex items-center justify-between gap-2 pt-1">
                   <div className="flex flex-wrap gap-1">
-                    {["admin", "mna", "chairperson", "civil_officer", "staff"].map((key) => (
+                    {["admin", "director", "ms", "clerk", "operator"].map((key) => (
                       <button
                         key={key}
                         type="button"
