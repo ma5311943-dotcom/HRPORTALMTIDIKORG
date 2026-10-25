@@ -71,27 +71,28 @@ export default function DashboardTopBar({
 
   return (
     <header className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200 print:hidden">
-      {/* Utility bar — Dark Green UI */}
-      <div className="hidden sm:flex bg-[#072418] text-emerald-200/80 text-[11px] py-1.5 px-4 lg:px-6 items-center justify-between border-b border-[#0d3b28]">
-        <div className="flex items-center gap-2 min-w-0">
+      {/* Utility bar — Responsive Dark Green UI */}
+      <div className="flex bg-[#072418] text-emerald-200/80 text-[10px] sm:text-[11px] py-1.5 px-3 sm:px-4 lg:px-6 items-center justify-between border-b border-[#0d3b28]">
+        <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
           <span className="w-2 h-2 rounded-full bg-[#10b981] animate-pulse shrink-0" />
           <span className="font-bold text-white tracking-wide truncate">
-            <span className="xl:hidden">GOVT OF KPK • DHQ HOSPITAL</span>
+            <span className="sm:hidden">KPK • DHQ</span>
+            <span className="hidden sm:inline xl:hidden">GOVT OF KPK • DHQ HOSPITAL</span>
             <span className="hidden xl:inline">GOVERNMENT OF KHYBER PAKHTUNKHWA • DHQ HOSPITAL HR SYSTEM</span>
           </span>
-          <span className="text-emerald-500/40 hidden md:inline">|</span>
-          <span className="truncate hidden md:inline text-[11px]">
-            Signed in: <strong className="text-white">{user.name}</strong> <span className="hidden lg:inline">({user.role})</span>
+          <span className="text-emerald-500/40">|</span>
+          <span className="truncate text-[10px] sm:text-[11px]">
+            <span className="text-emerald-300/80">Signed in:</span> <strong className="text-white">{user.name}</strong> <span className="hidden lg:inline text-emerald-200/70">({user.role})</span>
           </span>
         </div>
 
-        <div className="flex items-center gap-3 shrink-0">
+        <div className="flex items-center gap-2 sm:gap-3 shrink-0 ml-1">
           <button
             onClick={onGoToLandingPage}
             className="flex items-center gap-1 text-emerald-200/80 hover:text-white cursor-pointer font-medium"
           >
             <Globe2 className="w-3 h-3 text-[#10b981]" />
-            <span>Landing Page</span>
+            <span className="hidden xs:inline">Landing Page</span>
           </button>
         </div>
       </div>
@@ -156,18 +157,18 @@ export default function DashboardTopBar({
 
           <div
             title={`Active session: ${user.name} (${user.role})`}
-            className="relative flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-lg px-2 sm:px-2.5 py-1"
+            className="relative flex items-center gap-1.5 sm:gap-2 bg-slate-50 border border-slate-200 rounded-lg px-2 sm:px-2.5 py-1"
           >
             <img
               src={user.avatar}
               alt={user.name}
-              className="w-6 h-6 rounded-full object-cover border border-slate-200"
+              className="w-6 h-6 rounded-full object-cover border border-slate-200 shrink-0"
             />
-            <div className="hidden sm:block text-left">
-              <div className="text-xs font-bold text-slate-800 leading-tight">
+            <div className="text-left">
+              <div className="text-[11px] sm:text-xs font-bold text-slate-800 leading-tight truncate max-w-[85px] sm:max-w-none">
                 {user.name.split(" ")[0]}
               </div>
-              <div className="text-[10px] text-slate-500 leading-none">
+              <div className="text-[9px] sm:text-[10px] text-slate-500 leading-none hidden xs:block truncate max-w-[85px] sm:max-w-none">
                 {user.role.split(" ")[0]}
               </div>
             </div>
