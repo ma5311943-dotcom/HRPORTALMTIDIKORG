@@ -77,8 +77,8 @@ const initialCandidates = [
     cnicFrontUrl: "/images/nadra_biometric_card.jpg",
     cnicBackUrl: "/images/nadra_biometric_card.jpg",
     photoUrl: "/images/cand_bilal.jpg",
-    matricDetails: { board: "BISE D.I. Khan", passingYear: 2015, grade: "B" },
-    fscDetails: { board: "BISE D.I. Khan", passingYear: 2017, group: "General", grade: "B" },
+    matricDetails: { board: "BISE D.I. Khan", passingYear: 2015, grade: "B", documentUrl: "matric_dmc_verified.pdf" },
+    fscDetails: { board: "BISE D.I. Khan", passingYear: 2017, group: "General", grade: "B", documentUrl: "hssc_certificate_scanned.pdf" },
     status: "Allocated" as const,
     allocatedRoleId: "dhq-alloc-01",
     registeredAt: "2026-10-15T09:00:00Z",
@@ -107,8 +107,8 @@ const initialCandidates = [
     cnicFrontUrl: "/images/nadra_biometric_card.jpg",
     cnicBackUrl: "/images/nadra_biometric_card.jpg",
     photoUrl: "/images/cand_hamza.jpg",
-    matricDetails: { board: "BISE D.I. Khan", passingYear: 2016, grade: "B" },
-    fscDetails: { board: "BISE D.I. Khan", passingYear: 2018, group: "Arts", grade: "C" },
+    matricDetails: { board: "BISE D.I. Khan", passingYear: 2016, grade: "B", documentUrl: "matric_gazette_verified.pdf" },
+    fscDetails: { board: "BISE D.I. Khan", passingYear: 2018, group: "Arts", grade: "C", documentUrl: "intermediate_dmc.pdf" },
     status: "Allocated" as const,
     allocatedRoleId: "dhq-alloc-02",
     registeredAt: "2026-10-16T10:15:00Z",
@@ -137,8 +137,8 @@ const initialCandidates = [
     cnicFrontUrl: "/images/nadra_biometric_card.jpg",
     cnicBackUrl: "/images/nadra_biometric_card.jpg",
     photoUrl: "/images/cand_usman.jpg",
-    matricDetails: { board: "BISE D.I. Khan", passingYear: 2015, grade: "C" },
-    fscDetails: { board: "BISE D.I. Khan", passingYear: 2017, group: "General", grade: "C" },
+    matricDetails: { board: "BISE D.I. Khan", passingYear: 2015, grade: "C", documentUrl: "ssc_certificate_scan.jpg" },
+    fscDetails: { board: "BISE D.I. Khan", passingYear: 2017, group: "General", grade: "C", documentUrl: "hssc_verified_dmc.pdf" },
     status: "Allocated" as const,
     allocatedRoleId: "dhq-alloc-03",
     registeredAt: "2026-10-16T11:45:00Z",
@@ -167,8 +167,8 @@ const initialCandidates = [
     cnicFrontUrl: "/images/nadra_biometric_card.jpg",
     cnicBackUrl: "/images/nadra_biometric_card.jpg",
     photoUrl: "/images/staff_portrait.jpg",
-    matricDetails: { board: "BISE D.I. Khan", passingYear: 2012, grade: "B" },
-    fscDetails: { board: "BISE D.I. Khan", passingYear: 2014, group: "Arts", grade: "B" },
+    matricDetails: { board: "BISE D.I. Khan", passingYear: 2012, grade: "B", documentUrl: "matric_result_card.pdf" },
+    fscDetails: { board: "BISE D.I. Khan", passingYear: 2014, group: "Arts", grade: "B", documentUrl: "fsc_dmc_verified.pdf" },
     status: "Allocated" as const,
     allocatedRoleId: "dhq-alloc-04",
     registeredAt: "2026-10-17T08:30:00Z",
@@ -197,8 +197,8 @@ const initialCandidates = [
     cnicFrontUrl: "/images/nadra_biometric_card.jpg",
     cnicBackUrl: "/images/nadra_biometric_card.jpg",
     photoUrl: "/images/councilor_portrait.jpg",
-    matricDetails: { board: "BISE D.I. Khan", passingYear: 2013, grade: "A" },
-    fscDetails: { board: "BISE D.I. Khan", passingYear: 2015, group: "Pre-Medical", grade: "B" },
+    matricDetails: { board: "BISE D.I. Khan", passingYear: 2013, grade: "A", documentUrl: "matric_board_certificate.pdf" },
+    fscDetails: { board: "BISE D.I. Khan", passingYear: 2015, group: "Pre-Medical", grade: "B", documentUrl: "pre_med_fsc_dmc.pdf" },
     status: "Allocated" as const,
     allocatedRoleId: "dhq-alloc-05",
     registeredAt: "2026-10-17T12:00:00Z",
@@ -629,6 +629,12 @@ const initialMessages: ChatMessage[] = [
 export async function seedDatabase() {
   const now = new Date().toISOString();
   const db = getDb();
+
+  console.log("Cleaning existing messages, allocations, candidate images, and candidates...");
+  await db.delete(schema.candidateImages);
+  await db.delete(schema.messages);
+  await db.delete(schema.allocations);
+  await db.delete(schema.candidates);
 
   console.log("Seeding DHQ Hospital users...");
   const userRows = Object.entries(ROLE_PRESETS).map(([key, preset]) => ({
