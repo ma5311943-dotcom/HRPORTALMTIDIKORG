@@ -194,7 +194,7 @@ export default function Sidebar({
         {/* Current User Profile Card */}
         <div className="p-3 border-b border-slate-100 bg-slate-50/70">
           {!isCollapsed ? (
-            <div className="space-y-2">
+            <div className="space-y-1.5">
               <div className="flex items-center gap-2.5">
                 <div className="relative shrink-0">
                   <img
@@ -214,24 +214,15 @@ export default function Sidebar({
                 </div>
               </div>
 
-              <div className="flex items-center justify-between gap-2 text-[10px] text-slate-500 pt-1.5 border-t border-slate-200/60">
-                <span className="truncate max-w-[170px]" title={user.department}>
-                  {user.department}
-                </span>
-                <button
-                  onClick={onOpenSwitchRole}
-                  className="text-emerald-700 hover:text-emerald-900 hover:underline font-bold shrink-0 cursor-pointer"
-                >
-                  Switch
-                </button>
+              <div className="text-[10px] text-slate-500 pt-1 border-t border-slate-200/60 truncate" title={user.department}>
+                {user.department}
               </div>
             </div>
           ) : (
             <div className="flex flex-col items-center py-1">
-              <button
-                onClick={onOpenSwitchRole}
-                title={`Signed in as ${user.name} (${user.role}). Click to switch role.`}
-                className="relative cursor-pointer group"
+              <div
+                title={`Signed in as ${user.name} (${user.role})`}
+                className="relative"
               >
                 <img
                   src={user.avatar}
@@ -239,7 +230,7 @@ export default function Sidebar({
                   className="w-8 h-8 rounded-full object-cover border border-emerald-600/30 ring-2 ring-white"
                 />
                 <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-500 ring-2 ring-white" />
-              </button>
+              </div>
             </div>
           )}
         </div>

@@ -86,14 +86,6 @@ export default function DashboardTopBar({
 
         <div className="flex items-center gap-3 shrink-0">
           <button
-            onClick={onOpenSwitchRole}
-            className="flex items-center gap-1 text-[#10b981] hover:text-white font-bold cursor-pointer"
-          >
-            <Sparkles className="w-3 h-3 text-[#10b981]" />
-            <span>Switch Role</span>
-          </button>
-          <span className="text-emerald-500/40">•</span>
-          <button
             onClick={onGoToLandingPage}
             className="flex items-center gap-1 text-emerald-200/80 hover:text-white cursor-pointer font-medium"
           >
@@ -161,10 +153,9 @@ export default function DashboardTopBar({
             <Globe2 className="w-4 h-4" />
           </button>
 
-          <button
-            onClick={onOpenSwitchRole}
-            title="Active session"
-            className="relative flex items-center gap-2 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-lg px-2 sm:px-2.5 py-1 transition-colors cursor-pointer"
+          <div
+            title={`Active session: ${user.name} (${user.role})`}
+            className="relative flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-lg px-2 sm:px-2.5 py-1"
           >
             <img
               src={user.avatar}
@@ -184,7 +175,7 @@ export default function DashboardTopBar({
                 {unreadCount}
               </span>
             )}
-          </button>
+          </div>
 
           <button
             onClick={onLogout}
