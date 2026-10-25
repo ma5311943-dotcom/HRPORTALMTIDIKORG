@@ -145,50 +145,75 @@ export default function Sidebar({
         } ${isCollapsed ? "w-72 max-w-[85vw] lg:w-20" : "w-72 max-w-[85vw]"}`}
       >
         {/* Brand Header */}
-        <div className="h-16 px-4 border-b border-slate-100 flex items-center justify-between gap-2 bg-gradient-to-r from-emerald-900 to-emerald-950 shrink-0 text-white">
-          <div className="flex items-center gap-3 overflow-hidden">
-            <div className="w-10 h-10 rounded-xl bg-white border border-emerald-700/50 overflow-hidden flex items-center justify-center shrink-0 shadow-sm">
-              <img
-                src="/images/state_emblem.jpg"
-                alt="State Emblem"
-                className="w-full h-full object-cover"
-              />
-            </div>
-
-            {!isCollapsed && (
-              <div className="truncate">
-                <div className="flex items-center gap-1.5">
-                  <span className="font-extrabold text-sm tracking-tight text-white uppercase">
-                    DHQ Hospital
-                  </span>
-                  <span className="bg-[#10b981] text-[#052e16] text-[9px] font-black px-1.5 py-0.5 rounded shadow-xs">
-                    HR
-                  </span>
+        <div className={`h-16 border-b border-slate-100 flex items-center bg-gradient-to-r from-emerald-900 to-emerald-950 shrink-0 text-white ${
+          isCollapsed ? "flex-col justify-center gap-1 px-1 py-1 relative" : "justify-between gap-2 px-4"
+        }`}>
+          {!isCollapsed ? (
+            <>
+              <div className="flex items-center gap-3 overflow-hidden">
+                <div className="w-10 h-10 rounded-xl bg-white border border-emerald-700/50 overflow-hidden flex items-center justify-center shrink-0 shadow-sm">
+                  <img
+                    src="/images/state_emblem.jpg"
+                    alt="State Emblem"
+                    className="w-full h-full object-cover"
+                  />
                 </div>
-                <p className="text-[10px] text-emerald-200/80 font-medium truncate">
-                  Teaching Hospital D.I. Khan
-                </p>
+
+                <div className="truncate">
+                  <div className="flex items-center gap-1.5">
+                    <span className="font-extrabold text-sm tracking-tight text-white uppercase">
+                      DHQ Hospital
+                    </span>
+                    <span className="bg-[#10b981] text-[#052e16] text-[9px] font-black px-1.5 py-0.5 rounded shadow-xs">
+                      HR
+                    </span>
+                  </div>
+                  <p className="text-[10px] text-emerald-200/80 font-medium truncate">
+                    Teaching Hospital D.I. Khan
+                  </p>
+                </div>
               </div>
-            )}
-          </div>
 
-          <div className="flex items-center">
-            <button
-              onClick={onCloseMobile}
-              className="lg:hidden p-1.5 text-emerald-200 hover:text-white rounded-lg hover:bg-white/10 cursor-pointer"
-              aria-label="Close navigation"
-            >
-              <X className="w-5 h-5" />
-            </button>
+              <div className="flex items-center">
+                <button
+                  onClick={onCloseMobile}
+                  className="lg:hidden p-1.5 text-emerald-200 hover:text-white rounded-lg hover:bg-white/10 cursor-pointer"
+                  aria-label="Close navigation"
+                >
+                  <X className="w-5 h-5" />
+                </button>
 
-            <button
-              onClick={onToggleCollapse}
-              className="hidden lg:flex p-1.5 text-emerald-200 hover:text-white rounded-lg hover:bg-white/10 transition-colors cursor-pointer"
-              title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
-            >
-              {isCollapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
-            </button>
-          </div>
+                <button
+                  onClick={onToggleCollapse}
+                  className="hidden lg:flex p-1.5 text-emerald-200 hover:text-white rounded-lg hover:bg-white/10 transition-colors cursor-pointer"
+                  title="Collapse sidebar"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+              </div>
+            </>
+          ) : (
+            <div className="w-full flex items-center justify-center relative">
+              <button
+                onClick={onToggleCollapse}
+                className="w-10 h-10 rounded-xl bg-white/10 hover:bg-white/20 border border-emerald-600/40 p-1 flex items-center justify-center transition-all cursor-pointer group"
+                title="Expand sidebar"
+              >
+                <img
+                  src="/images/state_emblem.jpg"
+                  alt="State Emblem"
+                  className="w-7 h-7 rounded-lg object-cover"
+                />
+              </button>
+              <button
+                onClick={onToggleCollapse}
+                className="absolute -right-2 top-1/2 -translate-y-1/2 w-4 h-6 rounded-r bg-emerald-700 hover:bg-emerald-600 text-white flex items-center justify-center shadow-xs cursor-pointer z-10"
+                title="Expand sidebar"
+              >
+                <ChevronRight className="w-3 h-3" />
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Current User Profile Card */}
