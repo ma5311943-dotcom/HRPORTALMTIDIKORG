@@ -16,38 +16,6 @@ const initialDistricts: District[] = [
     province: "Khyber Pakhtunkhwa",
     constituencies: ["NA-44", "NA-45", "PK-111", "PK-112", "PK-113", "PK-114", "PK-115"],
     totalQuota: 350,
-    allocatedCount: 9
-  },
-  {
-    id: "tank",
-    name: "Tank",
-    province: "Khyber Pakhtunkhwa",
-    constituencies: ["NA-43", "PK-108"],
-    totalQuota: 80,
-    allocatedCount: 2
-  },
-  {
-    id: "bnk",
-    name: "Bannu",
-    province: "Khyber Pakhtunkhwa",
-    constituencies: ["NA-39", "NA-40", "PK-99", "PK-100"],
-    totalQuota: 120,
-    allocatedCount: 3
-  },
-  {
-    id: "lakki",
-    name: "Lakki Marwat",
-    province: "Khyber Pakhtunkhwa",
-    constituencies: ["NA-41", "PK-105", "PK-106"],
-    totalQuota: 100,
-    allocatedCount: 2
-  },
-  {
-    id: "pesh",
-    name: "Peshawar",
-    province: "Khyber Pakhtunkhwa",
-    constituencies: ["NA-28", "NA-29", "NA-30"],
-    totalQuota: 200,
     allocatedCount: 5
   }
 ];
@@ -635,6 +603,7 @@ export async function seedDatabase() {
   await db.delete(schema.messages);
   await db.delete(schema.allocations);
   await db.delete(schema.candidates);
+  await db.delete(schema.districts);
 
   console.log("Seeding DHQ Hospital users...");
   const userRows = Object.entries(ROLE_PRESETS).map(([key, preset]) => ({

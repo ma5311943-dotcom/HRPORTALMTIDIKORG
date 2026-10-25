@@ -25,13 +25,13 @@ const jetbrains = JetBrains_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "Internal HR System | Constituency Human Resources & Analytics System",
-    template: "%s | Internal HR System",
+    default: "HR Portal MMTI | DHQ Teaching Hospital D.I. Khan",
+    template: "%s | HR Portal MMTI",
   },
   description:
-    "Official National Candidate Registry, District Seat Allocation, and Regional Employment Analytics Portal | Government of Pakistan",
-  applicationName: "Internal HR System",
-  keywords: ["Pakistan", "Constituency", "Human Resources", "Government", "Internal HR System"],
+    "HR Portal MMTI — Official Staff Recruitment, Verification, and Quota Ledger System for DHQ Teaching Hospital D.I. Khan | Government of Khyber Pakhtunkhwa",
+  applicationName: "HR Portal MMTI",
+  keywords: ["MMTI", "DHQ Hospital", "HR Portal", "Dera Ismail Khan", "Khyber Pakhtunkhwa"],
 };
 
 export const viewport: Viewport = {

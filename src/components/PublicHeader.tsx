@@ -64,14 +64,14 @@ export default function PublicHeader({ activePage = "home" }: PublicHeaderProps)
             <div>
               <div className="flex items-center gap-1.5">
                 <span className="text-sm font-bold tracking-tight text-slate-900 transition-colors group-hover:text-emerald-800 sm:text-lg">
-                  DHQ Hospital <span className="text-emerald-700">HR</span>
+                  HR Portal <span className="text-emerald-700">MMTI</span>
                 </span>
                 <span className="hidden rounded-full border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wide text-emerald-800 sm:inline-block">
                   D.I. Khan
                 </span>
               </div>
               <p className="hidden text-[11px] font-medium leading-none text-slate-500 md:block">
-                Teaching Hospital Staff Recruitment &amp; Management Portal
+                DHQ Teaching Hospital Staff Recruitment &amp; Management Portal
               </p>
             </div>
           </Link>

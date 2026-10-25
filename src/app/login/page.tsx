@@ -157,7 +157,7 @@ function LoginPanel() {
               <p className="text-[9px] font-bold uppercase tracking-[0.18em] text-pak-gold-soft">
                 Official Gateway
               </p>
-              <p className="text-sm font-extrabold leading-tight">DHQ Hospital HR</p>
+              <p className="text-sm font-extrabold leading-tight">HR Portal MMTI</p>
             </div>
           </div>
 
