@@ -74,13 +74,14 @@ export default function DashboardTopBar({
       {/* Utility bar — Dark Green UI */}
       <div className="hidden sm:flex bg-[#072418] text-emerald-200/80 text-[11px] py-1.5 px-4 lg:px-6 items-center justify-between border-b border-[#0d3b28]">
         <div className="flex items-center gap-2 min-w-0">
-          <span className="w-2 h-2 rounded-full bg-[#10b981] animate-pulse" />
+          <span className="w-2 h-2 rounded-full bg-[#10b981] animate-pulse shrink-0" />
           <span className="font-bold text-white tracking-wide truncate">
-            GOVERNMENT OF KHYBER PAKHTUNKHWA • DHQ HOSPITAL HR SYSTEM
+            <span className="xl:hidden">GOVT OF KPK • DHQ HOSPITAL</span>
+            <span className="hidden xl:inline">GOVERNMENT OF KHYBER PAKHTUNKHWA • DHQ HOSPITAL HR SYSTEM</span>
           </span>
-          <span className="text-emerald-500/40">|</span>
-          <span className="truncate">
-            Signed in: <strong className="text-white">{user.name}</strong> ({user.role})
+          <span className="text-emerald-500/40 hidden md:inline">|</span>
+          <span className="truncate hidden md:inline text-[11px]">
+            Signed in: <strong className="text-white">{user.name}</strong> <span className="hidden lg:inline">({user.role})</span>
           </span>
         </div>
 
