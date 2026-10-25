@@ -9,17 +9,10 @@ export type RecommenderAlias =
   | "Quota E"
   | "Quota F"
   | "DIR-OFFICE"
-  | "REF-NA-01" 
-  | "REF-NA-02" 
-  | "REF-PA-01" 
-  | "REF-PA-02" 
-  | "REF-DIST-01"
-  | "REF-NZM-01" 
-  | "REF-NZM-02" 
   | "MERIT-OPEN" 
   | "DEPT-DIRECT";
 
-// Backward-compatible alias for existing political references
+// Backward-compatible alias for quota references
 export type PoliticalParty = RecommenderAlias;
 
 // DHQ Hospital Staff Roles (strictly from client voice notes)

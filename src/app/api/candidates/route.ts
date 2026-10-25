@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { compressImage } from "@/lib/image";
 import { hashPassword } from "@/lib/password";
 import {
   ApiError,
@@ -24,13 +25,6 @@ const VALID_PARTIES: PoliticalParty[] = [
   "Quota E",
   "Quota F",
   "DIR-OFFICE",
-  "REF-NA-01",
-  "REF-NA-02",
-  "REF-PA-01",
-  "REF-PA-02",
-  "REF-DIST-01",
-  "REF-NZM-01",
-  "REF-NZM-02",
   "MERIT-OPEN",
   "DEPT-DIRECT",
 ];
@@ -202,7 +196,25 @@ export async function POST(req: NextRequest) {
       passwordHash: password ? hashPassword(password) : undefined,
     });
 
-    return NextResponse.json({ success: true, data: newCandidate }, { status: 201 });
+    let finalPhotoUrl = photoUrl;
+    if (requestedPhotoUrl.startsWith("data:image/")) {
+      try {
+        const base64Data = requestedPhotoUrl.split(",")[1];
+        if (base64Data) {
+          const buffer = Buffer.from(base64Data, "base64");
+          const compressed = await compressImage(buffer);
+          const imageResult = await db.upsertCandidateImage(newCandidate.id, compressed);
+          finalPhotoUrl = imageResult.photoUrl;
+        }
+      } catch (err) {
+        console.warn("Could not save initial candidate image blob:", err);
+      }
+    }
+
+    return NextResponse.json({
+      success: true,
+      data: { ...newCandidate, photoUrl: finalPhotoUrl },
+    }, { status: 201 });
   } catch (error) {
     return apiErrorResponse(error);
   }

@@ -19,7 +19,7 @@ import {
 } from "lucide-react";
 import confetti from "canvas-confetti";
 import { toast } from "sonner";
-import { EducationRecord } from "@/types";
+import { EducationRecord, PoliticalParty } from "@/types";
 import PublicHeader from "@/components/PublicHeader";
 import PublicFooter from "@/components/PublicFooter";
 
@@ -51,7 +51,7 @@ export default function SignupPage() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const partyAffiliation = "Independent";
+  const partyAffiliation: PoliticalParty = "MERIT-OPEN";
   
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);

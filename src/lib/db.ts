@@ -803,13 +803,6 @@ export const db = {
       "Quota E": 0,
       "Quota F": 0,
       "DIR-OFFICE": 0,
-      "REF-NA-01": 0,
-      "REF-NA-02": 0,
-      "REF-PA-01": 0,
-      "REF-PA-02": 0,
-      "REF-DIST-01": 0,
-      "REF-NZM-01": 0,
-      "REF-NZM-02": 0,
       "MERIT-OPEN": 0,
       "DEPT-DIRECT": 0,
     };

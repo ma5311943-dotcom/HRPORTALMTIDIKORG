@@ -165,13 +165,11 @@ const ROLE_CATEGORY_BY_KEY: Record<string, RoleCategory | "Admin"> = {
  * Authenticates user where identifier (email/username) and password match.
  * Example:
  *   admin / admin
- *   mna / mna
- *   mpa / mpa
- *   chairperson / chairperson
- *   uc_chairman / uc_chairman
- *   civil_officer / civil_officer
- *   staff / staff
- * Also supports emails like admin@internalhr.gov.pk or mna@na.gov.pk
+ *   director / director
+ *   ms / ms
+ *   clerk / clerk
+ *   operator / operator
+ * Also supports emails like admin@internalhr.gov.pk
  */
 export function authenticateUser(identifier: string, passwordInput: string): UserSession | null {
   const cleanId = identifier.trim().toLowerCase();
