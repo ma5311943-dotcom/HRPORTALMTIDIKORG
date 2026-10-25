@@ -540,17 +540,17 @@ export default function SeatAllocationView({
         </div>
 
         {/* Table */}
-        <div className="overflow-x-auto">
-          <table className="w-full min-w-[920px] text-left border-collapse text-xs">
+        <div className="overflow-x-auto -mx-4 sm:-mx-5 px-4 sm:px-5">
+          <table className="w-full min-w-[760px] lg:min-w-full text-left border-collapse text-xs">
             <thead>
               <tr className="bg-slate-50 text-slate-600 uppercase font-bold text-[10px] tracking-wider border-b border-slate-200">
-                <th className="py-3 px-4">Ref Number</th>
-                <th className="py-3 px-4">Appointee Details</th>
-                <th className="py-3 px-4">Role & Category</th>
-                <th className="py-3 px-4">District / Seat</th>
-                <th className="py-3 px-4">Issuing Authority</th>
-                <th className="py-3 px-4">Status</th>
-                <th className="py-3 px-4 text-right">Actions</th>
+                <th className="py-2.5 px-2.5 sm:px-3">Ref Number</th>
+                <th className="py-2.5 px-2.5 sm:px-3">Appointee Details</th>
+                <th className="py-2.5 px-2.5 sm:px-3">Role & Category</th>
+                <th className="py-2.5 px-2.5 sm:px-3">District / Seat</th>
+                <th className="py-2.5 px-2.5 sm:px-3 hidden xl:table-cell">Issuing Authority</th>
+                <th className="py-2.5 px-2.5 sm:px-3">Status</th>
+                <th className="py-2.5 px-2.5 sm:px-3 text-right">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 font-medium text-slate-700">
@@ -565,82 +565,82 @@ export default function SeatAllocationView({
                 const cand = candidates.find((c) => c.id === alloc.candidateId);
                 return (
                   <tr key={alloc.id} className="hover:bg-emerald-50/40 transition-colors">
-                    <td className="py-3.5 px-4 font-mono font-bold text-emerald-700">
+                    <td className="py-2.5 px-2.5 sm:px-3 font-mono font-bold text-emerald-700 text-[11px] whitespace-nowrap">
                       {alloc.appointmentRefNo}
                     </td>
-                    <td className="py-3.5 px-4">
-                      <div className="flex items-center gap-2.5">
+                    <td className="py-2.5 px-2.5 sm:px-3">
+                      <div className="flex items-center gap-2">
                         <img
                           src={cand?.photoUrl || "/images/cand_hamza.jpg"}
                           alt={alloc.candidateName}
                           onError={(e) => {
                             e.currentTarget.src = "/images/councilor_portrait.jpg";
                           }}
-                          className="w-8 h-8 rounded-full object-cover border border-slate-200 shadow-xs shrink-0"
+                          className="w-7 h-7 rounded-full object-cover border border-slate-200 shadow-xs shrink-0"
                         />
-                        <div>
-                          <div className="font-bold text-slate-900">{alloc.candidateName}</div>
-                          <div className="text-[11px] font-mono text-slate-500">
+                        <div className="min-w-0">
+                          <div className="font-bold text-slate-900 truncate max-w-[150px]">{alloc.candidateName}</div>
+                          <div className="text-[10px] font-mono text-slate-500 truncate max-w-[170px]">
                             {alloc.candidateCnic} • <span className="font-semibold text-emerald-800">{alloc.partyAffiliation}</span>
                           </div>
                         </div>
                       </div>
                     </td>
-                  <td className="py-3.5 px-4">
-                    <div className="font-semibold text-slate-900">{alloc.roleTitle}</div>
-                    <span className="text-[10px] bg-slate-100 text-slate-700 px-2 py-0.5 rounded font-bold border border-slate-200">
-                      {alloc.roleCategory}
-                    </span>
-                  </td>
-                  <td className="py-3.5 px-4">
-                    <div className="font-semibold text-slate-900">{alloc.district}</div>
-                    <div className="text-[11px] text-emerald-700 font-semibold">{alloc.constituency}</div>
-                  </td>
-                  <td className="py-3.5 px-4">
-                    <div className="text-slate-800">{alloc.allocatedBy}</div>
-                    <div className="text-[10px] text-slate-400">Date: {alloc.allocatedDate}</div>
-                  </td>
-                  <td className="py-3.5 px-4">
-                    <span
-                      className={`inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full border ${
-                        alloc.status === "Active"
-                          ? "bg-emerald-100 text-emerald-800 border-emerald-300"
-                          : "bg-red-50 text-red-700 border-red-200"
-                      }`}
-                    >
-                      {alloc.status === "Active" ? (
-                        <CheckCircle2 className="w-3 h-3 text-emerald-600" />
-                      ) : (
-                        <XCircle className="w-3 h-3 text-red-500" />
-                      )}
-                      {alloc.status}
-                    </span>
-                  </td>
-                  <td className="py-3.5 px-4 text-right">
-                    <div className="flex items-center justify-end gap-2">
-                      <button
-                        onClick={() => onViewLetter(alloc)}
-                        title="View Official Gazette Notification"
-                        className="text-emerald-700 hover:text-[#064e3b] font-bold flex items-center gap-1 cursor-pointer"
+                    <td className="py-2.5 px-2.5 sm:px-3">
+                      <div className="font-semibold text-slate-900 text-[11px] leading-tight">{alloc.roleTitle}</div>
+                      <span className="inline-block mt-0.5 text-[9px] bg-slate-100 text-slate-700 px-1.5 py-0.2 rounded font-bold border border-slate-200">
+                        {alloc.roleCategory}
+                      </span>
+                    </td>
+                    <td className="py-2.5 px-2.5 sm:px-3 whitespace-nowrap">
+                      <div className="font-semibold text-slate-900 text-[11px]">{alloc.district}</div>
+                      <div className="text-[10px] text-emerald-700 font-semibold">{alloc.constituency}</div>
+                    </td>
+                    <td className="py-2.5 px-2.5 sm:px-3 hidden xl:table-cell">
+                      <div className="text-slate-800 text-[11px] truncate max-w-[170px]">{alloc.allocatedBy}</div>
+                      <div className="text-[10px] text-slate-400">Date: {alloc.allocatedDate}</div>
+                    </td>
+                    <td className="py-2.5 px-2.5 sm:px-3 whitespace-nowrap">
+                      <span
+                        className={`inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full border ${
+                          alloc.status === "Active"
+                            ? "bg-emerald-100 text-emerald-800 border-emerald-300"
+                            : "bg-red-50 text-red-700 border-red-200"
+                        }`}
                       >
-                        <FileText className="w-3.5 h-3.5" />
-                        <span>Gazette</span>
-                      </button>
-
-                      {alloc.status === "Active" && canRevokeAllocations && (
+                        {alloc.status === "Active" ? (
+                          <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                        ) : (
+                          <XCircle className="w-3 h-3 text-red-500" />
+                        )}
+                        {alloc.status}
+                      </span>
+                    </td>
+                    <td className="py-2.5 px-2.5 sm:px-3 text-right whitespace-nowrap">
+                      <div className="flex items-center justify-end gap-1.5">
                         <button
-                          onClick={() => handleRevoke(alloc.id)}
-                          title="Revoke Appointment"
-                          className="text-red-500 hover:text-red-700 text-[11px] font-semibold cursor-pointer ml-1"
+                          onClick={() => onViewLetter(alloc)}
+                          title="View Official Gazette Notification"
+                          className="text-emerald-700 hover:text-[#064e3b] font-bold flex items-center gap-1 cursor-pointer text-[11px]"
                         >
-                          Revoke
+                          <FileText className="w-3.5 h-3.5" />
+                          <span>Gazette</span>
                         </button>
-                      )}
-                    </div>
-                  </td>
-                </tr>
-              );
-            })}
+
+                        {alloc.status === "Active" && canRevokeAllocations && (
+                          <button
+                            onClick={() => handleRevoke(alloc.id)}
+                            title="Revoke Appointment"
+                            className="text-red-500 hover:text-red-700 text-[10px] font-semibold cursor-pointer ml-1"
+                          >
+                            Revoke
+                          </button>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
