@@ -22,7 +22,8 @@ export default function PublicHeader({ activePage = "home" }: PublicHeaderProps)
   const getHref = (hash: string) => (activePage === "home" ? hash : `/${hash}`);
 
   return (
-    <>
+    <div className="sticky top-0 z-50 shadow-sm">
+      {/* Top Government Strip */}
       <div className="bg-[#072418] text-white border-b border-[#0d3b28]">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-1.5 sm:px-6 lg:px-8">
           <div className="flex min-w-0 items-center gap-2">
@@ -51,7 +52,8 @@ export default function PublicHeader({ activePage = "home" }: PublicHeaderProps)
         </div>
       </div>
 
-      <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/95 shadow-sm backdrop-blur-md">
+      {/* Main Navigation Bar */}
+      <header className="border-b border-slate-200 bg-white/95 backdrop-blur-md">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-2.5 sm:px-6 lg:px-8">
           <Link href="/" className="group flex shrink-0 items-center gap-2.5" aria-label="DHQ Hospital HR Home">
             <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
@@ -78,13 +80,13 @@ export default function PublicHeader({ activePage = "home" }: PublicHeaderProps)
 
           <nav
             aria-label="Primary navigation"
-            className="hidden items-center gap-0.5 text-xs font-semibold text-slate-600 lg:flex xl:gap-2 xl:text-sm"
+            className="hidden items-center gap-0.5 text-xs font-semibold text-slate-600 lg:flex xl:gap-1.5 xl:text-sm"
           >
             {NAV_ITEMS.map((item) => (
               <Link
                 key={item.hash}
                 href={getHref(item.hash)}
-                className="whitespace-nowrap rounded-lg px-2.5 py-1.5 transition-colors hover:bg-emerald-50 hover:text-emerald-800"
+                className="whitespace-nowrap rounded-lg px-2 py-1.5 transition-colors hover:bg-emerald-50 hover:text-emerald-800 lg:text-[11px] xl:text-xs 2xl:text-sm"
               >
                 {item.label}
               </Link>
@@ -170,6 +172,6 @@ export default function PublicHeader({ activePage = "home" }: PublicHeaderProps)
           </div>
         )}
       </header>
-    </>
+    </div>
   );
 }

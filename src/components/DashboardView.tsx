@@ -195,11 +195,11 @@ export default function DashboardView({
           )}
         </div>
 
-        {/* Filter Badges Grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 xl:grid-cols-10 gap-2">
+        {/* Filter Badges: Responsive Wrap with clean min-width */}
+        <div className="flex flex-wrap items-stretch gap-2">
           <button
             onClick={() => setSelectedRoleFilter("All")}
-            className={`p-2.5 rounded-xl border text-center transition-all cursor-pointer flex flex-col justify-between items-center ${
+            className={`px-3.5 py-2 rounded-xl border text-center transition-all cursor-pointer flex flex-col justify-between items-center min-w-[85px] sm:min-w-[95px] flex-1 sm:flex-initial ${
               selectedRoleFilter === "All"
                 ? "bg-[#072418] text-white border-[#1b5e3f] shadow-md font-bold"
                 : "bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-200 text-xs font-medium"
@@ -216,13 +216,13 @@ export default function DashboardView({
               <button
                 key={role}
                 onClick={() => setSelectedRoleFilter(role)}
-                className={`p-2 rounded-xl border text-center transition-all cursor-pointer flex flex-col justify-between items-center min-h-[58px] ${
+                className={`px-3 py-2 rounded-xl border text-center transition-all cursor-pointer flex flex-col justify-between items-center min-w-[95px] sm:min-w-[105px] flex-1 sm:flex-initial ${
                   isSelected
                     ? "bg-[#072418] text-white border-[#1b5e3f] shadow-md font-bold"
                     : "bg-slate-50 hover:bg-emerald-50/60 text-slate-700 border-slate-200 hover:border-emerald-200 text-xs font-medium"
                 }`}
               >
-                <div className="text-[11px] leading-snug font-semibold text-center w-full px-0.5 line-clamp-2" title={role}>
+                <div className="text-[11px] leading-snug font-semibold text-center whitespace-normal" title={role}>
                   {role}
                 </div>
                 <div className={`text-xs font-bold mt-1 shrink-0 ${isSelected ? "text-[#10b981]" : "text-emerald-700"}`}>
