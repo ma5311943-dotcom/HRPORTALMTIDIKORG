@@ -108,10 +108,10 @@ export default function DashboardView({
           <img
             src="/images/hero_dashboard_banner.jpg"
             alt="DHQ Hospital Campus"
-            className="h-full w-full object-cover object-center filter brightness-[0.45] contrast-[1.08]"
+            className="h-full w-full object-cover object-center filter brightness-[0.75] contrast-[1.05]"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-[#072418]/95 via-[#0b3824]/85 to-[#051c13]/90" />
-          <div className="absolute inset-0 bg-[#10b981]/10" />
+          <div className="absolute inset-0 bg-gradient-to-r from-[#072418]/85 via-[#0b3824]/65 to-[#051c13]/75" />
+          <div className="absolute inset-0 bg-[#072418]/25" />
         </div>
 
         <div className="absolute top-0 right-0 w-96 h-96 rounded-full bg-[#10b981]/10 blur-3xl pointer-events-none z-0" />

@@ -222,10 +222,10 @@ export default function SeatAllocationView({
           <img
             src="/images/tab_seat_allocation.jpg"
             alt="Seat and Staff Allocation"
-            className="h-full w-full object-cover object-center filter brightness-[0.28] contrast-[1.1]"
+            className="h-full w-full object-cover object-center filter brightness-[0.70] contrast-[1.05]"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-teal-950/95 via-emerald-950/85 to-slate-950/90 mix-blend-multiply" />
-          <div className="absolute inset-0 bg-teal-500/15" />
+          <div className="absolute inset-0 bg-gradient-to-r from-teal-950/85 via-emerald-950/70 to-slate-950/75" />
+          <div className="absolute inset-0 bg-teal-950/20" />
         </div>
 
         <div className="relative z-10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">

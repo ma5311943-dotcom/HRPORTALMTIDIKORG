@@ -73,10 +73,10 @@ export default function CandidatePortalView({
           <img
             src="/images/hero_dashboard_banner.jpg"
             alt="DHQ Hospital Portal"
-            className="h-full w-full object-cover object-center filter brightness-[0.35]"
+            className="h-full w-full object-cover object-center filter brightness-[0.70]"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-emerald-950/90 via-teal-900/85 to-slate-950/90 mix-blend-multiply" />
-          <div className="absolute inset-0 bg-emerald-600/15" />
+          <div className="absolute inset-0 bg-gradient-to-r from-emerald-950/85 via-teal-900/70 to-slate-950/75" />
+          <div className="absolute inset-0 bg-emerald-950/20" />
         </div>
 
         <div className="pointer-events-none absolute -right-16 -top-16 z-0 h-52 w-52 rounded-full border border-white/10" />

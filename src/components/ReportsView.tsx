@@ -101,10 +101,10 @@ export default function ReportsView({
           <img
             src="/images/tab_reports_analytics.jpg"
             alt="Reports & Analytics"
-            className="h-full w-full object-cover object-center filter brightness-[0.28] contrast-[1.1]"
+            className="h-full w-full object-cover object-center filter brightness-[0.70] contrast-[1.05]"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-emerald-950/95 via-teal-900/85 to-slate-950/90 mix-blend-multiply" />
-          <div className="absolute inset-0 bg-emerald-600/15" />
+          <div className="absolute inset-0 bg-gradient-to-r from-emerald-950/85 via-teal-900/70 to-slate-950/75" />
+          <div className="absolute inset-0 bg-emerald-950/20" />
         </div>
 
         <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
