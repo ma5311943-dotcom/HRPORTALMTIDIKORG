@@ -82,7 +82,7 @@ export default function DashboardTopBar({
           </span>
           <span className="text-emerald-500/40">|</span>
           <span className="truncate text-[10px] sm:text-[11px]">
-            <span className="text-emerald-300/80">Signed in:</span> <strong className="text-white">{user.name}</strong> <span className="hidden lg:inline text-emerald-200/70">({user.role})</span>
+            <span className="text-emerald-300/80">Signed in:</span> <strong className="text-white">{user.name}</strong>
           </span>
         </div>
 
@@ -165,11 +165,8 @@ export default function DashboardTopBar({
               className="w-6 h-6 rounded-full object-cover border border-slate-200 shrink-0"
             />
             <div className="text-left">
-              <div className="text-[11px] sm:text-xs font-bold text-slate-800 leading-tight truncate max-w-[85px] sm:max-w-none">
-                {user.name.split(" ")[0]}
-              </div>
-              <div className="text-[9px] sm:text-[10px] text-slate-500 leading-none hidden xs:block truncate max-w-[85px] sm:max-w-none">
-                {user.role.split(" ")[0]}
+              <div className="text-[11px] sm:text-xs font-bold text-slate-800 leading-tight truncate max-w-[120px] sm:max-w-none">
+                {user.name}
               </div>
             </div>
             {unreadCount > 0 && (
