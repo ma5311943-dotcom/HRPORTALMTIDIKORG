@@ -580,33 +580,32 @@ export default function CandidateRegistrationView({
 
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1">
-                  Recommender / Reference Code
+                  Recommended By (Quota / Directive)
                 </label>
                 <select
                   value={partyAffiliation}
                   onChange={(e) => setPartyAffiliation(e.target.value as PoliticalParty)}
                   className="w-full text-xs p-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-600 focus:outline-none font-bold text-slate-800"
                 >
-                  <option value="MERIT-OPEN">MERIT-OPEN (Open Merit)</option>
-                  <option value="DIR-OFFICE">DIR-OFFICE (Director Office)</option>
-                  <option value="REF-NA-01">REF-NA-01 (MNA Ref. #1)</option>
-                  <option value="REF-NA-02">REF-NA-02 (MNA Ref. #2)</option>
-                  <option value="REF-PA-01">REF-PA-01 (MPA Ref. #1)</option>
-                  <option value="REF-PA-02">REF-PA-02 (MPA Ref. #2)</option>
-                  <option value="REF-DIST-01">REF-DIST-01 (District Ref.)</option>
-                  <option value="REF-NZM-01">REF-NZM-01 (Nazim Ref. #1)</option>
-                  <option value="REF-NZM-02">REF-NZM-02 (Nazim Ref. #2)</option>
-                  <option value="DEPT-DIRECT">DEPT-DIRECT (Dept. Direct)</option>
+                  <option value="Quota A">Recommended by Quota A</option>
+                  <option value="Quota B">Recommended by Quota B</option>
+                  <option value="Quota C">Recommended by Quota C</option>
+                  <option value="Quota D">Recommended by Quota D</option>
+                  <option value="Quota E">Recommended by Quota E</option>
+                  <option value="Quota F">Recommended by Quota F</option>
+                  <option value="MERIT-OPEN">Open Merit (Direct)</option>
+                  <option value="DIR-OFFICE">Hospital Director Directive (DIR-OFFICE)</option>
+                  <option value="DEPT-DIRECT">Department Direct (DEPT-DIRECT)</option>
                 </select>
               </div>
 
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1">
-                  Reference Sub-Code / Detail
+                  Reference Code / File Detail
                 </label>
                 <input
                   type="text"
-                  placeholder="Optional short code e.g. NZM-DI-02"
+                  placeholder="Optional reference identifier e.g. HR-REF-A-01"
                   value={referenceCode}
                   onChange={(e) => setReferenceCode(e.target.value)}
                   className="w-full text-xs p-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-600 focus:outline-none font-mono"

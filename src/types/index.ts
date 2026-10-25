@@ -2,6 +2,12 @@ export type Province = "Khyber Pakhtunkhwa" | "Punjab" | "Sindh" | "Balochistan"
 
 // Reference Short-Codes / Authorized Aliases instead of real political names
 export type RecommenderAlias = 
+  | "Quota A"
+  | "Quota B"
+  | "Quota C"
+  | "Quota D"
+  | "Quota E"
+  | "Quota F"
   | "DIR-OFFICE"
   | "REF-NA-01" 
   | "REF-NA-02" 

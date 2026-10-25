@@ -746,8 +746,8 @@ export default function LandingPage({
                 Inter-Agency Protected Communications
               </h3>
               <p className="text-xs leading-relaxed text-slate-600">
-                Direct, encrypted internal communication between MNAs, MPAs, District
-                Commissioners, and Public Sector Staff.
+                Direct, encrypted internal communication between Hospital Directors, Medical
+                Superintendents, District Officers, and Staff.
               </p>
             </div>
           </div>

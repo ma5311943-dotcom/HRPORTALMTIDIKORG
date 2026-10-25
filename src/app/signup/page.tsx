@@ -41,9 +41,9 @@ export default function SignupPage() {
   const [gender, setGender] = useState<"Male" | "Female" | "Other">("Male");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
-  const [domicileDistrict, setDomicileDistrict] = useState("Lahore");
-  const [constituency, setConstituency] = useState("NA-127");
-  const [tehsil, setTehsil] = useState("Model Town");
+  const [domicileDistrict, setDomicileDistrict] = useState("Dera Ismail Khan");
+  const [constituency, setConstituency] = useState("NA-44");
+  const [tehsil, setTehsil] = useState("Dera");
   const [address, setAddress] = useState("");
   const [highestEducation, setHighestEducation] = useState<EducationRecord["level"]>("Bachelors");
   const [degreeName, setDegreeName] = useState("BS Information Technology");
@@ -71,16 +71,7 @@ export default function SignupPage() {
 
   // District options with matching default constituencies
   const DISTRICT_CONSTITUENCIES: Record<string, { na: string; tehsil: string }> = {
-    Lahore: { na: "NA-127", tehsil: "Model Town" },
-    Rawalpindi: { na: "NA-60", tehsil: "Rawalpindi Cantt" },
-    Islamabad: { na: "NA-47", tehsil: "Islamabad Urban" },
-    "Karachi Central": { na: "NA-241", tehsil: "North Nazimabad" },
-    Peshawar: { na: "NA-31", tehsil: "Peshawar City" },
-    Quetta: { na: "NA-263", tehsil: "Quetta City" },
-    Faisalabad: { na: "NA-106", tehsil: "Faisalabad City" },
-    Multan: { na: "NA-150", tehsil: "Multan Sadar" },
-    Gujranwala: { na: "NA-79", tehsil: "Gujranwala City" },
-    Hyderabad: { na: "NA-218", tehsil: "Latifabad" },
+    "Dera Ismail Khan": { na: "NA-44", tehsil: "Dera" },
   };
 
   const handleDistrictChange = (dist: string) => {
@@ -94,17 +85,17 @@ export default function SignupPage() {
 
   const handleQuickSampleAutoFill = () => {
     const randNum = Math.floor(1000 + Math.random() * 9000);
-    setFullName("Zeeshan Haider Chishti");
-    setFatherName("Haider Ali Chishti");
-    setCnic(`35201-928${randNum}-1`);
-    setPhone("0300-4829103");
-    setEmail(`zeeshan.chishti${randNum}@gmail.com`);
-    setAddress("House 42-B, Johar Town Phase 2, Lahore");
-    setDomicileDistrict("Lahore");
-    setConstituency("NA-127");
-    setTehsil("Model Town");
-    setHighestEducation("Bachelors");
-    setDegreeName("BS Computer Science - Punjab University");
+    setFullName("Muhammad Kamran Gandapur");
+    setFatherName("Noor Muhammad Khan");
+    setCnic(`12101-839${randNum}-1`);
+    setPhone("0300-9281726");
+    setEmail(`kamran.gandapur${randNum}@gmail.com`);
+    setAddress("Mohallah Khakwani, Tehsil Kulachi, D.I. Khan");
+    setDomicileDistrict("Dera Ismail Khan");
+    setConstituency("NA-44");
+    setTehsil("Kulachi");
+    setHighestEducation("FSc / Intermediate");
+    setDegreeName("FSc Pre-Medical - BISE D.I. Khan");
     setPassword("Pakistan2026!");
     toast.info("Sample candidate profile auto-filled!");
   };

@@ -17,6 +17,12 @@ const VALID_STATUSES: CandidateStatus[] = [
   "Under Review",
 ];
 const VALID_PARTIES: PoliticalParty[] = [
+  "Quota A",
+  "Quota B",
+  "Quota C",
+  "Quota D",
+  "Quota E",
+  "Quota F",
   "DIR-OFFICE",
   "REF-NA-01",
   "REF-NA-02",

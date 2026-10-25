@@ -796,6 +796,12 @@ export const db = {
     });
 
     const partyStats: Record<PoliticalParty, number> = {
+      "Quota A": 0,
+      "Quota B": 0,
+      "Quota C": 0,
+      "Quota D": 0,
+      "Quota E": 0,
+      "Quota F": 0,
       "DIR-OFFICE": 0,
       "REF-NA-01": 0,
       "REF-NA-02": 0,

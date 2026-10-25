@@ -33,16 +33,16 @@ const TAB_TITLES: Record<string, { title: string; subtitle: string }> = {
     subtitle: "Biometric and NADRA CNIC matched talent archives for election constituencies",
   },
   allocation: {
-    title: "Parliamentary Seat & Public Job Allocation",
+    title: "Hospital Staff & Public Quota Allocation",
     subtitle: "Meritocratic quota distribution with official Gazette notification issuance",
   },
   chat: {
-    title: "Inter-Agency Parliamentary Communications",
-    subtitle: "Protected communications network for MNAs, MPAs, Commissioners and Staff",
+    title: "Inter-Agency Secure Communications",
+    subtitle: "Protected communications network for Hospital Management, Directors, and Staff",
   },
   reports: {
-    title: "Election-Ready Ledgers & Gazette Audits",
-    subtitle: "Printable constituency breakdown, party distributions, and legal compliance records",
+    title: "Official Gazettes & Staff Ledgers",
+    subtitle: "Printable district breakdowns, recommendation streams, and compliance audits",
   },
 };
 

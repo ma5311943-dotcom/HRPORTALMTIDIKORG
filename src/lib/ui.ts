@@ -17,6 +17,12 @@ export function cn(...values: Array<string | false | null | undefined>): string 
  * intentionally varied but muted so dashboards do not become a wall of green.
  */
 export const PARTY_STYLES: Record<string, string> = {
+  "Quota A": "bg-emerald-50 text-emerald-800 border-emerald-200",
+  "Quota B": "bg-blue-50 text-blue-800 border-blue-200",
+  "Quota C": "bg-purple-50 text-purple-800 border-purple-200",
+  "Quota D": "bg-amber-50 text-amber-800 border-amber-200",
+  "Quota E": "bg-teal-50 text-teal-800 border-teal-200",
+  "Quota F": "bg-rose-50 text-rose-800 border-rose-200",
   "DIR-OFFICE": "bg-cyan-50 text-cyan-800 border-cyan-200",
   "REF-NA-01": "bg-emerald-50 text-emerald-800 border-emerald-200",
   "REF-NA-02": "bg-teal-50 text-teal-800 border-teal-200",
@@ -30,16 +36,22 @@ export const PARTY_STYLES: Record<string, string> = {
 };
 
 export const PARTY_LABELS: Record<string, string> = {
+  "Quota A": "Recommended by Quota A",
+  "Quota B": "Recommended by Quota B",
+  "Quota C": "Recommended by Quota C",
+  "Quota D": "Recommended by Quota D",
+  "Quota E": "Recommended by Quota E",
+  "Quota F": "Recommended by Quota F",
   "DIR-OFFICE": "Ref: Hospital Director",
-  "REF-NA-01": "Code: REF-NA-01",
-  "REF-NA-02": "Code: REF-NA-02",
-  "REF-PA-01": "Code: REF-PA-01",
-  "REF-PA-02": "Code: REF-PA-02",
-  "REF-DIST-01": "Code: REF-DIST-01",
-  "REF-NZM-01": "Code: REF-NZM-01",
-  "REF-NZM-02": "Code: REF-NZM-02",
+  "REF-NA-01": "Code: REF-A",
+  "REF-NA-02": "Code: REF-B",
+  "REF-PA-01": "Code: REF-C",
+  "REF-PA-02": "Code: REF-D",
+  "REF-DIST-01": "Code: REF-E",
+  "REF-NZM-01": "Code: REF-F",
+  "REF-NZM-02": "Code: REF-G",
   "MERIT-OPEN": "Open Merit",
-  "DEPT-DIRECT": "Dept Direct Order",
+  "DEPT-DIRECT": "Hospital Director Directive",
 };
 
 export const ROLE_STYLES: Record<RoleCategory, string> = {

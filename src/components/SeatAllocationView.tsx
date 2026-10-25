@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Candidate, District, Allocation, RoleCategory } from "@/types";
+import { Candidate, District, Allocation, RoleCategory, DHQ_STAFF_ROLES } from "@/types";
 import {
   Award,
   Search,
@@ -526,15 +526,12 @@ export default function SeatAllocationView({
               onChange={(e) => setFilterRole(e.target.value)}
               className="text-xs p-2.5 border border-slate-300 rounded-xl bg-white font-semibold text-slate-700"
             >
-              <option value="All">All Roles</option>
-              <option value="MNA">MNA</option>
-              <option value="MPA">MPA</option>
-              <option value="District Chairperson">District Chairperson</option>
-              <option value="Union Council Chairman">UC Chairman</option>
-              <option value="Councilor">Councilor</option>
-              <option value="Civil Administration Officer">Civil Officer</option>
-              <option value="Committee Head">Committee Head</option>
-              <option value="Public Sector Staff">Public Sector Staff</option>
+              <option value="All">All Staff Roles</option>
+              {DHQ_STAFF_ROLES.map((r) => (
+                <option key={r} value={r}>
+                  {r}
+                </option>
+              ))}
             </select>
           </div>
         </div>
