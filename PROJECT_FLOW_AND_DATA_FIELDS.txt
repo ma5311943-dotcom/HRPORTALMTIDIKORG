@@ -1,0 +1,288 @@
+================================================================================
+                    HR PORTAL MMTI — SYSTEM SPECIFICATION
+            DHQ Teaching Hospital Dera Ismail Khan (D.I. Khan)
+              Health Department, Government of Khyber Pakhtunkhwa
+================================================================================
+
+================================================================================
+TABLE OF CONTENTS
+================================================================================
+1. System Purpose & Core Objective
+2. End-to-End Workflow (Step-by-Step)
+3. Form & Database Fields (Complete Catalog)
+   3.1. Candidates Record (All Stored Candidate Data)
+   3.2. Passport Photo & Image Storage
+   3.3. Staff Appointment & Allocation Record
+   3.4. Inter-Agency Memorandums & Notices
+   3.5. System Users & District Configuration
+4. The 9 Hospital Roles
+5. Recommendation Codes (Non-Political Quota System)
+
+
+================================================================================
+1. SYSTEM PURPOSE & CORE OBJECTIVE
+================================================================================
+A centralized, secure digital Human Resource portal to manage recruitment,
+quota verification, and staff allocations for 9 non-gazetted positions across 
+5 tehsils of District Dera Ismail Khan (D.I. Khan).
+
+Key Requirements Met:
+  • Strictly zero political names/titles (MNA, MPA, Nazim, Councilor removed).
+  • Neutral recommendation quota codes: Recommended A through F.
+  • Client-side image compression + database binary blob storage.
+  • PDF and image support for all academic certificates and CNIC proofs.
+  • Single-district jurisdiction: Dera Ismail Khan with its 5 tehsils.
+
+
+================================================================================
+2. END-TO-END WORKFLOW (STEP-BY-STEP)
+================================================================================
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ STEP 1: PUBLIC DISCOVERY & ONLINE VERIFICATION                               │
+│ URL: /                                                                       │
+└──────────────────────────────────────────────────────────────────────────────┘
+  • Any citizen can view overall hospital recruitment metrics and quota stats.
+  • "Verify CNIC" search: An applicant enters their 13-digit CNIC number.
+  • System instantly checks the database:
+      - If registered: Displays verification status, applied role, and tehsil.
+      - If allocated: Displays official Appointment Order # and Joining Date.
+      - If not found: Informs applicant that record does not exist.
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ STEP 2: CANDIDATE REGISTRATION                                               │
+│ URL: /signup  or  Dashboard -> "Add New Staff"                               │
+└──────────────────────────────────────────────────────────────────────────────┘
+  • Candidate or HR data-entry clerk submits the 5-part registration form:
+      1. Personal Info    : Name, Father/Husband, CNIC, Father CNIC, Phone,
+                            Email, Gender, Date of Birth.
+      2. Role & Domicile  : Category (1 of 9 roles), Tehsil, Constituency,
+                            Union Council, Recommended By (A to F), Address.
+      3. Academic Proofs  : Matric (Board, Grade, PDF/IMG Upload)
+                            FSc / Intermediate (Board, Group, Grade, PDF/IMG)
+                            Higher Degree (Title, Institute, Grade, PDF/IMG)
+      4. Identity Proofs  : CNIC Front (PDF/IMG), CNIC Back (PDF/IMG),
+                            Passport Photo (Auto-compressed to <300 KB).
+      5. Remarks & Save   : Optional notes or disability quota remarks.
+  • On submission:
+      - Photo is compressed in browser, saved into database binary blob table.
+      - Documents (PDF / image) are saved with permanent access paths.
+      - Candidate status is set to "Registered" or "Verified".
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ STEP 3: HR ADMINISTRATION & SCRUTINY                                         │
+│ URL: /login  ->  Dashboard View                                              │
+└──────────────────────────────────────────────────────────────────────────────┘
+  • Authorized hospital officials (Hospital Director, MS, HR Officers) log in.
+  • Analytics Dashboard displays:
+      - 4 Top KPI cards: Total Staff, Issued Appointments, Tehsils, Verification %.
+      - Instant Role Category Filter: 9 clickable pills to isolate any role.
+      - Quota Tracker: Visual breakdown for Recommended A through F.
+  • Applicant Registry Directory:
+      - Filter candidates by Tehsil, Status, or Role.
+      - Search by Name, CNIC, Phone, or Constituency (NA-44, NA-45).
+      - "View Dossier": Opens full modal with photo, verified degrees, CNIC proofs.
+      - "Export Word Dossier": Generates official formatted .docx file.
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ STEP 4: SEAT ALLOCATION & APPOINTMENT ORDERS                                 │
+│ URL: Dashboard -> "Staff Appointment" Tab                                    │
+└──────────────────────────────────────────────────────────────────────────────┘
+  • HR Officer or Director clicks "Allocate" on a verified candidate.
+  • Assigns specific Department (e.g., Trauma & Emergency Center).
+  • Sets Tenure (e.g., 12 months) and Basic Pay Scale / Stipend.
+  • System generates:
+      - Unique Appointment Ref Number (e.g., DHQ-APT-2026-0042).
+      - Official Joining Order Number (e.g., DHQ-JOIN-2026-0042).
+  • Candidate status automatically updates from "Verified" -> "Allocated".
+  • Revocation: Authorized executives can revoke an allocation with recorded reason.
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ STEP 5: OFFICIAL MEMORANDUMS & DISPATCH                                      │
+│ URL: Dashboard -> "Internal Memos" Tab                                       │
+└──────────────────────────────────────────────────────────────────────────────┘
+  • High-priority communications between hospital management and tehsils.
+  • Dispatches "Urgent Directives", "Official Notices", or "Inquiries".
+  • Recorded on internal official ledger with timestamp and reply templates.
+
+
+================================================================================
+3. FORM & DATABASE FIELDS (COMPLETE CATALOG)
+================================================================================
+
+--------------------------------------------------------------------------------
+3.1. CANDIDATES TABLE ("candidates")
+--------------------------------------------------------------------------------
+
+FIELD NAME              DATA TYPE       REQUIRED?   DESCRIPTION / EXAMPLE
+────────────────────────────────────────────────────────────────────────────────
+id                      VARCHAR(64)     YES         Unique candidate ID (Primary Key)
+full_name               VARCHAR(191)    YES         Candidate Full Name (e.g. Zubair Ahmad)
+father_name             VARCHAR(191)    YES         Father or Husband Name
+cnic                    VARCHAR(15)     YES         Formatted CNIC (e.g. 12101-6381920-3)
+cnic_digits             VARCHAR(13)     YES         13-digit raw CNIC (Unique index)
+father_cnic             VARCHAR(15)     OPTIONAL    Father/Husband CNIC (e.g. 12101-7654321-1)
+dob                     VARCHAR(10)     YES         Date of Birth (YYYY-MM-DD)
+gender                  VARCHAR(10)     YES         "Male" | "Female" | "Other"
+phone                   VARCHAR(30)     YES         Mobile Contact (e.g. 0300-1234567)
+email                   VARCHAR(191)    YES         Email Address (Unique)
+address                 VARCHAR(255)    YES         Residential Street / House Address
+domicile_district       VARCHAR(100)    YES         District ("Dera Ismail Khan")
+tehsil                  VARCHAR(100)    YES         Daraban / Kulachi / Paharpur / Dera / Parova
+constituency            VARCHAR(64)     YES         National/Provincial Assembly (e.g. NA-44)
+union_council           VARCHAR(100)    OPTIONAL    Union Council / Village (e.g. UC-04)
+applied_role            VARCHAR(64)     YES         One of the 9 DHQ Hospital Roles
+party_affiliation       VARCHAR(64)     YES         Recommendation (Quota A to F, Merit, Director)
+reference_code          VARCHAR(64)     OPTIONAL    File Reference Code (e.g. REF-2026-001)
+photo_url               LONGTEXT        YES         Passport photo data URL / image link
+cnic_front_url          LONGTEXT        OPTIONAL    CNIC Front scan link / PDF file data
+cnic_back_url           LONGTEXT        OPTIONAL    CNIC Back scan link / PDF file data
+
+matric_details          JSON            YES         Matriculation (SSC) Record:
+  ├─ board              STRING          YES         Board Name (e.g. BISE D.I. Khan)
+  ├─ passingYear        INTEGER         YES         Passing Year (e.g. 2018)
+  ├─ grade              STRING          YES         Grade / Division (e.g. A, B, C)
+  └─ documentUrl        STRING          OPTIONAL    Attached proof document (PDF / JPG)
+
+fsc_details             JSON            YES         Intermediate (HSSC) Record:
+  ├─ board              STRING          YES         Board Name (e.g. BISE D.I. Khan)
+  ├─ passingYear        INTEGER         YES         Passing Year (e.g. 2020)
+  ├─ group              STRING          YES         Pre-Medical, Pre-Eng, FA, ICS
+  ├─ grade              STRING          YES         Grade / Division (e.g. A, B)
+  └─ documentUrl        STRING          OPTIONAL    Attached proof document (PDF / JPG)
+
+higher_education        JSON            OPTIONAL    List of Higher Degrees:
+  ├─ level              STRING          YES         Bachelors / Masters / Diploma
+  ├─ degreeName         STRING          YES         e.g. BS Computer Science
+  ├─ institute          STRING          YES         e.g. Gomal University D.I. Khan
+  ├─ passingYear        INTEGER         YES         e.g. 2024
+  ├─ grade              STRING          YES         e.g. 3.45 CGPA / Grade A
+  └─ documentUrl        STRING          OPTIONAL    Attached degree transcript (PDF / JPG)
+
+status                  VARCHAR(32)     YES         Registered | Verified | Allocated | Under Review
+appointment_order_no    VARCHAR(100)    OPTIONAL    Assigned Appointment Order Number
+joining_order_no        VARCHAR(100)    OPTIONAL    Assigned Joining Order Number
+allocated_role_id       VARCHAR(64)     OPTIONAL    ID of active allocation record
+notes                   VARCHAR(1000)   OPTIONAL    Remarks, disability quota, or notes
+registered_at           VARCHAR(30)     YES         ISO timestamp of registration
+created_at              VARCHAR(30)     YES         Record creation timestamp
+updated_at              VARCHAR(30)     YES         Record last update timestamp
+
+
+--------------------------------------------------------------------------------
+3.2. PASSPORT PHOTO & IMAGE STORAGE TABLE ("candidate_images")
+--------------------------------------------------------------------------------
+
+FIELD NAME              DATA TYPE       DESCRIPTION
+────────────────────────────────────────────────────────────────────────────────
+id                      VARCHAR(64)     Unique Image Record ID
+candidate_id            VARCHAR(64)     Foreign Key -> candidates.id (Cascade on delete)
+mime_type               VARCHAR(64)     MIME type (image/jpeg, image/png, image/webp)
+data                    MEDIUMBLOB      Compressed binary image file stored in database
+width                   INT             Width in pixels
+height                  INT             Height in pixels
+size_bytes              INT             File size in bytes (compressed)
+checksum                VARCHAR(64)     SHA-256 integrity hash
+created_at              VARCHAR(30)     Timestamp
+updated_at              VARCHAR(30)     Timestamp
+
+
+--------------------------------------------------------------------------------
+3.3. STAFF APPOINTMENT & ALLOCATION TABLE ("allocations")
+--------------------------------------------------------------------------------
+
+FIELD NAME              DATA TYPE       DESCRIPTION
+────────────────────────────────────────────────────────────────────────────────
+id                      VARCHAR(64)     Unique Allocation ID (Primary Key)
+candidate_id            VARCHAR(64)     Foreign Key -> candidates.id
+candidate_name          VARCHAR(191)    Candidate name snapshot at time of appointment
+candidate_cnic          VARCHAR(15)     Candidate CNIC snapshot
+district                VARCHAR(100)    "District Dera Ismail Khan"
+constituency            VARCHAR(64)     e.g. NA-44, NA-45
+role_category           VARCHAR(64)     Assigned role (e.g. "Ward Boy", "Security Guard")
+role_title              VARCHAR(191)    Job designation (e.g. "Emergency Ward Attendant")
+department              VARCHAR(255)    Hospital wing (e.g. "Trauma Center", "OPD")
+party_affiliation       VARCHAR(32)     Quota under which appointed (Quota A to F)
+allocated_date          VARCHAR(10)     Appointment Date (YYYY-MM-DD)
+tenure_months           INT             Contract duration in months (e.g. 12, 24, 36)
+status                  VARCHAR(20)     "Active" | "Completed" | "Revoked"
+allocated_by            VARCHAR(191)    Approving authority (e.g. "Hospital Director")
+appointment_ref_no      VARCHAR(100)    Official Reference # (Unique, e.g. DHQ-APT-2026-001)
+joining_order_no        VARCHAR(100)    Official Joining Order # (e.g. DHQ-JOIN-2026-001)
+salary_or_stipend       VARCHAR(100)    Pay scale (BPS-01 to BPS-09) or monthly stipend
+remarks                 VARCHAR(1000)   Directorate instructions or conditions
+revoked_by              VARCHAR(191)    Name of official who revoked (if revoked)
+revoked_at              VARCHAR(30)     Revocation timestamp (if revoked)
+revoke_reason           VARCHAR(500)    Written justification for revocation
+created_at              VARCHAR(30)     Timestamp
+updated_at              VARCHAR(30)     Timestamp
+
+
+--------------------------------------------------------------------------------
+3.4. INTER-AGENCY MEMORANDUMS TABLE ("messages")
+--------------------------------------------------------------------------------
+
+FIELD NAME              DATA TYPE       DESCRIPTION
+────────────────────────────────────────────────────────────────────────────────
+id                      VARCHAR(64)     Unique Message ID (Primary Key)
+sender_id               VARCHAR(64)     Foreign Key -> users.id
+sender_name             VARCHAR(191)    Sender Full Name
+sender_role             VARCHAR(128)    Sender Designation (e.g. "Hospital Director")
+sender_department       VARCHAR(255)    Sender Office (e.g. "Directorate Office")
+district                VARCHAR(100)    "District Dera Ismail Khan"
+subject                 VARCHAR(191)    Memorandum Subject / Title
+message                 VARCHAR(5000)   Full memorandum message text
+priority                VARCHAR(32)     "Urgent Directive" | "Official Notice" | "Routine"
+timestamp               VARCHAR(30)     ISO Dispatched Timestamp
+unread                  BOOLEAN         true = unread, false = read
+created_at              VARCHAR(30)     Timestamp
+updated_at              VARCHAR(30)     Timestamp
+
+
+--------------------------------------------------------------------------------
+3.5. USERS & DISTRICT TABLES ("users", "districts")
+--------------------------------------------------------------------------------
+• users     : Admin username, email, bcrypt password hash, role key, department,
+              profile avatar, and granular permissions (canRegister, canAllocate, etc.).
+• districts : District name ("Dera Ismail Khan"), Province ("Khyber Pakhtunkhwa"),
+              active constituencies array, and recruitment quota thresholds.
+
+
+================================================================================
+4. THE 9 OFFICIAL DHQ HOSPITAL ROLES
+================================================================================
+All candidate registrations and allocations are categorized under these 9 roles:
+
+  #   ROLE NAME                 TYPICAL PLACEMENT / DEPARTMENT
+ ───  ─────────────────────     ────────────────────────────────────────────────
+  1   Ward Boy                  General Wards, Surgical Units, ICU
+  2   Helper Boy                Emergency Pharmacy, Laboratory, Stores
+  3   Stretcher Puller          Accident & Trauma Center, Ambulance Bay
+  4   Security Guard            Main Gate, OPD Entrances, Emergency Perimeter
+  5   Male Ward Attendant       Male Inpatient Wards, Orthopedic Ward
+  6   Female Ward Attendant     Gynecology, Labor Room, Pediatric Ward
+  7   Junior Clerk              Admin Office, Record Room, Accounts Branch
+  8   Reception                 Front Desk, Patient Registration Counter
+  9   Computer Operator         IT Section, Biometrics, Patient Management
+
+
+================================================================================
+5. RECOMMENDATION CODES (NON-POLITICAL QUOTA SYSTEM)
+================================================================================
+All political designations (MNA, MPA, Nazim, Councilor) have been permanently
+replaced with neutral institutional recommendation codes:
+
+  DATABASE CODE       DISPLAY LABEL IN UI          DESCRIPTION
+ ──────────────      ────────────────────────     ─────────────────────────────
+  Quota A             Recommended A                Authorized Quota Slot A
+  Quota B             Recommended B                Authorized Quota Slot B
+  Quota C             Recommended C                Authorized Quota Slot C
+  Quota D             Recommended D                Authorized Quota Slot D
+  Quota E             Recommended E                Authorized Quota Slot E
+  Quota F             Recommended F                Authorized Quota Slot F
+  DIR-OFFICE          Director Office              Hospital Director Office
+  MERIT-OPEN          Open Merit                   General Open Competition
+
+================================================================================
+                        END OF SPECIFICATION DOCUMENT
+================================================================================
