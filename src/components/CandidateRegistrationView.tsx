@@ -976,29 +976,29 @@ export default function CandidateRegistrationView({
         </div>
 
         {/* Candidate Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-3.5 sm:gap-4">
           {filteredCandidates.map((cand) => (
             <div
               key={cand.id}
-              className="bg-white rounded-xl border border-slate-200 hover:border-emerald-300 shadow-sm hover:shadow-md transition-all p-4 flex flex-col justify-between"
+              className="bg-white rounded-xl border border-slate-200 hover:border-emerald-300 shadow-xs hover:shadow-md transition-all p-3.5 sm:p-4 flex flex-col justify-between gap-3"
             >
-              <div className="flex items-start gap-3.5">
+              <div className="flex items-start gap-3">
                 <img
                   src={cand.photoUrl}
                   alt={cand.fullName}
                   onError={(e) => {
                     e.currentTarget.src = "/images/cand_hamza.jpg";
                   }}
-                  className="w-14 h-14 rounded-xl object-cover border border-slate-200 bg-slate-100 flex-shrink-0 shadow-xs"
+                  className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl object-cover border border-slate-200 bg-slate-100 shrink-0 shadow-xs"
                 />
 
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between gap-1">
-                    <h4 className="text-sm font-bold text-slate-900 truncate">
+                  <div className="flex items-center justify-between gap-1.5 flex-wrap">
+                    <h4 className="text-sm font-bold text-slate-900 truncate max-w-[150px] sm:max-w-[180px]" title={cand.fullName}>
                       {cand.fullName}
                     </h4>
                     <span
-                      className={`rounded border px-1.5 py-0.5 text-[10px] font-bold uppercase ${PARTY_STYLES[cand.partyAffiliation]}`}
+                      className={`rounded border px-1.5 py-0.5 text-[10px] font-bold uppercase shrink-0 whitespace-nowrap ${PARTY_STYLES[cand.partyAffiliation]}`}
                     >
                       {PARTY_LABELS[cand.partyAffiliation]}
                     </span>
@@ -1009,21 +1009,21 @@ export default function CandidateRegistrationView({
                   </p>
 
                   <div className="flex items-center gap-1.5 text-xs text-slate-600 mt-1 font-medium">
-                    <MapPin className="w-3.5 h-3.5 text-emerald-700" />
+                    <MapPin className="w-3.5 h-3.5 text-emerald-700 shrink-0" />
                     <span className="truncate">{cand.constituency} ({cand.domicileDistrict})</span>
                   </div>
                 </div>
               </div>
 
               {/* Status and Action Buttons */}
-              <div className="mt-4 pt-3 border-t border-slate-200 flex flex-wrap items-center justify-between gap-2">
+              <div className="pt-2.5 border-t border-slate-100 flex items-center justify-between gap-2 flex-wrap">
                 <span
-                  className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${CANDIDATE_STATUS_STYLES[cand.status]}`}
+                  className={`text-[10px] font-bold px-2 py-0.5 rounded-full border shrink-0 ${CANDIDATE_STATUS_STYLES[cand.status]}`}
                 >
                   {cand.status}
                 </span>
 
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 ml-auto">
                   <button
                     onClick={() => onSelectCandidate(cand)}
                     className="text-xs font-bold text-emerald-800 hover:text-emerald-700 hover:underline cursor-pointer"
@@ -1034,7 +1034,7 @@ export default function CandidateRegistrationView({
                   {cand.status !== "Allocated" && canAllocateSeats && (
                     <button
                       onClick={() => onAllocateCandidate(cand)}
-                      className="bg-emerald-700 hover:bg-emerald-800 text-white text-[11px] font-bold px-3 py-1 rounded-lg transition-all shadow-xs cursor-pointer"
+                      className="bg-emerald-700 hover:bg-emerald-800 text-white text-[11px] font-bold px-2.5 sm:px-3 py-1 rounded-lg transition-all shadow-xs cursor-pointer whitespace-nowrap"
                     >
                       Allocate
                     </button>

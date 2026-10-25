@@ -42,7 +42,7 @@ export const PARTY_LABELS: Record<string, string> = {
   "Quota D": "Recommended D",
   "Quota E": "Recommended E",
   "Quota F": "Recommended F",
-  "DIR-OFFICE": "Recommended Director Office",
+  "DIR-OFFICE": "Director Office",
   "REF-NA-01": "Recommended A",
   "REF-NA-02": "Recommended B",
   "REF-PA-01": "Recommended C",
