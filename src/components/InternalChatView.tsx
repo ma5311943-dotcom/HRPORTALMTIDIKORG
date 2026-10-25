@@ -192,50 +192,50 @@ export default function InternalChatView({
                   key={msg.id}
                   className="bg-white rounded-xl border border-slate-200/90 hover:border-emerald-500 shadow-sm transition-all p-5 space-y-3"
                 >
-                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-slate-100 pb-2.5">
-                    <div className="flex items-center gap-2.5">
-                      <div className="w-8 h-8 rounded-full bg-emerald-600 text-white flex items-center justify-center font-bold text-xs shadow-sm">
+                  <div className="flex flex-wrap items-start sm:items-center justify-between gap-2.5 border-b border-slate-100 pb-2.5">
+                    <div className="flex items-start gap-2.5 min-w-0 flex-1">
+                      <div className="w-8 h-8 rounded-full bg-emerald-600 text-white flex items-center justify-center font-bold text-xs shadow-sm shrink-0 mt-0.5 sm:mt-0">
                         {msg.senderName.charAt(0)}
                       </div>
-                      <div>
-                        <div className="text-xs font-bold text-slate-900 flex items-center gap-2">
-                          <span>{msg.senderName}</span>
+                      <div className="min-w-0 flex-1">
+                        <div className="text-xs font-bold text-slate-900 flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
+                          <span className="truncate">{msg.senderName}</span>
                           <span className="text-[11px] text-slate-500 font-normal">
                             ({msg.senderRole} • {msg.senderDepartment})
                           </span>
                         </div>
-                        <div className="flex items-center gap-2 text-[10px] text-slate-400 mt-0.5">
+                        <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[10px] text-slate-400 mt-0.5">
                           <span className="flex items-center gap-1">
-                            <MapPin className="w-3 h-3 text-emerald-700" />
+                            <MapPin className="w-3 h-3 text-emerald-700 shrink-0" />
                             {msg.district}
                           </span>
                           <span>•</span>
                           <span className="flex items-center gap-1">
-                            <Clock className="w-3 h-3" />
+                            <Clock className="w-3 h-3 shrink-0" />
                             {dateStr}
                           </span>
                         </div>
                       </div>
                     </div>
 
-                    <span className={`self-start sm:self-auto text-[10px] font-bold px-2 py-0.5 rounded-full border ${badge.bg}`}>
+                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border shrink-0 whitespace-nowrap self-start ${badge.bg}`}>
                       {badge.text}
                     </span>
                   </div>
 
                   {/* Subject and Body */}
-                  <div>
-                    <h4 className="text-xs sm:text-sm font-bold text-slate-900 mb-1">
+                  <div className="space-y-1.5">
+                    <h4 className="text-xs sm:text-sm font-bold text-slate-900 break-words">
                       {msg.subject}
                     </h4>
-                    <p className="text-xs text-slate-700 leading-relaxed bg-slate-50 p-3 rounded-lg border border-slate-100 font-sans">
+                    <p className="text-xs text-slate-700 leading-relaxed bg-slate-50 p-3 rounded-lg border border-slate-100 font-sans break-words whitespace-pre-wrap">
                       {msg.message}
                     </p>
                   </div>
 
-                  <div className="flex items-center justify-between text-[11px] text-slate-400 pt-1">
-                    <span className="flex items-center gap-1 font-mono text-emerald-800 font-semibold">
-                      <CheckCheck className="w-3.5 h-3.5 text-emerald-600" />
+                  <div className="flex flex-wrap items-center justify-between gap-2 text-[11px] text-slate-400 pt-1">
+                    <span className="flex items-center gap-1 font-mono text-emerald-800 font-semibold text-[10px] sm:text-[11px]">
+                      <CheckCheck className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
                       Recorded on Internal HR System Official Ledger
                     </span>
 
@@ -245,9 +245,9 @@ export default function InternalChatView({
                         setMessage(`Acknowledged receipt from ${msg.senderName}. `);
                         toast.info("Reply Template Loaded in Dispatcher");
                       }}
-                      className="text-xs font-bold text-emerald-700 hover:underline flex items-center gap-1 cursor-pointer"
+                      className="text-xs font-bold text-emerald-700 hover:underline flex items-center gap-1 cursor-pointer ml-auto"
                     >
-                      <CornerDownRight className="w-3 h-3" />
+                      <CornerDownRight className="w-3 h-3 shrink-0" />
                       <span>Reply</span>
                     </button>
                   </div>
