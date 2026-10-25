@@ -676,12 +676,21 @@ export default function CandidateRegistrationView({
                   <label className="block text-[11px] font-semibold text-slate-600 mb-1">
                     Certificate / DMC Scan (PDF/JPG)
                   </label>
-                  <label className="flex items-center gap-2 cursor-pointer">
+                  <label className="flex items-center gap-2 cursor-pointer flex-wrap">
                     <span className="inline-flex items-center gap-1.5 bg-slate-700 hover:bg-slate-800 text-white text-[11px] font-bold px-3 py-1.5 rounded transition-all">
                       <FileText className="w-3 h-3" />
                       {matricDocName ? "Change File" : "Upload File"}
                     </span>
-                    <span className="text-[11px] text-slate-500 truncate max-w-[140px]">{matricDocName || "No file chosen"}</span>
+                    {matricDocName ? (
+                      <span className="inline-flex items-center gap-1 bg-emerald-50 text-emerald-800 border border-emerald-200 px-2 py-0.5 rounded text-[11px] font-semibold truncate max-w-[180px]">
+                        <span className="text-[9px] bg-red-600 text-white font-bold px-1 rounded uppercase">
+                          {matricDocName.endsWith(".pdf") ? "PDF" : "IMG"}
+                        </span>
+                        <span className="truncate">{matricDocName}</span>
+                      </span>
+                    ) : (
+                      <span className="text-[11px] text-slate-400">No file chosen</span>
+                    )}
                     <input
                       type="file"
                       accept=".pdf,image/jpeg,image/png,image/webp"
@@ -748,12 +757,21 @@ export default function CandidateRegistrationView({
                   <label className="block text-[11px] font-semibold text-slate-600 mb-1">
                     Certificate / DMC Scan (PDF/JPG)
                   </label>
-                  <label className="flex items-center gap-2 cursor-pointer">
+                  <label className="flex items-center gap-2 cursor-pointer flex-wrap">
                     <span className="inline-flex items-center gap-1.5 bg-slate-700 hover:bg-slate-800 text-white text-[11px] font-bold px-3 py-1.5 rounded transition-all">
                       <FileText className="w-3 h-3" />
                       {fscDocName ? "Change File" : "Upload File"}
                     </span>
-                    <span className="text-[11px] text-slate-500 truncate max-w-[140px]">{fscDocName || "No file chosen"}</span>
+                    {fscDocName ? (
+                      <span className="inline-flex items-center gap-1 bg-emerald-50 text-emerald-800 border border-emerald-200 px-2 py-0.5 rounded text-[11px] font-semibold truncate max-w-[180px]">
+                        <span className="text-[9px] bg-red-600 text-white font-bold px-1 rounded uppercase">
+                          {fscDocName.endsWith(".pdf") ? "PDF" : "IMG"}
+                        </span>
+                        <span className="truncate">{fscDocName}</span>
+                      </span>
+                    ) : (
+                      <span className="text-[11px] text-slate-400">No file chosen</span>
+                    )}
                     <input
                       type="file"
                       accept=".pdf,image/jpeg,image/png,image/webp"
@@ -806,12 +824,21 @@ export default function CandidateRegistrationView({
               {/* CNIC Front */}
               <div className="bg-slate-50 p-3 rounded-xl border border-slate-200">
                 <p className="text-[11px] font-bold text-slate-700 mb-2">CNIC — Front Side</p>
-                <label className="flex items-center gap-2 cursor-pointer">
+                <label className="flex items-center gap-2 cursor-pointer flex-wrap">
                   <span className="inline-flex items-center gap-1.5 bg-slate-700 hover:bg-slate-800 text-white text-[11px] font-bold px-3 py-1.5 rounded transition-all">
                     <FileText className="w-3 h-3" />
                     {cnicFrontName ? "Change" : "Upload"}
                   </span>
-                  <span className="text-[11px] text-slate-500 truncate max-w-[120px]">{cnicFrontName || "No file chosen"}</span>
+                  {cnicFrontName ? (
+                    <span className="inline-flex items-center gap-1 bg-emerald-50 text-emerald-800 border border-emerald-200 px-2 py-0.5 rounded text-[11px] font-semibold truncate max-w-[140px]">
+                      <span className="text-[9px] bg-red-600 text-white font-bold px-1 rounded uppercase">
+                        {cnicFrontName.endsWith(".pdf") ? "PDF" : "IMG"}
+                      </span>
+                      <span className="truncate">{cnicFrontName}</span>
+                    </span>
+                  ) : (
+                    <span className="text-[11px] text-slate-400">No file chosen</span>
+                  )}
                   <input
                     type="file"
                     accept=".pdf,image/jpeg,image/png,image/webp"
@@ -825,12 +852,21 @@ export default function CandidateRegistrationView({
               {/* CNIC Back */}
               <div className="bg-slate-50 p-3 rounded-xl border border-slate-200">
                 <p className="text-[11px] font-bold text-slate-700 mb-2">CNIC — Back Side</p>
-                <label className="flex items-center gap-2 cursor-pointer">
+                <label className="flex items-center gap-2 cursor-pointer flex-wrap">
                   <span className="inline-flex items-center gap-1.5 bg-slate-700 hover:bg-slate-800 text-white text-[11px] font-bold px-3 py-1.5 rounded transition-all">
                     <FileText className="w-3 h-3" />
                     {cnicBackName ? "Change" : "Upload"}
                   </span>
-                  <span className="text-[11px] text-slate-500 truncate max-w-[120px]">{cnicBackName || "No file chosen"}</span>
+                  {cnicBackName ? (
+                    <span className="inline-flex items-center gap-1 bg-emerald-50 text-emerald-800 border border-emerald-200 px-2 py-0.5 rounded text-[11px] font-semibold truncate max-w-[140px]">
+                      <span className="text-[9px] bg-red-600 text-white font-bold px-1 rounded uppercase">
+                        {cnicBackName.endsWith(".pdf") ? "PDF" : "IMG"}
+                      </span>
+                      <span className="truncate">{cnicBackName}</span>
+                    </span>
+                  ) : (
+                    <span className="text-[11px] text-slate-400">No file chosen</span>
+                  )}
                   <input
                     type="file"
                     accept=".pdf,image/jpeg,image/png,image/webp"
