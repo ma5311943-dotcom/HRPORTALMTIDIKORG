@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useMemo, useState } from "react";
-import { SystemAnalytics, Candidate, Allocation, RoleCategory, DHQ_STAFF_ROLES, RecommenderAlias } from "@/types";
+import { SystemAnalytics, Candidate, Allocation, RoleCategory, DHQ_STAFF_ROLES, RecommenderAlias, DI_KHAN_TEHSILS } from "@/types";
 import { 
   Users, 
   CheckCircle2, 
@@ -85,6 +85,17 @@ export default function DashboardView({
     return Math.round((verifiedCandidatesCount / districtFilteredCandidates.length) * 100);
   }, [districtFilteredCandidates, verifiedCandidatesCount]);
 
+  const tehsilStats = useMemo(() => {
+    const tehsils = Array.from(
+      new Set(
+        districtFilteredCandidates
+          .map((c) => c.tehsil?.trim())
+          .filter((t): t is string => !!t)
+      )
+    );
+    return tehsils;
+  }, [districtFilteredCandidates]);
+
   // Single-Click Export for current filtered view or all
   const handleExportWord = () => {
     const records = districtFilteredCandidates.map(c => {
@@ -129,7 +140,7 @@ export default function DashboardView({
             </h2>
 
             <p className="text-emerald-100/80 text-sm leading-relaxed">
-              Official centralized registry of Ward Boys, Attendants, Clerks, Security Guards, and Technical Staff across D.I. Khan tehsils: <strong>Daraban, Kulachi, Paharpur, Dera, and Parova</strong>. Strict confidentiality of recommendation short-codes.
+              Official centralized registry of Ward Boys, Attendants, Clerks, Security Guards, and Technical Staff across D.I. Khan tehsils: <strong>{DI_KHAN_TEHSILS.join(", ")}</strong>. Strict confidentiality of recommendation short-codes.
             </p>
 
             <div className="flex flex-wrap items-center gap-2.5 text-xs text-emerald-200/90 pt-1">
@@ -253,7 +264,7 @@ export default function DashboardView({
             </div>
             <div className="mt-1.5 flex items-center gap-1.5 text-xs">
               <span className="inline-flex items-center px-1.5 py-0.5 rounded-md text-[10px] font-bold bg-[#10b981]/20 text-[#10b981] border border-[#10b981]/30">
-                +15% verified
+                {verificationRatio}% verified
               </span>
               <span className="text-emerald-200/70 text-[11px]">with NADRA CNIC</span>
             </div>
@@ -284,7 +295,7 @@ export default function DashboardView({
         <div className="bg-white rounded-xl p-5 border border-slate-200 shadow-sm hover:border-amber-300 hover:shadow-md transition-all">
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
-              D.I. Khan Tehsils
+              Tehsils Represented
             </span>
             <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-700 flex items-center justify-center border border-amber-100">
               <MapPin className="w-5 h-5" />
@@ -292,10 +303,10 @@ export default function DashboardView({
           </div>
           <div className="mt-3">
             <div className="text-2xl sm:text-3xl font-extrabold text-slate-900">
-              5 Tehsils
+              {tehsilStats.length > 0 ? `${tehsilStats.length} Tehsils` : "—"}
             </div>
-            <p className="text-xs text-slate-500 mt-1 flex items-center gap-1 font-medium">
-              Daraban, Kulachi, Paharpur, Dera, Parova
+            <p className="text-xs text-slate-500 mt-1 flex items-center gap-1 font-medium truncate" title={tehsilStats.join(", ")}>
+              {tehsilStats.length > 0 ? tehsilStats.join(", ") : "No tehsil data recorded yet"}
             </p>
           </div>
         </div>
@@ -486,37 +497,22 @@ export default function DashboardView({
               {districtFilteredAllocations.length === 0 && (
                 <tr>
                   <td colSpan={7} className="px-4 py-8 text-center text-xs text-slate-500">
-                    No DHQ staff appointments match the selected role filter "{selectedRoleFilter}".
+                    No DHQ staff appointments match the selected role filter &quot;{selectedRoleFilter}&quot;.
                   </td>
                 </tr>
               )}
               {districtFilteredAllocations.map((alloc) => {
-                const candidate = candidates.find(c => c.id === alloc.candidateId || c.cnic === alloc.candidateCnic) || {
+                const storedCandidate = candidates.find(c => c.id === alloc.candidateId || c.cnic === alloc.candidateCnic);
+                const candidate = storedCandidate ?? {
                   id: alloc.candidateId,
                   fullName: alloc.candidateName,
-                  fatherName: "Applicant Parent Record",
                   cnic: alloc.candidateCnic,
-                  dob: "1998-01-01",
-                  gender: "Male" as const,
-                  phone: "0300-0000000",
-                  email: `${alloc.candidateName.toLowerCase().replace(/[^a-z0-9]/g, "")}@dhq.hospital.pk`,
-                  address: `${alloc.constituency}, District ${alloc.district}`,
-                  domicileDistrict: alloc.district,
-                  constituency: alloc.constituency,
-                  tehsil: alloc.district,
-                  unionCouncil: alloc.constituency,
-                  partyAffiliation: alloc.partyAffiliation,
+                  photoUrl: "",
+                  tehsil: "",
+                  unionCouncil: "",
                   referenceCode: alloc.partyAffiliation,
-                  appliedRole: alloc.roleCategory,
-                  appointmentOrderNo: alloc.appointmentRefNo,
-                  joiningOrderNo: alloc.joiningOrderNo,
-                  photoUrl: "/images/cand_bilal.jpg",
-                  matricDetails: { board: "BISE D.I. Khan", passingYear: 2016, grade: "A" },
-                  fscDetails: { board: "BISE D.I. Khan", passingYear: 2018, group: "General", grade: "B" },
-                  status: "Allocated" as const,
-                  allocatedRoleId: alloc.id,
-                  registeredAt: alloc.allocatedDate,
-                };
+                  partyAffiliation: alloc.partyAffiliation,
+                } as Candidate;
                 const roleStyle = ROLE_STYLES[alloc.roleCategory] || "bg-slate-100 text-slate-800 border-slate-200";
                 const refCode = candidate.referenceCode || alloc.partyAffiliation || "DIR-OFFICE";
                 const refStyle = PARTY_STYLES[refCode] || "bg-slate-100 text-slate-700 border-slate-200";

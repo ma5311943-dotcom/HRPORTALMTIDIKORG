@@ -5,6 +5,8 @@ import { DomainError, isDuplicateKeyError } from "@/lib/errors";
 import type {
   Allocation,
   Candidate,
+  CandidateDocumentField,
+  CandidateDocumentSummary,
   CandidateStatus,
   ChatMessage,
   District,
@@ -18,6 +20,7 @@ type CandidateRow = typeof schema.candidates.$inferSelect;
 type AllocationRow = typeof schema.allocations.$inferSelect;
 type MessageRow = typeof schema.messages.$inferSelect;
 type DistrictRow = typeof schema.districts.$inferSelect;
+type DocumentRow = typeof schema.candidateDocuments.$inferSelect;
 
 function nowIso() {
   return new Date().toISOString();
@@ -113,6 +116,28 @@ function mapDistrict(row: DistrictRow): District {
 
 function likePattern(value: string) {
   return `%${value.replace(/[%_]/g, "\\$&")}%`;
+}
+
+function documentFieldUrl(candidateId: string, field: CandidateDocumentField) {
+  return `/api/candidates/${candidateId}/documents?field=${field}`;
+}
+
+function mapDocumentSummary(row: DocumentRow): CandidateDocumentSummary {
+  const savedPercent = Math.max(
+    0,
+    Math.round((1 - row.sizeBytes / Math.max(1, row.originalSizeBytes)) * 100)
+  );
+  return {
+    field: row.field as CandidateDocumentField,
+    fileName: row.fileName,
+    mimeType: row.mimeType,
+    originalSizeBytes: row.originalSizeBytes,
+    sizeBytes: row.sizeBytes,
+    savedPercent,
+    checksum: row.checksum,
+    updatedAt: row.updatedAt,
+    url: `${documentFieldUrl(row.candidateId, row.field as CandidateDocumentField)}&v=${row.checksum.slice(0, 12)}`,
+  };
 }
 
 export const db = {
@@ -220,6 +245,11 @@ export const db = {
     const now = nowIso();
     const id = `cand-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 
+    const photoUrl =
+      candidate.photoUrl && candidate.photoUrl.length > 0
+        ? candidate.photoUrl
+        : `/api/candidates/${id}/photo`;
+
     await database.insert(schema.candidates).values({
       id,
       fullName: candidate.fullName,
@@ -243,7 +273,7 @@ export const db = {
       cnicFrontUrl: candidate.cnicFrontUrl ?? null,
       cnicBackUrl: candidate.cnicBackUrl ?? null,
       partyAffiliation: candidate.partyAffiliation,
-      photoUrl: candidate.photoUrl,
+      photoUrl,
       matricDetails: candidate.matricDetails,
       fscDetails: candidate.fscDetails,
       higherEducation: candidate.higherEducation ?? [],
@@ -264,6 +294,7 @@ export const db = {
     return stripCandidateSecret({
       ...candidate,
       id,
+      photoUrl,
       registeredAt: now,
       passwordHash: candidate.passwordHash,
     });
@@ -671,6 +702,123 @@ export const db = {
         checksum: image.checksum,
       };
     });
+  },
+
+  async upsertCandidateDocument(
+    candidateId: string,
+    doc: {
+      field: CandidateDocumentField;
+      fileName: string;
+      mimeType: string;
+      data: Buffer;
+      originalSizeBytes: number;
+      sizeBytes: number;
+      checksum: string;
+    }
+  ): Promise<CandidateDocumentSummary> {
+    const database = getDb();
+    return database.transaction(async (tx) => {
+      const [candidate] = await tx
+        .select()
+        .from(schema.candidates)
+        .where(eq(schema.candidates.id, candidateId))
+        .limit(1)
+        .for("update");
+
+      if (!candidate) {
+        throw new DomainError(404, "Candidate not found.");
+      }
+
+      const now = nowIso();
+      const [existing] = await tx
+        .select({ id: schema.candidateDocuments.id })
+        .from(schema.candidateDocuments)
+        .where(
+          and(
+            eq(schema.candidateDocuments.candidateId, candidateId),
+            eq(schema.candidateDocuments.field, doc.field)
+          )
+        )
+        .limit(1)
+        .for("update");
+
+      let row: DocumentRow;
+      if (existing) {
+        await tx
+          .update(schema.candidateDocuments)
+          .set({ ...doc, updatedAt: now })
+          .where(eq(schema.candidateDocuments.id, existing.id));
+        const [updated] = await tx
+          .select()
+          .from(schema.candidateDocuments)
+          .where(eq(schema.candidateDocuments.id, existing.id))
+          .limit(1);
+        row = updated;
+      } else {
+        const docId = `doc-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+        await tx.insert(schema.candidateDocuments).values({
+          id: docId,
+          candidateId,
+          ...doc,
+          createdAt: now,
+          updatedAt: now,
+        });
+        const [inserted] = await tx
+          .select()
+          .from(schema.candidateDocuments)
+          .where(eq(schema.candidateDocuments.id, docId))
+          .limit(1);
+        row = inserted;
+      }
+
+      const documentUrl = `${documentFieldUrl(candidateId, doc.field)}&v=${doc.checksum.slice(0, 12)}`;
+      const patch: Partial<typeof schema.candidates.$inferInsert> = {
+        updatedAt: now,
+      };
+      if (doc.field === "cnicFront") patch.cnicFrontUrl = documentUrl;
+      if (doc.field === "cnicBack") patch.cnicBackUrl = documentUrl;
+      if (doc.field === "matricDoc") {
+        patch.matricDetails = { ...candidate.matricDetails, documentUrl };
+      }
+      if (doc.field === "fscDoc") {
+        patch.fscDetails = { ...candidate.fscDetails, documentUrl };
+      }
+      await tx
+        .update(schema.candidates)
+        .set(patch)
+        .where(eq(schema.candidates.id, candidateId));
+
+      return mapDocumentSummary(row);
+    });
+  },
+
+  async getCandidateDocument(
+    candidateId: string,
+    field: CandidateDocumentField
+  ): Promise<(CandidateDocumentSummary & { data: Buffer }) | undefined> {
+    const [row] = await getDb()
+      .select()
+      .from(schema.candidateDocuments)
+      .where(
+        and(
+          eq(schema.candidateDocuments.candidateId, candidateId),
+          eq(schema.candidateDocuments.field, field)
+        )
+      )
+      .limit(1);
+    if (!row) return undefined;
+    return { ...mapDocumentSummary(row), data: row.data };
+  },
+
+  async listCandidateDocuments(
+    candidateId: string
+  ): Promise<CandidateDocumentSummary[]> {
+    const rows = await getDb()
+      .select()
+      .from(schema.candidateDocuments)
+      .where(eq(schema.candidateDocuments.candidateId, candidateId))
+      .orderBy(desc(schema.candidateDocuments.updatedAt));
+    return rows.map(mapDocumentSummary);
   },
 
   async getMessages(districtFilter?: string): Promise<ChatMessage[]> {

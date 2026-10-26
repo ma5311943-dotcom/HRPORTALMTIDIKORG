@@ -1,6 +1,7 @@
-import "dotenv/config";
+﻿import "dotenv/config";
 import fs from "node:fs";
 import path from "node:path";
+import { eq, sql } from "drizzle-orm";
 import { getDb, getPool, schema } from "../src/db/client";
 import { ROLE_PRESETS } from "../src/lib/auth";
 import { hashPassword } from "../src/lib/password";
@@ -17,6 +18,30 @@ const initialDistricts: District[] = [
     constituencies: ["NA-44", "NA-45", "PK-111", "PK-112", "PK-113", "PK-114", "PK-115"],
     totalQuota: 350,
     allocatedCount: 5
+  },
+  {
+    id: "tank",
+    name: "Tank",
+    province: "Khyber Pakhtunkhwa",
+    constituencies: ["NA-42"],
+    totalQuota: 40,
+    allocatedCount: 0
+  },
+  {
+    id: "bannu",
+    name: "Bannu",
+    province: "Khyber Pakhtunkhwa",
+    constituencies: ["NA-41"],
+    totalQuota: 50,
+    allocatedCount: 0
+  },
+  {
+    id: "lakki",
+    name: "Lakki Marwat",
+    province: "Khyber Pakhtunkhwa",
+    constituencies: ["NA-40"],
+    totalQuota: 60,
+    allocatedCount: 0
   }
 ];
 
@@ -42,11 +67,9 @@ const initialCandidates = [
     appliedRole: "Ward Boy" as RoleCategory,
     appointmentOrderNo: "DHQ-DIR/APPT/2026/014",
     joiningOrderNo: "DHQ-MS/JOIN/2026/014",
-    cnicFrontUrl: "/images/nadra_biometric_card.jpg",
-    cnicBackUrl: "/images/nadra_biometric_card.jpg",
-    photoUrl: "/images/cand_bilal.jpg",
-    matricDetails: { board: "BISE D.I. Khan", passingYear: 2015, grade: "B", documentUrl: "matric_dmc_verified.pdf" },
-    fscDetails: { board: "BISE D.I. Khan", passingYear: 2017, group: "General", grade: "B", documentUrl: "hssc_certificate_scanned.pdf" },
+    photoUrl: "",
+    matricDetails: { board: "BISE D.I. Khan", passingYear: 2015, grade: "B" },
+    fscDetails: { board: "BISE D.I. Khan", passingYear: 2017, group: "General", grade: "B" },
     status: "Allocated" as const,
     allocatedRoleId: "dhq-alloc-01",
     registeredAt: "2026-10-15T09:00:00Z",
@@ -72,11 +95,9 @@ const initialCandidates = [
     appliedRole: "Helper Boy" as RoleCategory,
     appointmentOrderNo: "DHQ-DIR/APPT/2026/015",
     joiningOrderNo: "DHQ-MS/JOIN/2026/015",
-    cnicFrontUrl: "/images/nadra_biometric_card.jpg",
-    cnicBackUrl: "/images/nadra_biometric_card.jpg",
-    photoUrl: "/images/cand_hamza.jpg",
-    matricDetails: { board: "BISE D.I. Khan", passingYear: 2016, grade: "B", documentUrl: "matric_gazette_verified.pdf" },
-    fscDetails: { board: "BISE D.I. Khan", passingYear: 2018, group: "Arts", grade: "C", documentUrl: "intermediate_dmc.pdf" },
+    photoUrl: "",
+    matricDetails: { board: "BISE D.I. Khan", passingYear: 2016, grade: "B" },
+    fscDetails: { board: "BISE D.I. Khan", passingYear: 2018, group: "Arts", grade: "C" },
     status: "Allocated" as const,
     allocatedRoleId: "dhq-alloc-02",
     registeredAt: "2026-10-16T10:15:00Z",
@@ -102,11 +123,9 @@ const initialCandidates = [
     appliedRole: "Stretcher Puller" as RoleCategory,
     appointmentOrderNo: "DHQ-DIR/APPT/2026/016",
     joiningOrderNo: "DHQ-MS/JOIN/2026/016",
-    cnicFrontUrl: "/images/nadra_biometric_card.jpg",
-    cnicBackUrl: "/images/nadra_biometric_card.jpg",
-    photoUrl: "/images/cand_usman.jpg",
-    matricDetails: { board: "BISE D.I. Khan", passingYear: 2015, grade: "C", documentUrl: "ssc_certificate_scan.jpg" },
-    fscDetails: { board: "BISE D.I. Khan", passingYear: 2017, group: "General", grade: "C", documentUrl: "hssc_verified_dmc.pdf" },
+    photoUrl: "",
+    matricDetails: { board: "BISE D.I. Khan", passingYear: 2015, grade: "C" },
+    fscDetails: { board: "BISE D.I. Khan", passingYear: 2017, group: "General", grade: "C" },
     status: "Allocated" as const,
     allocatedRoleId: "dhq-alloc-03",
     registeredAt: "2026-10-16T11:45:00Z",
@@ -132,11 +151,9 @@ const initialCandidates = [
     appliedRole: "Security Guard" as RoleCategory,
     appointmentOrderNo: "DHQ-DIR/APPT/2026/017",
     joiningOrderNo: "DHQ-MS/JOIN/2026/017",
-    cnicFrontUrl: "/images/nadra_biometric_card.jpg",
-    cnicBackUrl: "/images/nadra_biometric_card.jpg",
-    photoUrl: "/images/staff_portrait.jpg",
-    matricDetails: { board: "BISE D.I. Khan", passingYear: 2012, grade: "B", documentUrl: "matric_result_card.pdf" },
-    fscDetails: { board: "BISE D.I. Khan", passingYear: 2014, group: "Arts", grade: "B", documentUrl: "fsc_dmc_verified.pdf" },
+    photoUrl: "",
+    matricDetails: { board: "BISE D.I. Khan", passingYear: 2012, grade: "B" },
+    fscDetails: { board: "BISE D.I. Khan", passingYear: 2014, group: "Arts", grade: "B" },
     status: "Allocated" as const,
     allocatedRoleId: "dhq-alloc-04",
     registeredAt: "2026-10-17T08:30:00Z",
@@ -162,11 +179,9 @@ const initialCandidates = [
     appliedRole: "Male Ward Attendant" as RoleCategory,
     appointmentOrderNo: "DHQ-DIR/APPT/2026/018",
     joiningOrderNo: "DHQ-MS/JOIN/2026/018",
-    cnicFrontUrl: "/images/nadra_biometric_card.jpg",
-    cnicBackUrl: "/images/nadra_biometric_card.jpg",
-    photoUrl: "/images/councilor_portrait.jpg",
-    matricDetails: { board: "BISE D.I. Khan", passingYear: 2013, grade: "A", documentUrl: "matric_board_certificate.pdf" },
-    fscDetails: { board: "BISE D.I. Khan", passingYear: 2015, group: "Pre-Medical", grade: "B", documentUrl: "pre_med_fsc_dmc.pdf" },
+    photoUrl: "",
+    matricDetails: { board: "BISE D.I. Khan", passingYear: 2013, grade: "A" },
+    fscDetails: { board: "BISE D.I. Khan", passingYear: 2015, group: "Pre-Medical", grade: "B" },
     status: "Allocated" as const,
     allocatedRoleId: "dhq-alloc-05",
     registeredAt: "2026-10-17T12:00:00Z",
@@ -192,9 +207,7 @@ const initialCandidates = [
     appliedRole: "Female Ward Attendant" as RoleCategory,
     appointmentOrderNo: "DHQ-DIR/APPT/2026/019",
     joiningOrderNo: "DHQ-MS/JOIN/2026/019",
-    cnicFrontUrl: "/images/nadra_biometric_card.jpg",
-    cnicBackUrl: "/images/nadra_biometric_card.jpg",
-    photoUrl: "/images/cand_fatima.jpg",
+    photoUrl: "",
     matricDetails: { board: "BISE D.I. Khan", passingYear: 2014, grade: "A" },
     fscDetails: { board: "BISE D.I. Khan", passingYear: 2016, group: "General", grade: "A" },
     status: "Allocated" as const,
@@ -222,9 +235,7 @@ const initialCandidates = [
     appliedRole: "Junior Clerk" as RoleCategory,
     appointmentOrderNo: "DHQ-DIR/APPT/2026/020",
     joiningOrderNo: "DHQ-MS/JOIN/2026/020",
-    cnicFrontUrl: "/images/nadra_biometric_card.jpg",
-    cnicBackUrl: "/images/nadra_biometric_card.jpg",
-    photoUrl: "/images/cand_usman.jpg",
+    photoUrl: "",
     matricDetails: { board: "BISE D.I. Khan", passingYear: 2012, grade: "A" },
     fscDetails: { board: "BISE D.I. Khan", passingYear: 2014, group: "I.Com", grade: "A" },
     status: "Allocated" as const,
@@ -252,9 +263,7 @@ const initialCandidates = [
     appliedRole: "Reception" as RoleCategory,
     appointmentOrderNo: "DHQ-DIR/APPT/2026/021",
     joiningOrderNo: "DHQ-MS/JOIN/2026/021",
-    cnicFrontUrl: "/images/nadra_biometric_card.jpg",
-    cnicBackUrl: "/images/nadra_biometric_card.jpg",
-    photoUrl: "/images/cand_ayesha.jpg",
+    photoUrl: "",
     matricDetails: { board: "BISE D.I. Khan", passingYear: 2017, grade: "A+" },
     fscDetails: { board: "BISE D.I. Khan", passingYear: 2019, group: "ICS", grade: "A" },
     status: "Allocated" as const,
@@ -282,9 +291,7 @@ const initialCandidates = [
     appliedRole: "Computer Operator" as RoleCategory,
     appointmentOrderNo: "DHQ-DIR/APPT/2026/022",
     joiningOrderNo: "DHQ-MS/JOIN/2026/022",
-    cnicFrontUrl: "/images/nadra_biometric_card.jpg",
-    cnicBackUrl: "/images/nadra_biometric_card.jpg",
-    photoUrl: "/images/cand_zainab.jpg",
+    photoUrl: "",
     matricDetails: { board: "BISE D.I. Khan", passingYear: 2014, grade: "A" },
     fscDetails: { board: "BISE D.I. Khan", passingYear: 2016, group: "ICS", grade: "A" },
     status: "Allocated" as const,
@@ -310,9 +317,7 @@ const initialCandidates = [
     partyAffiliation: "REF-NZM-02" as RecommenderAlias,
     referenceCode: "REF-NZM-02",
     appliedRole: "Ward Boy" as RoleCategory,
-    cnicFrontUrl: "/images/nadra_biometric_card.jpg",
-    cnicBackUrl: "/images/nadra_biometric_card.jpg",
-    photoUrl: "/images/cand_bilal.jpg",
+    photoUrl: "",
     matricDetails: { board: "BISE D.I. Khan", passingYear: 2013, grade: "B" },
     fscDetails: { board: "BISE D.I. Khan", passingYear: 2015, group: "General", grade: "B" },
     status: "Verified" as const,
@@ -337,9 +342,7 @@ const initialCandidates = [
     partyAffiliation: "MERIT-OPEN" as RecommenderAlias,
     referenceCode: "MERIT-OPEN",
     appliedRole: "Security Guard" as RoleCategory,
-    cnicFrontUrl: "/images/nadra_biometric_card.jpg",
-    cnicBackUrl: "/images/nadra_biometric_card.jpg",
-    photoUrl: "/images/cand_hamza.jpg",
+    photoUrl: "",
     matricDetails: { board: "BISE D.I. Khan", passingYear: 2016, grade: "B" },
     fscDetails: { board: "BISE D.I. Khan", passingYear: 2018, group: "Arts", grade: "C" },
     status: "Registered" as const,
@@ -606,6 +609,7 @@ export async function seedDatabase() {
   await db.delete(schema.districts);
 
   console.log("Seeding DHQ Hospital users...");
+  await db.delete(schema.users);
   const userRows = Object.entries(ROLE_PRESETS).map(([key, preset]) => ({
     id: `user-${key}`,
     username: key,
@@ -684,9 +688,9 @@ export async function seedDatabase() {
       appliedRole: c.appliedRole,
       appointmentOrderNo: c.appointmentOrderNo,
       joiningOrderNo: c.joiningOrderNo,
-      cnicFrontUrl: c.cnicFrontUrl,
-      cnicBackUrl: c.cnicBackUrl,
-      photoUrl: c.photoUrl,
+      cnicFrontUrl: null,
+      cnicBackUrl: null,
+      photoUrl: `/api/candidates/${c.id}/photo`,
       matricDetails: c.matricDetails,
       fscDetails: c.fscDetails,
       higherEducation: [],
@@ -776,6 +780,22 @@ export async function seedDatabase() {
         updatedAt: now,
       }
     });
+  }
+
+  console.log("Syncing district allocated counts from real allocations...");
+  const activePerDistrict = await db
+    .select({
+      district: schema.allocations.district,
+      total: sql<number>`COUNT(*)`,
+    })
+    .from(schema.allocations)
+    .where(eq(schema.allocations.status, "Active"))
+    .groupBy(schema.allocations.district);
+  for (const row of activePerDistrict) {
+    await db
+      .update(schema.districts)
+      .set({ allocatedCount: Number(row.total), updatedAt: now })
+      .where(eq(schema.districts.name, row.district));
   }
 
   console.log("DHQ Hospital staff data seed completed successfully!");

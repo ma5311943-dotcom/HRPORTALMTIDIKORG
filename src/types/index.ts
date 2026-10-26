@@ -70,6 +70,39 @@ export type EducationRecord = {
   documentUrl?: string;
 };
 
+export type CandidateDocumentField =
+  | "cnicFront"
+  | "cnicBack"
+  | "matricDoc"
+  | "fscDoc";
+
+export const CANDIDATE_DOCUMENT_FIELDS: CandidateDocumentField[] = [
+  "cnicFront",
+  "cnicBack",
+  "matricDoc",
+  "fscDoc",
+];
+
+export const CANDIDATE_DOCUMENT_LABELS: Record<CandidateDocumentField, string> = {
+  cnicFront: "CNIC Front",
+  cnicBack: "CNIC Back",
+  matricDoc: "Matric Certificate",
+  fscDoc: "FSc Certificate",
+};
+
+export type CandidateDocumentSummary = {
+  field: CandidateDocumentField;
+  fileName: string;
+  mimeType: string;
+  originalSizeBytes: number;
+  sizeBytes: number;
+  savedPercent: number;
+  checksum: string;
+  updatedAt: string;
+  url: string;
+};
+
+
 export type Candidate = {
   id: string;
   fullName: string;

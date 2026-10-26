@@ -54,6 +54,7 @@ interface PublicOverview {
     totalQuota: number;
     quotaAlignment: number;
   };
+  sampleCnics: { label: string; cnic: string }[];
 }
 
 interface LandingPageProps {
@@ -72,12 +73,7 @@ export default function LandingPage({
   const [isSearching, setIsSearching] = useState<boolean>(false);
   const [activeHeroVisual, setActiveHeroVisual] = useState<"banner" | "parliament">("banner");
 
-  const sampleCnics = [
-    { label: "Hamza Tariq (Lahore)", cnic: "35201-1849204-1" },
-    { label: "Syeda Zainab (Rawalpindi)", cnic: "37405-7281920-4" },
-    { label: "Farhan Soomro (Karachi)", cnic: "42101-8172635-5" },
-    { label: "Jahangir Khan (Peshawar)", cnic: "17301-6382910-7" },
-  ];
+  const sampleCnics = overview.sampleCnics;
 
   const verifyCnic = async (value: string) => {
     const clean = value.trim().replace(/[^0-9-]/g, "");
@@ -374,7 +370,7 @@ export default function LandingPage({
                       type="text"
                       value={cnicQuery}
                       onChange={(e) => setCnicQuery(e.target.value)}
-                      placeholder="Enter 13-digit CNIC (e.g. 35201-1849204-1)"
+                      placeholder={sampleCnics.length > 0 ? `Enter 13-digit CNIC (e.g. ${sampleCnics[0].cnic})` : "Enter 13-digit CNIC"}
                       className="w-full rounded-xl border border-slate-300 bg-white py-3 pl-11 pr-4 font-mono text-sm font-semibold text-slate-900 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-600/30"
                     />
                   </div>
@@ -389,7 +385,9 @@ export default function LandingPage({
                 </form>
 
                 <div className="mt-4 flex flex-wrap items-center gap-1.5">
-                  <span className="text-[11px] font-bold text-slate-500">Test Sample CNICs:</span>
+                  <span className="text-[11px] font-bold text-slate-500">
+                    {sampleCnics.length > 0 ? "Registered Sample CNICs:" : "No sample CNICs available yet"}
+                  </span>
                   {sampleCnics.map((sample) => (
                     <button
                       key={sample.cnic}

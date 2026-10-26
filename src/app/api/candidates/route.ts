@@ -9,7 +9,7 @@ import {
   getSession,
   requireSession,
 } from "@/lib/server-auth";
-import type { Candidate, CandidateStatus, PoliticalParty } from "@/types";
+import type { Candidate, CandidateStatus, PoliticalParty, RoleCategory } from "@/types";
 
 const VALID_STATUSES: CandidateStatus[] = [
   "Registered",
@@ -107,6 +107,18 @@ export async function POST(req: NextRequest) {
     if (fullName.length < 3) {
       throw new ApiError(400, "Full name must be at least 3 characters long.");
     }
+    const dob = asString(body.dob);
+    if (!dob) {
+      throw new ApiError(400, "Date of birth is required.");
+    }
+    const tehsil = asString(body.tehsil);
+    if (!tehsil) {
+      throw new ApiError(400, "Tehsil is required.");
+    }
+    const address = asString(body.address);
+    if (!address) {
+      throw new ApiError(400, "Residential address is required.");
+    }
 
     const rawCnic = cnic.replace(/[^0-9]/g, "");
     if (rawCnic.length !== 13) {
@@ -144,48 +156,43 @@ export async function POST(req: NextRequest) {
         ? (body.partyAffiliation as PoliticalParty)
         : "DIR-OFFICE";
 
-    const email = asString(body.email) || `${rawCnic}@dhq.hospital.pk`;
+    const email = asString(body.email) || `${rawCnic}@candidates.internalhr.gov.pk`;
     const requestedPhotoUrl = asString(body.photoUrl);
-    const photoUrl =
-      requestedPhotoUrl.startsWith("/") && !requestedPhotoUrl.startsWith("//")
-        ? requestedPhotoUrl
-        : "/images/cand_bilal.jpg";
+    const emptyDetails = { board: "", passingYear: 0, grade: "" };
     const matricDetails =
       body.matricDetails && typeof body.matricDetails === "object"
         ? (body.matricDetails as Candidate["matricDetails"])
-        : { board: "BISE D.I. Khan", passingYear: 2020, grade: "A" };
+        : { ...emptyDetails };
     const fscDetails =
       body.fscDetails && typeof body.fscDetails === "object"
         ? (body.fscDetails as Candidate["fscDetails"])
-        : { board: "BISE D.I. Khan", passingYear: 2022, group: "General", grade: "B" };
+        : { ...emptyDetails, group: "" };
 
     const newCandidate = await db.createCandidate({
       fullName,
-      fatherName: asString(body.fatherName, "Not Specified"),
+      fatherName: asString(body.fatherName) || "Not Specified",
       cnic,
       fatherCnic: asString(body.fatherCnic) || undefined,
-      dob: asString(body.dob, "1998-05-15"),
+      dob,
       gender:
         body.gender === "Female" || body.gender === "Other"
           ? body.gender
           : "Male",
       phone,
       email,
-      address:
-        asString(body.address) ||
-        `${asString(body.tehsil, "Dera")}, Dera Ismail Khan`,
+      address,
       domicileDistrict,
       constituency,
-      tehsil: asString(body.tehsil, "Dera"),
+      tehsil,
       unionCouncil: asString(body.unionCouncil) || undefined,
       partyAffiliation: party,
       referenceCode: asString(body.referenceCode) || party,
-      appliedRole: asString(body.appliedRole) as any || undefined,
+      appliedRole: (asString(body.appliedRole) as RoleCategory) || undefined,
       appointmentOrderNo: asString(body.appointmentOrderNo) || undefined,
       joiningOrderNo: asString(body.joiningOrderNo) || undefined,
       cnicFrontUrl: asString(body.cnicFrontUrl) || undefined,
       cnicBackUrl: asString(body.cnicBackUrl) || undefined,
-      photoUrl,
+      photoUrl: "",
       matricDetails,
       fscDetails,
       higherEducation: Array.isArray(body.higherEducation)
@@ -196,7 +203,7 @@ export async function POST(req: NextRequest) {
       passwordHash: password ? hashPassword(password) : undefined,
     });
 
-    let finalPhotoUrl = photoUrl;
+    let finalPhotoUrl = newCandidate.photoUrl;
     if (requestedPhotoUrl.startsWith("data:image/")) {
       try {
         const base64Data = requestedPhotoUrl.split(",")[1];

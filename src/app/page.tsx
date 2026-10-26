@@ -39,6 +39,7 @@ interface PublicOverview {
     totalQuota: number;
     quotaAlignment: number;
   };
+  sampleCnics: { label: string; cnic: string }[];
 }
 
 const EMPTY_OVERVIEW: PublicOverview = {
@@ -51,6 +52,7 @@ const EMPTY_OVERVIEW: PublicOverview = {
     totalQuota: 0,
     quotaAlignment: 0,
   },
+  sampleCnics: [],
 };
 
 

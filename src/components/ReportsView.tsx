@@ -59,6 +59,28 @@ export default function ReportsView({
     return counts;
   }, [filteredAllocations]);
 
+  // Real credential-verification ratio for the current scope
+  const verifiedCredentialsRatio = useMemo(() => {
+    if (filteredCandidates.length === 0) return 0;
+    const verifiedCount = filteredCandidates.filter(
+      (c) => c.status === "Verified" || c.status === "Allocated"
+    ).length;
+    return Math.round((verifiedCount / filteredCandidates.length) * 100);
+  }, [filteredCandidates]);
+
+  // Real duplicate-allotment check: candidates holding more than one active allocation
+  const duplicateAllotmentCount = useMemo(() => {
+    const activePerCandidate = new Map<string, number>();
+    filteredAllocations.forEach((a) => {
+      activePerCandidate.set(a.candidateId, (activePerCandidate.get(a.candidateId) || 0) + 1);
+    });
+    let duplicates = 0;
+    activePerCandidate.forEach((count) => {
+      if (count > 1) duplicates += 1;
+    });
+    return duplicates;
+  }, [filteredAllocations]);
+
   const handlePrint = () => {
     window.print();
   };
@@ -200,7 +222,11 @@ export default function ReportsView({
           </div>
           <div>
             <span className="text-slate-500">Audit Status: </span>
-            <span className="text-emerald-700">Gazetted & Merit Verified</span>
+            <span className="text-emerald-700">
+              {filteredCandidates.length > 0
+                ? `${verifiedCredentialsRatio}% Records Verified`
+                : "No Records in Scope"}
+            </span>
           </div>
         </div>
 
@@ -235,12 +261,16 @@ export default function ReportsView({
               <span className="text-xl font-bold text-slate-800">{filteredCandidates.length}</span>
             </div>
             <div className="bg-white p-3 rounded-xl border border-emerald-200">
-              <span className="text-slate-500 block">Credential Authenticity</span>
-              <span className="text-xl font-bold text-emerald-700">100%</span>
+              <span className="text-slate-500 block">Verified Credentials</span>
+              <span className="text-xl font-bold text-emerald-700">
+                {filteredCandidates.length > 0 ? `${verifiedCredentialsRatio}%` : "—"}
+              </span>
             </div>
             <div className="bg-white p-3 rounded-xl border border-emerald-200">
               <span className="text-slate-500 block">Duplicate Allotments</span>
-              <span className="text-xl font-bold text-emerald-700">0 (Zero)</span>
+              <span className={`text-xl font-bold ${duplicateAllotmentCount > 0 ? "text-red-600" : "text-emerald-700"}`}>
+                {duplicateAllotmentCount}
+              </span>
             </div>
           </div>
         </div>

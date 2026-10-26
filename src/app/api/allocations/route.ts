@@ -62,11 +62,12 @@ export async function POST(req: NextRequest) {
     const candidateId = typeof body.candidateId === "string" ? body.candidateId : "";
     const roleCategory = body.roleCategory as RoleCategory;
     const roleTitle = typeof body.roleTitle === "string" ? body.roleTitle.trim() : "";
+    const department = typeof body.department === "string" ? body.department.trim() : "";
     const district = typeof body.district === "string" ? body.district.trim() : "";
     const constituency =
       typeof body.constituency === "string" ? body.constituency.trim() : "";
 
-    if (!candidateId || !roleTitle || !district || !constituency) {
+    if (!candidateId || !roleTitle || !department || !district || !constituency) {
       throw new ApiError(400, "Missing required fields for seat/job allocation.");
     }
     if (!VALID_ROLE_CATEGORIES.includes(roleCategory)) {
@@ -87,23 +88,16 @@ export async function POST(req: NextRequest) {
       candidateId,
       roleCategory,
       roleTitle,
-      department:
-        typeof body.department === "string" && body.department.trim()
-          ? body.department.trim()
-          : "DHQ Teaching Hospital D.I. Khan",
+      department,
       district,
       constituency,
       tenureMonths: Number(body.tenureMonths) || 24,
       allocatedBy: session.name,
       joiningOrderNo: typeof body.joiningOrderNo === "string" ? body.joiningOrderNo : undefined,
       salaryOrStipend:
-        typeof body.salaryOrStipend === "string"
-          ? body.salaryOrStipend
-          : "BPS Grade as per DHQ Hospital Rules",
+        typeof body.salaryOrStipend === "string" ? body.salaryOrStipend.trim() : "",
       remarks:
-        typeof body.remarks === "string"
-          ? body.remarks
-          : "Appointed under DHQ Hospital Executive Directorate Directive",
+        typeof body.remarks === "string" ? body.remarks.trim() : "",
     });
 
     return NextResponse.json({ success: true, data: allocation }, { status: 201 });

@@ -23,7 +23,8 @@ import {
   Briefcase,
   BookOpen,
 } from "lucide-react";
-import type { Candidate, Allocation } from "@/types";
+import type { Candidate, Allocation, CandidateDocumentSummary } from "@/types";
+import { CANDIDATE_DOCUMENT_FIELDS, CANDIDATE_DOCUMENT_LABELS } from "@/types";
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -38,6 +39,7 @@ function CandidateDossierContent({ params }: PageProps) {
   const [loadState, setLoadState] = useState<LoadState>("loading");
   const [candidate, setCandidate] = useState<Candidate | null>(null);
   const [allocation, setAllocation] = useState<Allocation | null>(null);
+  const [documents, setDocuments] = useState<CandidateDocumentSummary[]>([]);
   const [errorMsg, setErrorMsg] = useState<string>("");
 
   useEffect(() => {
@@ -45,9 +47,10 @@ function CandidateDossierContent({ params }: PageProps) {
 
     async function load() {
       try {
-        const [candRes, allocRes] = await Promise.all([
+        const [candRes, allocRes, docsRes] = await Promise.all([
           fetch(`/api/candidates/${id}`, { cache: "no-store" }),
           fetch(`/api/allocations`, { cache: "no-store" }),
+          fetch(`/api/candidates/${id}/documents`, { cache: "no-store" }),
         ]);
 
         if (!active) return;
@@ -86,9 +89,18 @@ function CandidateDossierContent({ params }: PageProps) {
           }
         }
 
+        let docs: CandidateDocumentSummary[] = [];
+        if (docsRes.ok) {
+          const docsData = await docsRes.json().catch(() => null);
+          if (docsData?.success) {
+            docs = docsData.data as CandidateDocumentSummary[];
+          }
+        }
+
         if (!active) return;
         setCandidate(cand);
         setAllocation(activeAlloc);
+        setDocuments(docs);
         setLoadState("done");
       } catch {
         if (!active) return;
@@ -102,6 +114,10 @@ function CandidateDossierContent({ params }: PageProps) {
       active = false;
     };
   }, [id]);
+
+  const documentsByField = new Map(
+    documents.map((doc) => [doc.field, doc])
+  );
 
   /* ── Loading ── */
   if (loadState === "loading") {
@@ -351,8 +367,8 @@ function CandidateDossierContent({ params }: PageProps) {
             {[
               { label: "Domicile District", value: candidate.domicileDistrict },
               { label: "Constituency", value: candidate.constituency, highlight: true },
-              { label: "Tehsil", value: candidate.tehsil || "Urban" },
-              { label: "Union Council", value: candidate.unionCouncil || "General" },
+              { label: "Tehsil", value: candidate.tehsil || "Not provided" },
+              { label: "Union Council", value: candidate.unionCouncil || "Not provided" },
             ].map(({ label, value, highlight }) => (
               <div key={label} className="bg-slate-50 border border-slate-200 rounded-xl p-3">
                 <span className="text-[10px] text-slate-400 uppercase font-semibold tracking-wide block mb-0.5">{label}</span>
@@ -381,29 +397,49 @@ function CandidateDossierContent({ params }: PageProps) {
             <div className="border border-slate-200 rounded-xl bg-slate-50/60 p-4 space-y-2">
               <div className="flex items-center justify-between border-b border-slate-200 pb-2">
                 <span className="text-sm font-bold text-slate-800">Matriculation (SSC)</span>
-                <span className="bg-emerald-100 text-emerald-800 font-bold text-[9px] px-2 py-0.5 rounded uppercase">
-                  Verified
+                <span
+                  className={`font-bold text-[9px] px-2 py-0.5 rounded uppercase ${
+                    documentsByField.has("matricDoc")
+                      ? "bg-emerald-100 text-emerald-800"
+                      : "bg-slate-100 text-slate-500 border border-slate-200"
+                  }`}
+                >
+                  {documentsByField.has("matricDoc") ? "Verified" : "No Document"}
                 </span>
               </div>
               <div className="space-y-1.5 text-xs text-slate-600">
                 <div>
                   <span className="text-slate-400">Board</span>
-                  <p className="font-semibold text-slate-800">{candidate.matricDetails.board}</p>
+                  <p className="font-semibold text-slate-800">{candidate.matricDetails.board || "Not provided"}</p>
                 </div>
                 <div className="flex gap-6">
                   <div>
                     <span className="text-slate-400">Year</span>
-                    <p className="font-semibold text-slate-800">{candidate.matricDetails.passingYear}</p>
+                    <p className="font-semibold text-slate-800">{candidate.matricDetails.passingYear || "—"}</p>
                   </div>
                   <div>
                     <span className="text-slate-400">Grade</span>
-                    <p className="font-semibold text-slate-800">{candidate.matricDetails.grade}</p>
+                    <p className="font-semibold text-slate-800">{candidate.matricDetails.grade || "Not provided"}</p>
                   </div>
                 </div>
-                <div className="flex items-center gap-1.5 text-emerald-700 font-semibold pt-1">
-                  <FileCheck className="w-3.5 h-3.5" />
-                  <span className="text-[11px]">{candidate.matricDetails.documentUrl || "matric_verified.pdf"}</span>
-                </div>
+                {documentsByField.get("matricDoc") ? (
+                  <a
+                    href={documentsByField.get("matricDoc")!.url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="flex items-center gap-1.5 text-emerald-700 font-semibold pt-1 hover:underline cursor-pointer"
+                  >
+                    <FileCheck className="w-3.5 h-3.5" />
+                    <span className="text-[11px]">
+                      {documentsByField.get("matricDoc")!.fileName} ({Math.round(documentsByField.get("matricDoc")!.sizeBytes / 1024)} KB, {documentsByField.get("matricDoc")!.savedPercent}% saved)
+                    </span>
+                  </a>
+                ) : (
+                  <div className="flex items-center gap-1.5 text-slate-400 font-semibold pt-1">
+                    <FileCheck className="w-3.5 h-3.5" />
+                    <span className="text-[11px]">No certificate uploaded yet</span>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -411,33 +447,96 @@ function CandidateDossierContent({ params }: PageProps) {
             <div className="border border-slate-200 rounded-xl bg-slate-50/60 p-4 space-y-2">
               <div className="flex items-center justify-between border-b border-slate-200 pb-2">
                 <span className="text-sm font-bold text-slate-800">Intermediate (HSSC)</span>
-                <span className="bg-emerald-100 text-emerald-800 font-bold text-[9px] px-2 py-0.5 rounded uppercase">
-                  Verified
+                <span
+                  className={`font-bold text-[9px] px-2 py-0.5 rounded uppercase ${
+                    documentsByField.has("fscDoc")
+                      ? "bg-emerald-100 text-emerald-800"
+                      : "bg-slate-100 text-slate-500 border border-slate-200"
+                  }`}
+                >
+                  {documentsByField.has("fscDoc") ? "Verified" : "No Document"}
                 </span>
               </div>
               <div className="space-y-1.5 text-xs text-slate-600">
                 <div>
                   <span className="text-slate-400">Board</span>
                   <p className="font-semibold text-slate-800">
-                    {candidate.fscDetails.board}
+                    {candidate.fscDetails.board || "Not provided"}
                     {candidate.fscDetails.group ? ` (${candidate.fscDetails.group})` : ""}
                   </p>
                 </div>
                 <div className="flex gap-6">
                   <div>
                     <span className="text-slate-400">Year</span>
-                    <p className="font-semibold text-slate-800">{candidate.fscDetails.passingYear}</p>
+                    <p className="font-semibold text-slate-800">{candidate.fscDetails.passingYear || "—"}</p>
                   </div>
                   <div>
                     <span className="text-slate-400">Grade</span>
-                    <p className="font-semibold text-slate-800">{candidate.fscDetails.grade}</p>
+                    <p className="font-semibold text-slate-800">{candidate.fscDetails.grade || "Not provided"}</p>
                   </div>
                 </div>
-                <div className="flex items-center gap-1.5 text-emerald-700 font-semibold pt-1">
-                  <FileCheck className="w-3.5 h-3.5" />
-                  <span className="text-[11px]">{candidate.fscDetails.documentUrl || "fsc_verified.pdf"}</span>
-                </div>
+                {documentsByField.get("fscDoc") ? (
+                  <a
+                    href={documentsByField.get("fscDoc")!.url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="flex items-center gap-1.5 text-emerald-700 font-semibold pt-1 hover:underline cursor-pointer"
+                  >
+                    <FileCheck className="w-3.5 h-3.5" />
+                    <span className="text-[11px]">
+                      {documentsByField.get("fscDoc")!.fileName} ({Math.round(documentsByField.get("fscDoc")!.sizeBytes / 1024)} KB, {documentsByField.get("fscDoc")!.savedPercent}% saved)
+                    </span>
+                  </a>
+                ) : (
+                  <div className="flex items-center gap-1.5 text-slate-400 font-semibold pt-1">
+                    <FileCheck className="w-3.5 h-3.5" />
+                    <span className="text-[11px]">No certificate uploaded yet</span>
+                  </div>
+                )}
               </div>
+            </div>
+          </div>
+
+          {/* Identity Documents */}
+          <div className="space-y-3">
+            <h3 className="text-xs font-bold text-slate-600 uppercase tracking-wide flex items-center gap-1.5">
+              <FileCheck className="w-3.5 h-3.5" />
+              Identity &amp; Supporting Documents
+            </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {CANDIDATE_DOCUMENT_FIELDS.map((field) => {
+                const doc = documentsByField.get(field);
+                return (
+                  <div
+                    key={field}
+                    className="border border-slate-200 rounded-xl bg-slate-50/60 p-3.5 flex items-center justify-between gap-2"
+                  >
+                    <div className="min-w-0">
+                      <p className="text-xs font-bold text-slate-800 truncate">
+                        {CANDIDATE_DOCUMENT_LABELS[field]}
+                      </p>
+                      {doc ? (
+                        <p className="text-[10px] text-slate-500 truncate">
+                          {doc.fileName} • {Math.round(doc.originalSizeBytes / 1024)} KB → {Math.round(doc.sizeBytes / 1024)} KB
+                          {doc.savedPercent > 0 ? ` (−${doc.savedPercent}%)` : ""}
+                        </p>
+                      ) : (
+                        <p className="text-[10px] text-slate-400">No document uploaded</p>
+                      )}
+                    </div>
+                    {doc && (
+                      <a
+                        href={doc.url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="shrink-0 inline-flex items-center gap-1 bg-emerald-700 hover:bg-emerald-800 text-white text-[10px] font-bold px-2.5 py-1.5 rounded-lg transition-colors cursor-pointer"
+                      >
+                        View Record
+                      </a>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           </div>
 

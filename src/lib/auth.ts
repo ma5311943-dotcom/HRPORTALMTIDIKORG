@@ -153,6 +153,12 @@ const ROLE_ALIASES: Record<string, string> = {
   "staff": "clerk",
 };
 
+export function resolveRoleAlias(identifier: string): string {
+  const cleanId = identifier.trim().toLowerCase();
+  const normalizedKey = cleanId.split("@")[0].replace(/[\s-]/g, "_");
+  return ROLE_ALIASES[normalizedKey] ?? normalizedKey;
+}
+
 const ROLE_CATEGORY_BY_KEY: Record<string, RoleCategory | "Admin"> = {
   admin: "Admin",
   director: "Admin",

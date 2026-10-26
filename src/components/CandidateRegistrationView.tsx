@@ -70,13 +70,13 @@ export default function CandidateRegistrationView({
 
   // Education Records
   const [matricBoard, setMatricBoard] = useState("");
-  const [matricYear] = useState<number>(2016);
+  const [matricYear, setMatricYear] = useState("");
   const [matricGrade, setMatricGrade] = useState("");
   const [matricDocFile, setMatricDocFile] = useState<File | null>(null);
   const [matricDocName, setMatricDocName] = useState("");
 
   const [fscBoard, setFscBoard] = useState("");
-  const [fscYear] = useState<number>(2018);
+  const [fscYear, setFscYear] = useState("");
   const [fscGroup, setFscGroup] = useState("Pre-Engineering");
   const [fscGrade, setFscGrade] = useState("");
   const [fscDocFile, setFscDocFile] = useState<File | null>(null);
@@ -84,6 +84,8 @@ export default function CandidateRegistrationView({
 
   const [higherDegree, setHigherDegree] = useState("");
   const [higherInstitute, setHigherInstitute] = useState("");
+  const [higherYear, setHigherYear] = useState("");
+  const [higherGrade, setHigherGrade] = useState("");
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -143,10 +145,12 @@ export default function CandidateRegistrationView({
     setPhotoPreview(null);
     setCnicFrontFile(null); setCnicFrontName("");
     setCnicBackFile(null); setCnicBackName("");
-    setMatricBoard(""); setMatricGrade(""); setMatricDocFile(null); setMatricDocName("");
-    setFscBoard(""); setFscGroup("Pre-Engineering"); setFscGrade(""); setFscDocFile(null); setFscDocName("");
+    setMatricBoard(""); setMatricGrade(""); setMatricDocFile(null); setMatricDocName(""); setMatricYear("");
+    setFscBoard(""); setFscGroup("Pre-Engineering"); setFscGrade(""); setFscDocFile(null); setFscDocName(""); setFscYear("");
     setHigherDegree("");
     setHigherInstitute("");
+    setHigherYear("");
+    setHigherGrade("");
   };
 
   const closeForm = () => {
@@ -208,49 +212,64 @@ export default function CandidateRegistrationView({
         setIsSubmitting(false);
         return;
       }
+      if (!dob) {
+        toast.error("Date of birth is required.");
+        setIsSubmitting(false);
+        return;
+      }
+      if (!tehsil) {
+        toast.error("Tehsil is required.");
+        setIsSubmitting(false);
+        return;
+      }
+      if (!matricYear || !fscYear) {
+        toast.error("Matric and FSc passing years are required.");
+        setIsSubmitting(false);
+        return;
+      }
 
       const payload = {
         fullName,
         fatherName,
         cnic,
         fatherCnic: fatherCnic || undefined,
-        dob: dob || "1995-01-01",
+        dob,
         gender,
         phone,
-        email: email || `${fullName.toLowerCase().replace(/\s+/g, ".")}@dhq.pk`,
+        email: email || undefined,
         address,
         domicileDistrict,
         constituency,
-        tehsil: tehsil || "Urban Center",
-        unionCouncil: unionCouncil || "UC Unassigned",
+        tehsil,
+        unionCouncil: unionCouncil || undefined,
         partyAffiliation,
         referenceCode: referenceCode || undefined,
         appliedRole,
         notes: notes || undefined,
-        photoUrl: "/images/candidate_portrait.jpg",
+        photoUrl: "",
         matricDetails: {
-          board: matricBoard || "—",
+          board: matricBoard,
           passingYear: Number(matricYear),
-          grade: matricGrade || "—",
-          documentUrl: matricDocName || undefined,
+          grade: matricGrade,
+          documentUrl: undefined,
         },
         fscDetails: {
-          board: fscBoard || "—",
+          board: fscBoard,
           passingYear: Number(fscYear),
           group: fscGroup,
-          grade: fscGrade || "—",
-          documentUrl: fscDocName || undefined,
+          grade: fscGrade,
+          documentUrl: undefined,
         },
         higherEducation: higherDegree ? [
           {
             level: "Bachelors" as const,
             degreeName: higherDegree,
-            institute: higherInstitute || "Recognized Pakistani University",
-            passingYear: Number(fscYear) + 4,
-            grade: "1st Division",
+            institute: higherInstitute,
+            passingYear: higherYear ? Number(higherYear) : Number(fscYear),
+            grade: higherGrade,
           }
         ] : [],
-        status: "Verified" as const,
+        status: "Registered" as const,
       };
 
       const res = await fetch("/api/candidates", {
@@ -266,7 +285,7 @@ export default function CandidateRegistrationView({
       }
 
       let registeredCandidate = data.data as Candidate;
-      let photoWarning = "";
+      const warnings: string[] = [];
       if (photoFile) {
         const formData = new FormData();
         formData.append("photo", photoFile);
@@ -277,30 +296,63 @@ export default function CandidateRegistrationView({
         const photoData = await photoRes.json().catch(() => null);
         if (photoRes.ok) {
           registeredCandidate = { ...registeredCandidate, photoUrl: photoData.data.photoUrl };
+          toast.success("Photograph uploaded & compressed", {
+            description: `${Math.round(photoData.data.sizeBytes / 1024)} KB stored (WebP).`,
+          });
         } else {
-          photoWarning = ` Photo upload failed: ${photoData?.error || "retry from dossier."}`;
+          warnings.push(`Photo upload failed: ${photoData?.error || "retry from dossier."}`);
         }
       }
-      // Upload CNIC docs if selected (best-effort, non-blocking)
-      const docUploads: Promise<void>[] = [];
-      for (const [field, file] of [["cnicFront", cnicFrontFile], ["cnicBack", cnicBackFile],
-      ["matricDoc", matricDocFile], ["fscDoc", fscDocFile]] as [string, File | null][]) {
-        if (file) {
-          const fd = new FormData();
-          fd.append("file", file);
-          fd.append("field", field);
-          docUploads.push(
-            fetch(`/api/candidates/${registeredCandidate.id}/documents`, { method: "POST", body: fd })
-              .then(() => undefined)
-              .catch(() => undefined)
-          );
-        }
+      // Upload CNIC / education documents via the real documents endpoint
+      const docUploads = [
+        ["cnicFront", cnicFrontFile, "CNIC Front"],
+        ["cnicBack", cnicBackFile, "CNIC Back"],
+        ["matricDoc", matricDocFile, "Matric Certificate"],
+        ["fscDoc", fscDocFile, "FSc Certificate"],
+      ] as [string, File | null, string][];
+      const uploadErrors: string[] = [];
+      await Promise.allSettled(
+        docUploads
+          .filter(([, file]) => !!file)
+          .map(([field, file, label]) => {
+            const fd = new FormData();
+            fd.append("file", file as File);
+            fd.append("field", field);
+            return fetch(`/api/candidates/${registeredCandidate.id}/documents`, {
+              method: "POST",
+              body: fd,
+            })
+              .then(async (res) => {
+                const resData = await res.json().catch(() => null);
+                if (!res.ok) {
+                  uploadErrors.push(`${label}: ${resData?.error || "upload failed"}`);
+                  return;
+                }
+                const doc = resData.data as {
+                  originalSizeBytes: number;
+                  sizeBytes: number;
+                  savedPercent: number;
+                  kind: string;
+                };
+                toast.success(`${label} uploaded`, {
+                  description:
+                    doc.kind === "image"
+                      ? `Compressed ${Math.round(doc.originalSizeBytes / 1024)} KB → ${Math.round(doc.sizeBytes / 1024)} KB (saved ${doc.savedPercent}%).`
+                      : `Stored ${Math.round(doc.sizeBytes / 1024)} KB PDF.`,
+                });
+              })
+              .catch(() => {
+                uploadErrors.push(`${label}: network error`);
+              });
+          })
+      );
+      if (uploadErrors.length > 0) {
+        warnings.push(`Document uploads: ${uploadErrors.join("; ")}`);
       }
-      await Promise.allSettled(docUploads);
 
       onCandidateCreated(registeredCandidate);
       toast.success("Candidate Registered Successfully!", {
-        description: `${fullName} has been added to the District ${domicileDistrict} verified roster.${photoWarning}`
+        description: `${fullName} has been added to the District ${domicileDistrict} roster as "Registered".${warnings.length ? " " + warnings.join(" ") : ""}`
       });
 
       // Reset Form & Close
@@ -457,10 +509,11 @@ export default function CandidateRegistrationView({
 
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1">
-                  Date of Birth
+                  Date of Birth <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="date"
+                  required
                   value={dob}
                   onChange={(e) => setDob(e.target.value)}
                   className="w-full text-xs p-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-600 focus:outline-none"
@@ -535,10 +588,11 @@ export default function CandidateRegistrationView({
 
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1">
-                  Tehsil
+                  Tehsil <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
+                  required
                   placeholder="e.g. Daraban / Kulachi / Dera"
                   value={tehsil}
                   onChange={(e) => setTehsil(e.target.value)}
@@ -641,7 +695,7 @@ export default function CandidateRegistrationView({
                   </span>
                 </div>
 
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                   <div className="col-span-2">
                     <label className="block text-[11px] font-semibold text-slate-600 mb-1">
                       Board of Education
@@ -650,6 +704,21 @@ export default function CandidateRegistrationView({
                       type="text"
                       value={matricBoard}
                       onChange={(e) => setMatricBoard(e.target.value)}
+                      className="w-full text-xs p-2 border border-slate-300 rounded bg-white"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[11px] font-semibold text-slate-600 mb-1">
+                      Passing Year <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="number"
+                      required
+                      min={1980}
+                      max={new Date().getFullYear()}
+                      placeholder="e.g. 2016"
+                      value={matricYear}
+                      onChange={(e) => setMatricYear(e.target.value)}
                       className="w-full text-xs p-2 border border-slate-300 rounded bg-white"
                     />
                   </div>
@@ -706,7 +775,7 @@ export default function CandidateRegistrationView({
                   </span>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                <div className="grid grid-cols-1 sm:grid-cols-4 gap-2">
                   <div>
                     <label className="block text-[11px] font-semibold text-slate-600 mb-1">
                       Board / College
@@ -733,6 +802,21 @@ export default function CandidateRegistrationView({
                       <option value="I.Com">I.Com</option>
                       <option value="Humanities / Arts">FA / Arts</option>
                     </select>
+                  </div>
+                  <div>
+                    <label className="block text-[11px] font-semibold text-slate-600 mb-1">
+                      Passing Year <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="number"
+                      required
+                      min={1980}
+                      max={new Date().getFullYear()}
+                      placeholder="e.g. 2018"
+                      value={fscYear}
+                      onChange={(e) => setFscYear(e.target.value)}
+                      className="w-full text-xs p-2 border border-slate-300 rounded bg-white"
+                    />
                   </div>
                   <div>
                     <label className="block text-[11px] font-semibold text-slate-600 mb-1">
@@ -778,7 +862,7 @@ export default function CandidateRegistrationView({
             </div>
 
             {/* Higher Degree */}
-            <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1">
                   Higher Education Degree (Bachelors / Masters / LLB / MBBS - Optional)
@@ -801,6 +885,34 @@ export default function CandidateRegistrationView({
                   placeholder="e.g. Punjab University / NUST / Quaid-i-Azam University"
                   value={higherInstitute}
                   onChange={(e) => setHigherInstitute(e.target.value)}
+                  className="w-full text-xs p-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-600 focus:outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">
+                  Passing Year
+                </label>
+                <input
+                  type="number"
+                  min={1980}
+                  max={new Date().getFullYear()}
+                  placeholder="e.g. 2022"
+                  value={higherYear}
+                  onChange={(e) => setHigherYear(e.target.value)}
+                  className="w-full text-xs p-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-600 focus:outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">
+                  Grade / Division
+                </label>
+                <input
+                  type="text"
+                  placeholder="e.g. 1st Division"
+                  value={higherGrade}
+                  onChange={(e) => setHigherGrade(e.target.value)}
                   className="w-full text-xs p-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-600 focus:outline-none"
                 />
               </div>

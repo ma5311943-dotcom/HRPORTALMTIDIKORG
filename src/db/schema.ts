@@ -197,6 +197,29 @@ export const candidateImages = mysqlTable(
   (table) => [uniqueIndex("candidate_images_candidate_uq").on(table.candidateId)]
 );
 
+export const candidateDocuments = mysqlTable(
+  "candidate_documents",
+  {
+    id: varchar("id", { length: 64 }).primaryKey(),
+    candidateId: varchar("candidate_id", { length: 64 })
+      .notNull()
+      .references(() => candidates.id, { onDelete: "cascade" }),
+    field: varchar("field", { length: 32 }).notNull(),
+    fileName: varchar("file_name", { length: 191 }).notNull(),
+    mimeType: varchar("mime_type", { length: 64 }).notNull(),
+    data: mediumBlob("data").notNull(),
+    originalSizeBytes: int("original_size_bytes").notNull(),
+    sizeBytes: int("size_bytes").notNull(),
+    checksum: varchar("checksum", { length: 64 }).notNull(),
+    createdAt: varchar("created_at", { length: 30 }).notNull(),
+    updatedAt: varchar("updated_at", { length: 30 }).notNull(),
+  },
+  (table) => [
+    uniqueIndex("candidate_documents_field_uq").on(table.candidateId, table.field),
+    index("candidate_documents_candidate_idx").on(table.candidateId),
+  ]
+);
+
 export const messages = mysqlTable(
   "messages",
   {
@@ -229,6 +252,7 @@ export const schema = {
   districts,
   candidates,
   candidateImages,
+  candidateDocuments,
   allocations,
   messages,
 };

@@ -53,12 +53,12 @@ export default function SeatAllocationView({
   );
   const [roleCategory, setRoleCategory] = useState<RoleCategory>("Ward Boy");
   const [roleTitle, setRoleTitle] = useState("");
-  const [department, setDepartment] = useState("DHQ Teaching Hospital D.I. Khan");
-  const [district, setDistrict] = useState<string>(preSelectedCandidate?.domicileDistrict || districts[0]?.name || "Lahore");
-  const [constituency, setConstituency] = useState<string>(preSelectedCandidate?.constituency || "NA-117");
+  const [department, setDepartment] = useState("");
+  const [district, setDistrict] = useState<string>(preSelectedCandidate?.domicileDistrict || districts[0]?.name || "");
+  const [constituency, setConstituency] = useState<string>(preSelectedCandidate?.constituency || "");
   const [tenureMonths, setTenureMonths] = useState<number>(24);
-  const [allocatedBy, setAllocatedBy] = useState("District Selection Board");
-  const [salaryOrStipend, setSalaryOrStipend] = useState("PKR 65,000 / mo");
+  const [allocatedBy, setAllocatedBy] = useState("");
+  const [salaryOrStipend, setSalaryOrStipend] = useState("");
   const [remarks, setRemarks] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -363,10 +363,12 @@ export default function SeatAllocationView({
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div>
                   <label className="block text-xs font-bold text-slate-700 mb-1">
-                    Department / Wing
+                    Department / Wing <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
+                    required
+                    placeholder="e.g. DHQ Teaching Hospital D.I. Khan"
                     value={department}
                     onChange={(e) => setDepartment(e.target.value)}
                     className="w-full text-xs p-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none"
@@ -438,10 +440,12 @@ export default function SeatAllocationView({
 
                 <div>
                   <label className="block text-xs font-bold text-slate-700 mb-1">
-                    Issuing Authority
+                    Issuing Authority <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
+                    required
+                    placeholder="e.g. District Selection Board"
                     value={allocatedBy}
                     onChange={(e) => setAllocatedBy(e.target.value)}
                     className="w-full text-xs p-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none"

@@ -5,6 +5,7 @@ import { getDb, schema } from "@/db/client";
 import { verifyCandidatePassword, verifyPassword } from "@/lib/password";
 import { DomainError } from "@/lib/errors";
 import type { UserSession as BaseUserSession } from "@/lib/auth";
+import { resolveRoleAlias } from "@/lib/auth";
 import type { UserPermissions } from "@/types";
 
 export const SESSION_COOKIE = "internal_hr_session";
@@ -238,7 +239,8 @@ export async function authenticateOfficer(
         eq(schema.users.isActive, true),
         or(
           eq(schema.users.username, cleanIdentifier),
-          eq(schema.users.email, cleanIdentifier)
+          eq(schema.users.email, cleanIdentifier),
+          eq(schema.users.username, resolveRoleAlias(cleanIdentifier))
         )
       )
     )
