@@ -305,7 +305,7 @@ export default function DashboardView({
             <div className="text-2xl sm:text-3xl font-extrabold text-slate-900">
               {tehsilStats.length > 0 ? `${tehsilStats.length} Tehsils` : "—"}
             </div>
-            <p className="text-xs text-slate-500 mt-1 flex items-center gap-1 font-medium truncate" title={tehsilStats.join(", ")}>
+            <p className="text-xs text-slate-500 mt-1 font-medium leading-snug" title={tehsilStats.join(", ")}>
               {tehsilStats.length > 0 ? tehsilStats.join(", ") : "No tehsil data recorded yet"}
             </p>
           </div>
