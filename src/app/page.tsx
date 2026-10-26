@@ -589,7 +589,7 @@ export default function Home() {
         </main>
 
         {/* Enriched Hospital Dashboard Footer */}
-        <footer className="mt-auto bg-white border-t border-slate-200/90 text-xs text-slate-600 print:hidden">
+        <footer className="mt-auto bg-gradient-to-r from-emerald-50 via-teal-50/80 to-emerald-50 border-t border-slate-200/90 text-xs text-slate-600 print:hidden">
           {/* Main Footer Body */}
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6 pb-6 border-b border-slate-100">
