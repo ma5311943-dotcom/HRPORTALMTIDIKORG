@@ -393,7 +393,7 @@ export default function Sidebar({
           <button
             onClick={() => setShowPasswordModal(true)}
             title="Change your account password"
-            className={`w-full flex items-center rounded-xl text-slate-700 hover:text-emerald-900 bg-white hover:bg-emerald-50 border border-slate-200 hover:border-emerald-200 transition-all text-xs font-semibold cursor-pointer shadow-2xs ${
+            className={`flex w-fit items-center rounded-xl text-slate-700 hover:text-emerald-900 bg-white hover:bg-emerald-50 border border-slate-200 hover:border-emerald-200 transition-all text-xs font-semibold cursor-pointer shadow-2xs ${
               isCollapsed ? "justify-center p-2.5" : "gap-2.5 px-3 py-2"
             }`}
           >
@@ -404,7 +404,7 @@ export default function Sidebar({
           <button
             onClick={onLogout}
             title="Sign Out of Portal"
-            className={`w-full flex items-center rounded-xl text-red-700 hover:text-red-800 bg-red-50 hover:bg-red-100 border border-red-200 transition-all text-xs font-semibold cursor-pointer shadow-2xs ${
+            className={`flex w-fit items-center rounded-xl text-red-700 hover:text-red-800 bg-red-50 hover:bg-red-100 border border-red-200 transition-all text-xs font-semibold cursor-pointer shadow-2xs ${
               isCollapsed ? "justify-center p-2.5" : "gap-2.5 px-3 py-2"
             }`}
           >
