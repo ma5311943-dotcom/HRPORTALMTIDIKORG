@@ -7,6 +7,7 @@ import {
   issueSessionToken,
   setSessionCookie,
 } from "@/lib/server-auth";
+import { db } from "@/lib/db";
 
 const attempts = new Map<string, { count: number; resetAt: number }>();
 
@@ -41,6 +42,14 @@ export async function POST(req: NextRequest) {
 
     const session = await authenticateOfficer(identifier, password);
     const token = await issueSessionToken({ sub: session.id, kind: "user" });
+    await db.logAudit({
+      actorId: session.id,
+      actorName: session.name,
+      actorRole: session.roleCategory,
+      actorDistrict: session.district,
+      action: "login",
+      entityType: "session",
+    });
     const response = NextResponse.json({ success: true, data: session });
     setSessionCookie(response, token);
     return response;

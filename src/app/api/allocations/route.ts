@@ -84,6 +84,15 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    const quota = await db.getDistrictQuotaUsage(district);
+    if (!quota) throw new ApiError(400, `District "${district}" is not registered in the system.`);
+    if (quota.remaining <= 0) {
+      throw new ApiError(
+        409,
+        `${quota.district} quota is exhausted: ${quota.activeAllocations} of ${quota.quota} seats already allocated.`
+      );
+    }
+
     const allocation = await db.allocateSeat({
       candidateId,
       roleCategory,
@@ -98,6 +107,17 @@ export async function POST(req: NextRequest) {
         typeof body.salaryOrStipend === "string" ? body.salaryOrStipend.trim() : "",
       remarks:
         typeof body.remarks === "string" ? body.remarks.trim() : "",
+    });
+
+    await db.logAudit({
+      actorId: session.id,
+      actorName: session.name,
+      actorRole: session.roleCategory,
+      actorDistrict: session.district,
+      action: "allocation.create",
+      entityType: "allocation",
+      entityId: allocation.id,
+      detail: `${allocation.roleCategory} allocated to ${allocation.candidateName} (${allocation.district}, ${allocation.constituency}).`,
     });
 
     return NextResponse.json({ success: true, data: allocation }, { status: 201 });

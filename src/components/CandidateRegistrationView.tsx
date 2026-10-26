@@ -12,9 +12,13 @@ import {
   Briefcase,
   FileText,
   StickyNote,
+  CheckCheck,
+  Loader2,
+  X,
 } from "lucide-react";
 import { toast } from "sonner";
 import { CANDIDATE_STATUS_STYLES, PARTY_LABELS, PARTY_STYLES } from "@/lib/ui";
+import { Avatar } from "@/components/ui/kit";
 
 interface CandidateRegistrationViewProps {
   candidates: Candidate[];
@@ -22,6 +26,7 @@ interface CandidateRegistrationViewProps {
   onCandidateCreated: (newCandidate: Candidate) => void;
   onSelectCandidate: (candidate: Candidate) => void;
   onAllocateCandidate: (candidate: Candidate) => void;
+  onCandidatesBulkUpdated?: (updated: Candidate[]) => void;
   canRegisterCandidates?: boolean;
   canAllocateSeats?: boolean;
 }
@@ -32,6 +37,7 @@ export default function CandidateRegistrationView({
   onCandidateCreated,
   onSelectCandidate,
   onAllocateCandidate,
+  onCandidatesBulkUpdated,
   canRegisterCandidates = true,
   canAllocateSeats = true,
 }: CandidateRegistrationViewProps) {
@@ -40,6 +46,60 @@ export default function CandidateRegistrationView({
   const [filterDistrict, setFilterDistrict] = useState("All");
   const [filterParty, setFilterParty] = useState("All");
   const [filterStatus, setFilterStatus] = useState("All");
+
+  // Bulk verify selection (Registered candidates only)
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [isBulkBusy, setIsBulkBusy] = useState(false);
+  const selectedRegistered = Array.from(selectedIds).filter((id) => {
+    const c = candidates.find((x) => x.id === id);
+    return c && c.status === "Registered";
+  });
+
+  const toggleSelect = (candId: string, status: string) => {
+    if (!canRegisterCandidates || status !== "Registered") return;
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(candId)) next.delete(candId);
+      else next.add(candId);
+      return next;
+    });
+  };
+
+  const clearSelection = () => setSelectedIds(new Set());
+
+  const handleBulkVerify = async () => {
+    if (selectedRegistered.length === 0) {
+      toast.error("Select at least one Registered candidate to verify.");
+      return;
+    }
+    setIsBulkBusy(true);
+    try {
+      const res = await fetch("/api/candidates/bulk", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ids: selectedRegistered, action: "verify" }),
+      });
+      const data = await res.json().catch(() => null);
+      if (!res.ok) throw new Error(data?.error || "Bulk verification failed.");
+      const refreshed = (data?.data ?? []) as Candidate[];
+      const updated = candidates.map((c) =>
+        selectedRegistered.includes(c.id)
+          ? { ...c, status: "Verified" as const }
+          : c
+      );
+      onCandidatesBulkUpdated?.(updated);
+      toast.success("Bulk verification complete", {
+        description: `${refreshed.length} candidate(s) moved to Verified status.`,
+      });
+      clearSelection();
+    } catch (err: unknown) {
+      toast.error("Bulk verification failed", {
+        description: err instanceof Error ? err.message : "Please try again.",
+      });
+    } finally {
+      setIsBulkBusy(false);
+    }
+  };
 
   // Form State
   const [fullName, setFullName] = useState("");
@@ -1087,21 +1147,65 @@ export default function CandidateRegistrationView({
           </div>
         </div>
 
+        {/* Bulk verify action bar */}
+        {canRegisterCandidates && selectedIds.size > 0 && (
+          <div className="flex flex-wrap items-center gap-2.5 bg-emerald-50/80 border border-emerald-200 rounded-xl px-3.5 py-2.5 animate-in slide-in-from-top-2 duration-150">
+            <span className="text-xs font-bold text-emerald-900">
+              {selectedIds.size} selected
+            </span>
+            <span className="text-[11px] text-emerald-700">
+              ({selectedRegistered.length} eligible for verification)
+            </span>
+            <div className="ml-auto flex items-center gap-2">
+              <button
+                type="button"
+                onClick={clearSelection}
+                disabled={isBulkBusy}
+                className="inline-flex items-center gap-1 text-[11px] font-bold text-slate-600 hover:text-slate-900 px-2 py-1.5 rounded-lg transition-colors disabled:opacity-50 cursor-pointer disabled:cursor-wait"
+              >
+                <X className="w-3.5 h-3.5" />
+                Clear
+              </button>
+              <button
+                type="button"
+                onClick={() => void handleBulkVerify()}
+                disabled={isBulkBusy || selectedRegistered.length === 0}
+                className="inline-flex items-center gap-1.5 bg-emerald-700 hover:bg-emerald-800 disabled:opacity-60 text-white text-[11px] font-bold px-3.5 py-1.5 rounded-lg transition-all shadow-xs cursor-pointer disabled:cursor-wait"
+              >
+                {isBulkBusy ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <CheckCheck className="w-3.5 h-3.5" />}
+                <span>{isBulkBusy ? "Verifying..." : "Verify Selected"}</span>
+              </button>
+            </div>
+          </div>
+        )}
+
         {/* Candidate Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-3.5 sm:gap-4">
           {filteredCandidates.map((cand) => (
             <div
               key={cand.id}
-              className="bg-white rounded-xl border border-slate-200 hover:border-emerald-300 shadow-xs hover:shadow-md transition-all p-3.5 sm:p-4 flex flex-col justify-between gap-3"
+              className={`bg-white rounded-xl border shadow-xs hover:shadow-md transition-all p-3.5 sm:p-4 flex flex-col justify-between gap-3 ${
+                selectedIds.has(cand.id)
+                  ? "border-emerald-500 ring-1 ring-emerald-300"
+                  : "border-slate-200 hover:border-emerald-300"
+              }`}
             >
               <div className="flex items-start gap-3">
-                <img
-                  src={cand.photoUrl}
+                {canRegisterCandidates && cand.status === "Registered" && (
+                  <input
+                    type="checkbox"
+                    checked={selectedIds.has(cand.id)}
+                    onChange={() => toggleSelect(cand.id, cand.status)}
+                    aria-label={`Select ${cand.fullName} for bulk verification`}
+                    className="mt-1 h-4 w-4 shrink-0 accent-emerald-700 cursor-pointer"
+                  />
+                )}
+                <Avatar
+                  src={cand.photoUrl || undefined}
+                  name={cand.fullName}
                   alt={cand.fullName}
-                  onError={(e) => {
-                    e.currentTarget.src = "/images/cand_hamza.jpg";
-                  }}
-                  className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl object-cover border border-slate-200 bg-slate-100 shrink-0 shadow-xs"
+                  className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl border border-slate-200 bg-slate-100 shadow-xs"
+                  textClassName="text-sm"
                 />
 
                 <div className="flex-1 min-w-0">

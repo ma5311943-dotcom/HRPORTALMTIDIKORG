@@ -117,6 +117,17 @@ export async function POST(
       checksum: processed.checksum,
     });
 
+    await db.logAudit({
+      actorId: session.id,
+      actorName: session.name,
+      actorRole: session.roleCategory,
+      actorDistrict: session.district,
+      action: "candidate.document",
+      entityType: "candidate",
+      entityId: id,
+      detail: `${field} document uploaded for ${candidate.fullName} (${result.fileName}).`,
+    });
+
     return NextResponse.json({
       success: true,
       data: { ...result, kind: processed.kind } satisfies CandidateDocumentSummary & { kind: string },

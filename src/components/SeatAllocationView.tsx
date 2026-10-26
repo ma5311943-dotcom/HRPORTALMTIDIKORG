@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Candidate, District, Allocation, RoleCategory, DHQ_STAFF_ROLES } from "@/types";
+import type { DistrictQuotaUsage } from "@/lib/db";
 import {
   Award,
   Search,
@@ -11,9 +12,18 @@ import {
   FileText,
   Sparkles,
   X,
+  Gauge,
 } from "lucide-react";
 import { toast } from "sonner";
 import confetti from "canvas-confetti";
+import {
+  Avatar,
+  EmptyState,
+  Pagination,
+  SortHeader,
+  paginate,
+  useSortable,
+} from "@/components/ui/kit";
 
 interface SeatAllocationViewProps {
   candidates: Candidate[];
@@ -66,6 +76,32 @@ export default function SeatAllocationView({
   const [revokeTarget, setRevokeTarget] = useState<Allocation | null>(null);
   const [revokeReason, setRevokeReason] = useState("");
   const [isRevoking, setIsRevoking] = useState(false);
+
+  // District quota guard (server enforces; this is the UI hint)
+  const [quotaUsage, setQuotaUsage] = useState<DistrictQuotaUsage | null>(null);
+  useEffect(() => {
+    let active = true;
+    (async () => {
+      try {
+        if (!showAllocateModal || !district) {
+          if (active) setQuotaUsage(null);
+          return;
+        }
+        const res = await fetch(`/api/districts/quota?district=${encodeURIComponent(district)}`, {
+          cache: "no-store",
+        });
+        const data = await res.json().catch(() => null);
+        if (!active) return;
+        setQuotaUsage(res.ok && data?.success ? (data.data as DistrictQuotaUsage) : null);
+      } catch {
+        if (active) setQuotaUsage(null);
+      }
+    })();
+    return () => {
+      active = false;
+    };
+  }, [showAllocateModal, district]);
+  const quotaExhausted = quotaUsage ? quotaUsage.remaining <= 0 : false;
 
   // Candidates available for allocation (excluding those already active)
   const availableCandidates = candidates.filter(
@@ -211,6 +247,29 @@ export default function SeatAllocationView({
     return matchesSearch && matchesRole && matchesDistrict;
   });
 
+  /* Table sorting + pagination */
+  const tableRows = useMemo(
+    () =>
+      filteredAllocations.map((a) => ({
+        alloc: a,
+        appointmentRefNo: a.appointmentRefNo,
+        candidateName: a.candidateName,
+        roleTitle: a.roleTitle,
+        roleCategory: a.roleCategory,
+        district: a.district,
+        constituency: a.constituency,
+        allocatedBy: a.allocatedBy,
+        status: a.status,
+      })),
+    [filteredAllocations]
+  );
+  const { sorted: sortedRows, sortKey, sortDir, toggle } = useSortable(tableRows, "appointmentRefNo");
+  const [allocPage, setAllocPage] = useState(1);
+  const { pageRows: pagedRows, pageCount: allocPageCount, safePage: safeAllocPage } = useMemo(
+    () => paginate(sortedRows, allocPage, 10),
+    [sortedRows, allocPage]
+  );
+
   const selectedDistrictObj = districts.find((d) => d.name === district);
 
   return (
@@ -303,13 +362,12 @@ export default function SeatAllocationView({
 
                 {selectedCandidate && (
                   <div className="mt-2 bg-emerald-50 p-2.5 rounded-lg border border-emerald-200 text-xs flex items-center gap-3">
-                    <img
-                      src={selectedCandidate.photoUrl}
+                    <Avatar
+                      src={selectedCandidate.photoUrl || undefined}
+                      name={selectedCandidate.fullName}
                       alt={selectedCandidate.fullName}
-                      onError={(e) => {
-                        e.currentTarget.src = "/images/councilor_portrait.jpg";
-                      }}
-                      className="w-10 h-10 rounded-lg object-cover"
+                      className="w-10 h-10 rounded-lg"
+                      textClassName="text-xs"
                     />
                     <div>
                       <div className="font-bold text-slate-900">{selectedCandidate.fullName}</div>
@@ -410,6 +468,28 @@ export default function SeatAllocationView({
                 </div>
               </div>
 
+              {/* Quota guard hint for selected district */}
+              {district && (
+                <div
+                  className={`p-3 rounded-lg border text-xs flex items-center gap-2 ${
+                    quotaExhausted
+                      ? "bg-red-50 border-red-200 text-red-800"
+                      : "bg-teal-50/70 border-teal-200 text-teal-800"
+                  }`}
+                >
+                  <Gauge className="w-4 h-4 shrink-0" />
+                  {quotaUsage ? (
+                    <span>
+                      <strong>{district} quota:</strong> {quotaUsage.activeAllocations}/{quotaUsage.quota} seats in use —{" "}
+                      <strong>{quotaUsage.remaining} remaining</strong>
+                      {quotaExhausted ? " · New appointments for this district are blocked until a seat is revoked." : ""}
+                    </span>
+                  ) : (
+                    <span>Checking remaining quota for {district}…</span>
+                  )}
+                </div>
+              )}
+
               {/* Tenure & Salary */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div>
@@ -486,10 +566,10 @@ export default function SeatAllocationView({
                 </button>
                 <button
                   type="submit"
-                  disabled={isSubmitting}
-                  className="bg-emerald-700 hover:bg-emerald-800 text-white px-5 py-2 rounded-xl text-xs sm:text-sm font-bold shadow-md transition-all cursor-pointer disabled:opacity-50"
+                  disabled={isSubmitting || quotaExhausted}
+                  className="bg-emerald-700 hover:bg-emerald-800 text-white px-5 py-2 rounded-xl text-xs sm:text-sm font-bold shadow-md transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {isSubmitting ? "Issuing Gazette..." : "Issue Official Appointment"}
+                  {quotaExhausted ? "District Quota Exhausted" : isSubmitting ? "Issuing Gazette..." : "Issue Official Appointment"}
                 </button>
               </div>
             </form>
@@ -541,28 +621,56 @@ export default function SeatAllocationView({
         </div>
 
         {/* Table */}
-        <div className="overflow-x-auto -mx-4 sm:-mx-5 px-4 sm:px-5">
+        <div className="overflow-x-auto -mx-4 sm:-mx-5 px-4 sm:px-5 max-h-[560px] overflow-y-auto">
           <table className="w-full min-w-[760px] lg:min-w-full text-left border-collapse text-xs">
-            <thead>
-              <tr className="bg-slate-50 text-slate-600 uppercase font-bold text-[10px] tracking-wider border-b border-slate-200">
-                <th className="py-2.5 px-2.5 sm:px-3">Ref Number</th>
-                <th className="py-2.5 px-2.5 sm:px-3">Appointee Details</th>
-                <th className="py-2.5 px-2.5 sm:px-3">Role & Category</th>
-                <th className="py-2.5 px-2.5 sm:px-3">District / Seat</th>
-                <th className="py-2.5 px-2.5 sm:px-3 hidden xl:table-cell">Issuing Authority</th>
-                <th className="py-2.5 px-2.5 sm:px-3">Status</th>
+            <thead className="sticky top-0 z-10">
+              <tr className="bg-slate-50 text-slate-600 uppercase font-bold text-[10px] tracking-wider border-b border-slate-200 shadow-[0_1px_0_0_#e2e8f0]">
+                <th className="py-2.5 px-2.5 sm:px-3">
+                  <SortHeader label="Ref Number" field="appointmentRefNo" sortKey={sortKey} sortDir={sortDir} onToggle={toggle} />
+                </th>
+                <th className="py-2.5 px-2.5 sm:px-3">
+                  <SortHeader label="Appointee Details" field="candidateName" sortKey={sortKey} sortDir={sortDir} onToggle={toggle} />
+                </th>
+                <th className="py-2.5 px-2.5 sm:px-3">
+                  <SortHeader label="Role & Category" field="roleTitle" sortKey={sortKey} sortDir={sortDir} onToggle={toggle} />
+                </th>
+                <th className="py-2.5 px-2.5 sm:px-3">
+                  <SortHeader label="District / Seat" field="district" sortKey={sortKey} sortDir={sortDir} onToggle={toggle} />
+                </th>
+                <th className="py-2.5 px-2.5 sm:px-3 hidden xl:table-cell">
+                  <SortHeader label="Issuing Authority" field="allocatedBy" sortKey={sortKey} sortDir={sortDir} onToggle={toggle} />
+                </th>
+                <th className="py-2.5 px-2.5 sm:px-3">
+                  <SortHeader label="Status" field="status" sortKey={sortKey} sortDir={sortDir} onToggle={toggle} />
+                </th>
                 <th className="py-2.5 px-2.5 sm:px-3 text-right">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 font-medium text-slate-700">
-              {filteredAllocations.length === 0 && (
+              {sortedRows.length === 0 && (
                 <tr>
-                  <td colSpan={7} className="px-4 py-8 text-center text-xs text-slate-500">
-                    No appointment records match the selected search and filters.
+                  <td colSpan={7} className="px-4 py-6">
+                    <EmptyState
+                      icon={Search}
+                      title="No appointments found"
+                      hint="No appointment records match the selected search and filters."
+                      action={
+                        <button
+                          onClick={() => {
+                            setSearchAllocQuery("");
+                            setFilterRole("All");
+                            setFilterDistrict("All");
+                          }}
+                          className="text-xs font-bold text-teal-700 hover:text-teal-900 underline cursor-pointer"
+                        >
+                          Clear search & filters
+                        </button>
+                      }
+                    />
                   </td>
                 </tr>
               )}
-              {filteredAllocations.map((alloc) => {
+              {pagedRows.map(({ alloc }) => {
                 const cand = candidates.find((c) => c.id === alloc.candidateId);
                 return (
                   <tr key={alloc.id} className="hover:bg-emerald-50/40 transition-colors">
@@ -571,13 +679,12 @@ export default function SeatAllocationView({
                     </td>
                     <td className="py-2.5 px-2.5 sm:px-3">
                       <div className="flex items-center gap-2">
-                        <img
-                          src={cand?.photoUrl || "/images/cand_hamza.jpg"}
+                        <Avatar
+                          src={cand?.photoUrl || undefined}
+                          name={alloc.candidateName}
                           alt={alloc.candidateName}
-                          onError={(e) => {
-                            e.currentTarget.src = "/images/councilor_portrait.jpg";
-                          }}
-                          className="w-7 h-7 rounded-full object-cover border border-slate-200 shadow-xs shrink-0"
+                          className="w-7 h-7 rounded-full border border-slate-200 shadow-xs"
+                          textClassName="text-[9px]"
                         />
                         <div className="min-w-0">
                           <div className="font-bold text-slate-900 truncate max-w-[150px]" title={alloc.candidateName}>{alloc.candidateName}</div>
@@ -645,6 +752,17 @@ export default function SeatAllocationView({
             </tbody>
           </table>
         </div>
+
+        {sortedRows.length > 10 && (
+          <div className="border-t border-slate-100 pt-1">
+            <Pagination
+              page={safeAllocPage}
+              pageCount={allocPageCount}
+              total={sortedRows.length}
+              onChange={setAllocPage}
+            />
+          </div>
+        )}
       </div>
 
       {revokeTarget && (

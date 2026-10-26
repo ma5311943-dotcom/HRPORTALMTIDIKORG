@@ -40,6 +40,16 @@ export async function PATCH(
         ? body.reason.trim()
         : "Administrative revocation";
     const revoked = await db.revokeAllocation(id, reason, session.name);
+    await db.logAudit({
+      actorId: session.id,
+      actorName: session.name,
+      actorRole: session.roleCategory,
+      actorDistrict: session.district,
+      action: "allocation.revoke",
+      entityType: "allocation",
+      entityId: id,
+      detail: `${existing.appointmentRefNo} revoked for ${existing.candidateName}. Reason: ${reason}`,
+    });
     return NextResponse.json({ success: true, data: revoked });
   } catch (error) {
     return apiErrorResponse(error);

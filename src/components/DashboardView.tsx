@@ -22,6 +22,15 @@ import {
 import { toast } from "sonner";
 import { ROLE_STYLES, PARTY_LABELS, PARTY_STYLES } from "@/lib/ui";
 import { exportStaffRosterToWord } from "@/lib/export-word";
+import {
+  Avatar,
+  DonutChart,
+  EmptyState,
+  Pagination,
+  SortHeader,
+  paginate,
+  useSortable,
+} from "@/components/ui/kit";
 
 interface DashboardViewProps {
   analytics: SystemAnalytics;
@@ -84,6 +93,38 @@ export default function DashboardView({
     if (districtFilteredCandidates.length === 0) return 0;
     return Math.round((verifiedCandidatesCount / districtFilteredCandidates.length) * 100);
   }, [districtFilteredCandidates, verifiedCandidatesCount]);
+
+  const allocationCoverage = useMemo(() => {
+    const stats = analytics.districtStats;
+    const quota = stats.reduce((sum, s) => sum + s.quota, 0);
+    const allocated = stats.reduce((sum, s) => sum + s.allocated, 0);
+    if (quota === 0) return { pct: 0, allocated: 0, quota: 0 };
+    return { pct: Math.round((allocated / quota) * 100), allocated, quota };
+  }, [analytics.districtStats]);
+
+  /* Ledger table: sorting + pagination */
+  const ledgerRows = useMemo(
+    () =>
+      districtFilteredAllocations.map((alloc) => {
+        const ca = candidates.find((c) => c.id === alloc.candidateId || c.cnic === alloc.candidateCnic);
+        return {
+          alloc,
+          candidate: ca,
+          appointmentRefNo: alloc.appointmentRefNo,
+          candidateName: alloc.candidateName,
+          tehsil: ca?.tehsil || alloc.district,
+          roleCategory: alloc.roleCategory,
+          status: alloc.status,
+        };
+      }),
+    [districtFilteredAllocations, candidates]
+  );
+  const { sorted: sortedLedger, sortKey, sortDir, toggle } = useSortable(ledgerRows, "appointmentRefNo");
+  const [ledgerPage, setLedgerPage] = useState(1);
+  const { pageRows: pagedLedger, pageCount: ledgerTotalPages, safePage: safeLedgerPage } = useMemo(
+    () => paginate(sortedLedger, ledgerPage, 10),
+    [sortedLedger, ledgerPage]
+  );
 
   const tehsilStats = useMemo(() => {
     const tehsils = Array.from(
@@ -281,14 +322,15 @@ export default function DashboardView({
               <Award className="w-5 h-5" />
             </div>
           </div>
-          <div className="mt-3">
+          <div className="mt-3 flex items-center gap-3">
             <div className="text-2xl sm:text-3xl font-extrabold text-slate-900">
               {activeAllocationsCount}
             </div>
-            <p className="text-xs text-slate-500 mt-1 flex items-center gap-1 font-medium">
-              <span className="text-emerald-700 font-bold">Director Orders</span> & Joining Verified
-            </p>
+            <DonutChart value={allocationCoverage.pct} size={44} color="#0891b2" />
           </div>
+          <p className="text-xs text-slate-500 mt-1 flex items-center gap-1 font-medium">
+            <span className="text-emerald-700 font-bold">{allocationCoverage.allocated}/{allocationCoverage.quota}</span> seats · Director Orders Verified
+          </p>
         </div>
 
         {/* Metric 3 */}
@@ -321,14 +363,15 @@ export default function DashboardView({
               <CheckCircle2 className="w-5 h-5" />
             </div>
           </div>
-          <div className="mt-3">
+          <div className="mt-3 flex items-center gap-3">
             <div className="text-2xl sm:text-3xl font-extrabold text-slate-900">
               {verificationRatio}%
             </div>
-            <p className="text-xs text-slate-500 mt-1 flex items-center gap-1 font-medium">
-              Union Council & Reference Cleared
-            </p>
+            <DonutChart value={verificationRatio} size={44} color="#059669" />
           </div>
+          <p className="text-xs text-slate-500 mt-1 flex items-center gap-1 font-medium">
+            Union Council & Reference Cleared
+          </p>
         </div>
       </div>
 
@@ -480,30 +523,56 @@ export default function DashboardView({
           </div>
         </div>
 
-        <div className="overflow-x-auto">
+        <div className="max-h-[560px] overflow-auto">
           <table className="w-full min-w-[860px] text-left border-collapse text-xs">
-            <thead>
-              <tr className="bg-slate-50 text-slate-600 uppercase font-bold text-[10px] tracking-wider border-b border-slate-200">
-                <th className="py-3 px-4">Appt / Joining Ref</th>
-                <th className="py-3 px-4">Staff Name & CNIC</th>
-                <th className="py-3 px-4">Tehsil & Union Council</th>
-                <th className="py-3 px-4">DHQ Assigned Role</th>
+            <thead className="sticky top-0 z-10">
+              <tr className="bg-slate-50 text-slate-600 uppercase font-bold text-[10px] tracking-wider border-b border-slate-200 shadow-[0_1px_0_0_#e2e8f0]">
+                <th className="py-3 px-4">
+                  <SortHeader label="Appt / Joining Ref" field="appointmentRefNo" sortKey={sortKey} sortDir={sortDir} onToggle={toggle} />
+                </th>
+                <th className="py-3 px-4">
+                  <SortHeader label="Staff Name & CNIC" field="candidateName" sortKey={sortKey} sortDir={sortDir} onToggle={toggle} />
+                </th>
+                <th className="py-3 px-4">
+                  <SortHeader label="Tehsil & Union Council" field="tehsil" sortKey={sortKey} sortDir={sortDir} onToggle={toggle} />
+                </th>
+                <th className="py-3 px-4">
+                  <SortHeader label="DHQ Assigned Role" field="roleCategory" sortKey={sortKey} sortDir={sortDir} onToggle={toggle} />
+                </th>
                 <th className="py-3 px-4">Reference Code</th>
-                <th className="py-3 px-4">Status</th>
+                <th className="py-3 px-4">
+                  <SortHeader label="Status" field="status" sortKey={sortKey} sortDir={sortDir} onToggle={toggle} />
+                </th>
                 <th className="py-3 px-4 text-right">Action</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 font-medium text-slate-700">
-              {districtFilteredAllocations.length === 0 && (
+              {sortedLedger.length === 0 && (
                 <tr>
-                  <td colSpan={7} className="px-4 py-8 text-center text-xs text-slate-500">
-                    No DHQ staff appointments match the selected role filter &quot;{selectedRoleFilter}&quot;.
+                  <td colSpan={7} className="px-4 py-6">
+                    <EmptyState
+                      icon={FileCheck}
+                      title="No appointments match this filter"
+                      hint={
+                        selectedRoleFilter === "All"
+                          ? "No DHQ staff appointments have been issued yet for this district."
+                          : `No appointments for the selected role filter "${selectedRoleFilter}".`
+                      }
+                      action={
+                        <button
+                          onClick={() => setSelectedRoleFilter("All")}
+                          className="text-xs font-bold text-teal-700 hover:text-teal-900 underline cursor-pointer"
+                        >
+                          Reset filters
+                        </button>
+                      }
+                    />
                   </td>
                 </tr>
               )}
-              {districtFilteredAllocations.map((alloc) => {
-                const storedCandidate = candidates.find(c => c.id === alloc.candidateId || c.cnic === alloc.candidateCnic);
-                const candidate = storedCandidate ?? {
+              {pagedLedger.map((row) => {
+                const { alloc, candidate: foundCandidate } = row;
+                const candidate = foundCandidate ?? {
                   id: alloc.candidateId,
                   fullName: alloc.candidateName,
                   cnic: alloc.candidateCnic,
@@ -530,13 +599,12 @@ export default function DashboardView({
                     </td>
                     <td className="py-3.5 px-4">
                       <div className="flex items-center gap-2.5">
-                        <img
-                          src={candidate.photoUrl || "/images/cand_bilal.jpg"}
+                        <Avatar
+                          src={candidate.photoUrl || undefined}
+                          name={alloc.candidateName}
                           alt={alloc.candidateName}
-                          onError={(e) => {
-                            e.currentTarget.src = "/images/cand_bilal.jpg";
-                          }}
-                          className="w-8 h-8 rounded-full object-cover border border-teal-400/40 shadow-xs shrink-0"
+                          className="w-8 h-8 rounded-full border border-teal-400/40 shadow-xs"
+                          textClassName="text-[10px]"
                         />
                         <div>
                           <div className="font-bold text-slate-900 group-hover:text-teal-900">{alloc.candidateName}</div>
@@ -583,6 +651,17 @@ export default function DashboardView({
             </tbody>
           </table>
         </div>
+
+        {sortedLedger.length > 10 && (
+          <div className="border-t border-slate-100 px-4 py-3">
+            <Pagination
+              page={safeLedgerPage}
+              pageCount={ledgerTotalPages}
+              total={sortedLedger.length}
+              onChange={setLedgerPage}
+            />
+          </div>
+        )}
       </div>
     </div>
   );

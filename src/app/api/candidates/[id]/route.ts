@@ -73,6 +73,16 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
       throw new ApiError(403, "You cannot move a candidate outside your assigned district.");
     }
     const updated = await db.updateCandidate(id, updates);
+    await db.logAudit({
+      actorId: session.id,
+      actorName: session.name,
+      actorRole: session.roleCategory,
+      actorDistrict: session.district,
+      action: "candidate.update",
+      entityType: "candidate",
+      entityId: id,
+      detail: `Updated ${updated.fullName} (${Object.keys(updates).join(", ").slice(0, 300)}).`,
+    });
     return NextResponse.json({ success: true, data: updated });
   } catch (error) {
     return apiErrorResponse(error);
@@ -82,8 +92,9 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     assertSameOrigin(req);
-    await requirePermission(req, "canManageDistricts");
+    const session = await requirePermission(req, "canManageDistricts");
     const { id } = await params;
+    const existing = await db.getCandidateById(id);
     const deleted = await db.deleteCandidate(id);
     if (!deleted) {
       return NextResponse.json(
@@ -91,6 +102,16 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
         { status: 404 }
       );
     }
+    await db.logAudit({
+      actorId: session.id,
+      actorName: session.name,
+      actorRole: session.roleCategory,
+      actorDistrict: session.district,
+      action: "candidate.delete",
+      entityType: "candidate",
+      entityId: id,
+      detail: `Deleted ${existing?.fullName ?? id} (${existing?.cnic ?? ""}).`,
+    });
     return NextResponse.json({ success: true, message: "Candidate deleted successfully." });
   } catch (error) {
     return apiErrorResponse(error);

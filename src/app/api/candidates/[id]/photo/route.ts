@@ -99,6 +99,17 @@ export async function POST(
     const compressed = await compressImage(input);
     const result = await db.upsertCandidateImage(id, compressed);
 
+    await db.logAudit({
+      actorId: session.id,
+      actorName: session.name,
+      actorRole: session.roleCategory,
+      actorDistrict: session.district,
+      action: "candidate.photo",
+      entityType: "candidate",
+      entityId: id,
+      detail: `Photo uploaded for ${candidate.fullName} (${compressed.sizeBytes} bytes, WebP).`,
+    });
+
     return NextResponse.json({
       success: true,
       data: {

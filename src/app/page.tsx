@@ -7,6 +7,8 @@ import DashboardTopBar from "@/components/DashboardTopBar";
 import LandingPage from "@/components/LandingPage";
 import DashboardView from "@/components/DashboardView";
 import CandidateRegistrationView from "@/components/CandidateRegistrationView";
+import AdminAccountsView from "@/components/AdminAccountsView";
+import AuditLogView from "@/components/AuditLogView";
 import SeatAllocationView from "@/components/SeatAllocationView";
 import InternalChatView from "@/components/InternalChatView";
 import ReportsView from "@/components/ReportsView";
@@ -255,6 +257,7 @@ export default function Home() {
 
   const canAccessTab = (tab: string) => {
     if (!userSession || userSession.isCandidate) return tab === "dashboard";
+    const isAdmin = userSession.roleCategory === "Admin";
     return (
       tab === "dashboard" ||
       (tab === "candidates" &&
@@ -265,7 +268,8 @@ export default function Home() {
         (userSession.permissions.canAllocateSeats ||
           userSession.permissions.canRevokeAllocations)) ||
       (tab === "chat" && userSession.permissions.canSendMessage) ||
-      (tab === "reports" && userSession.permissions.canGenerateReports)
+      (tab === "reports" && userSession.permissions.canGenerateReports) ||
+      (isAdmin && (tab === "accounts" || tab === "audit"))
     );
   };
 
@@ -474,6 +478,7 @@ export default function Home() {
         onCloseMobile={() => setIsMobileSidebarOpen(false)}
         isCollapsed={isSidebarCollapsed}
         onToggleCollapse={() => setIsSidebarCollapsed((prev) => !prev)}
+        onNavigateTab={navigateToTab}
       />
 
       {/* Main Dashboard Content Area (Offset by Sidebar on desktop) */}
@@ -529,6 +534,10 @@ export default function Home() {
                   onCandidateCreated={handleCandidateCreated}
                   onSelectCandidate={(cand) => router.push(`/candidates/${cand.id}`)}
                   onAllocateCandidate={handleOpenAllocationForCandidate}
+                  onCandidatesBulkUpdated={(updated) => {
+                    setCandidates(updated);
+                    fetchAllData(true);
+                  }}
                   canRegisterCandidates={userSession.permissions.canRegisterCandidates}
                   canAllocateSeats={userSession.permissions.canAllocateSeats}
                 />
@@ -566,6 +575,14 @@ export default function Home() {
                   selectedDistrict={selectedDistrict}
                   setSelectedDistrict={setSelectedDistrict}
                 />
+              )}
+
+              {activeTab === "accounts" && userSession.roleCategory === "Admin" && (
+                <AdminAccountsView />
+              )}
+
+              {activeTab === "audit" && userSession.roleCategory === "Admin" && (
+                <AuditLogView district={selectedDistrict} />
               )}
             </>
           )}

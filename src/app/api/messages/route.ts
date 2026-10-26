@@ -69,6 +69,17 @@ export async function POST(req: NextRequest) {
       priority,
     });
 
+    await db.logAudit({
+      actorId: session.id,
+      actorName: session.name,
+      actorRole: session.roleCategory,
+      actorDistrict: session.district,
+      action: "message.send",
+      entityType: "message",
+      entityId: newMessage.id,
+      detail: `${priority} memo "${subject}" to ${district}.`,
+    });
+
     return NextResponse.json({ success: true, data: newMessage }, { status: 201 });
   } catch (error) {
     return apiErrorResponse(error);

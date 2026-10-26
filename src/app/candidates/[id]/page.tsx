@@ -1,6 +1,6 @@
 "use client";
 
-import React, { Suspense, use, useEffect, useState } from "react";
+import React, { Suspense, use, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
@@ -22,9 +22,14 @@ import {
   User,
   Briefcase,
   BookOpen,
+  Upload,
 } from "lucide-react";
+import { toast } from "sonner";
 import type { Candidate, Allocation, CandidateDocumentSummary } from "@/types";
 import { CANDIDATE_DOCUMENT_FIELDS, CANDIDATE_DOCUMENT_LABELS } from "@/types";
+import type { UserSession } from "@/lib/server-auth";
+import DocumentPreviewModal, { type PreviewTarget } from "@/components/ui/DocumentPreviewModal";
+import { Avatar, Skeleton, SkeletonCard } from "@/components/ui/kit";
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -40,17 +45,64 @@ function CandidateDossierContent({ params }: PageProps) {
   const [candidate, setCandidate] = useState<Candidate | null>(null);
   const [allocation, setAllocation] = useState<Allocation | null>(null);
   const [documents, setDocuments] = useState<CandidateDocumentSummary[]>([]);
+  const [session, setSession] = useState<UserSession | null>(null);
   const [errorMsg, setErrorMsg] = useState<string>("");
+  const [preview, setPreview] = useState<PreviewTarget>(null);
+  const [uploadingField, setUploadingField] = useState<string | null>(null);
+  const fileInputs = useRef<Record<string, HTMLInputElement | null>>({});
+
+  const canManageDocs = useMemo(() => {
+    if (!session || session.isCandidate || !candidate) return false;
+    if (!session.permissions.canRegisterCandidates) return false;
+    if (session.district && session.district !== "All") {
+      return candidate.domicileDistrict.toLowerCase() === session.district.toLowerCase();
+    }
+    return true;
+  }, [session, candidate]);
+
+  async function refreshDocuments() {
+    const res = await fetch(`/api/candidates/${id}/documents`, { cache: "no-store" });
+    if (res.ok) {
+      const data = await res.json().catch(() => null);
+      if (data?.success) setDocuments(data.data as CandidateDocumentSummary[]);
+    }
+  }
+
+  async function handleReplace(field: string, file: File) {
+    setUploadingField(field);
+    try {
+      const form = new FormData();
+      form.append("file", file);
+      form.append("field", field);
+      const res = await fetch(`/api/candidates/${id}/documents`, {
+        method: "POST",
+        body: form,
+      });
+      const data = await res.json().catch(() => null);
+      if (res.ok && data?.success) {
+        toast.success("Document replaced", { description: `${CANDIDATE_DOCUMENT_LABELS[field as keyof typeof CANDIDATE_DOCUMENT_LABELS]} updated successfully.` });
+        await refreshDocuments();
+        router.refresh();
+      } else {
+        toast.error("Upload failed", { description: data?.error ?? `Could not replace the ${field} document.` });
+      }
+    } catch {
+      toast.error("Upload failed", { description: "A network error occurred while replacing the document." });
+    } finally {
+      setUploadingField(null);
+    }
+  }
 
   useEffect(() => {
     let active = true;
 
     async function load() {
       try {
-        const [candRes, allocRes, docsRes] = await Promise.all([
+        const [candRes, allocRes, docsRes, sessionRes] = await Promise.all([
           fetch(`/api/candidates/${id}`, { cache: "no-store" }),
           fetch(`/api/allocations`, { cache: "no-store" }),
           fetch(`/api/candidates/${id}/documents`, { cache: "no-store" }),
+          fetch(`/api/auth/session`, { cache: "no-store" }),
         ]);
 
         if (!active) return;
@@ -97,10 +149,17 @@ function CandidateDossierContent({ params }: PageProps) {
           }
         }
 
+        let userSession: UserSession | null = null;
+        if (sessionRes.ok) {
+          const sessionData = await sessionRes.json().catch(() => null);
+          userSession = (sessionData?.data as UserSession | null) ?? null;
+        }
+
         if (!active) return;
         setCandidate(cand);
         setAllocation(activeAlloc);
         setDocuments(docs);
+        setSession(userSession);
         setLoadState("done");
       } catch {
         if (!active) return;
@@ -122,10 +181,16 @@ function CandidateDossierContent({ params }: PageProps) {
   /* ── Loading ── */
   if (loadState === "loading") {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
-        <div className="flex flex-col items-center gap-3 text-slate-500">
-          <Loader2 className="w-8 h-8 animate-spin text-emerald-600" />
-          <p className="text-sm font-medium">Loading candidate dossier…</p>
+      <div className="min-h-screen bg-[#f4f6f4]">
+        <div className="sticky top-0 z-30 border-b border-slate-200 bg-white/90 px-4 py-3 shadow-sm backdrop-blur-md sm:px-8">
+          <Skeleton className="h-4 w-48" />
+        </div>
+        <div className="mx-auto max-w-4xl space-y-5 px-4 py-6 sm:px-6 sm:py-10">
+          <SkeletonCard lines={4} />
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <SkeletonCard lines={3} />
+            <SkeletonCard lines={3} />
+          </div>
         </div>
       </div>
     );
@@ -250,13 +315,12 @@ function CandidateDossierContent({ params }: PageProps) {
           <div className="p-5 sm:p-6 flex flex-col sm:flex-row gap-5 items-start">
             {/* Photo */}
             <div className="relative shrink-0">
-              <img
-                src={candidate.photoUrl || "/images/cand_hamza.jpg"}
+              <Avatar
+                src={candidate.photoUrl || undefined}
+                name={candidate.fullName}
                 alt={candidate.fullName}
-                onError={(e) => {
-                  e.currentTarget.src = "/images/councilor_portrait.jpg";
-                }}
-                className="w-24 h-24 sm:w-28 sm:h-28 rounded-xl object-cover border border-slate-200 shadow-sm bg-slate-100"
+                className="w-24 h-24 sm:w-28 sm:h-28 rounded-xl border border-slate-200 shadow-sm bg-slate-100"
+                textClassName="text-2xl"
               />
               <div className="absolute -bottom-1 -right-1 bg-emerald-600 text-white p-1 rounded-full shadow">
                 <ShieldCheck className="w-4 h-4" />
@@ -423,17 +487,19 @@ function CandidateDossierContent({ params }: PageProps) {
                   </div>
                 </div>
                 {documentsByField.get("matricDoc") ? (
-                  <a
-                    href={documentsByField.get("matricDoc")!.url}
-                    target="_blank"
-                    rel="noreferrer"
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const d = documentsByField.get("matricDoc")!;
+                      setPreview({ url: d.url, fileName: d.fileName, mimeType: d.mimeType });
+                    }}
                     className="flex items-center gap-1.5 text-emerald-700 font-semibold pt-1 hover:underline cursor-pointer"
                   >
                     <FileCheck className="w-3.5 h-3.5" />
                     <span className="text-[11px]">
                       {documentsByField.get("matricDoc")!.fileName} ({Math.round(documentsByField.get("matricDoc")!.sizeBytes / 1024)} KB, {documentsByField.get("matricDoc")!.savedPercent}% saved)
                     </span>
-                  </a>
+                  </button>
                 ) : (
                   <div className="flex items-center gap-1.5 text-slate-400 font-semibold pt-1">
                     <FileCheck className="w-3.5 h-3.5" />
@@ -476,17 +542,19 @@ function CandidateDossierContent({ params }: PageProps) {
                   </div>
                 </div>
                 {documentsByField.get("fscDoc") ? (
-                  <a
-                    href={documentsByField.get("fscDoc")!.url}
-                    target="_blank"
-                    rel="noreferrer"
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const d = documentsByField.get("fscDoc")!;
+                      setPreview({ url: d.url, fileName: d.fileName, mimeType: d.mimeType });
+                    }}
                     className="flex items-center gap-1.5 text-emerald-700 font-semibold pt-1 hover:underline cursor-pointer"
                   >
                     <FileCheck className="w-3.5 h-3.5" />
                     <span className="text-[11px]">
                       {documentsByField.get("fscDoc")!.fileName} ({Math.round(documentsByField.get("fscDoc")!.sizeBytes / 1024)} KB, {documentsByField.get("fscDoc")!.savedPercent}% saved)
                     </span>
-                  </a>
+                  </button>
                 ) : (
                   <div className="flex items-center gap-1.5 text-slate-400 font-semibold pt-1">
                     <FileCheck className="w-3.5 h-3.5" />
@@ -516,7 +584,7 @@ function CandidateDossierContent({ params }: PageProps) {
                         {CANDIDATE_DOCUMENT_LABELS[field]}
                       </p>
                       {doc ? (
-                        <p className="text-[10px] text-slate-500 truncate">
+                        <p className="text-[10px] text-slate-500 truncate" title={doc.fileName}>
                           {doc.fileName} • {Math.round(doc.originalSizeBytes / 1024)} KB → {Math.round(doc.sizeBytes / 1024)} KB
                           {doc.savedPercent > 0 ? ` (−${doc.savedPercent}%)` : ""}
                         </p>
@@ -524,16 +592,57 @@ function CandidateDossierContent({ params }: PageProps) {
                         <p className="text-[10px] text-slate-400">No document uploaded</p>
                       )}
                     </div>
-                    {doc && (
-                      <a
-                        href={doc.url}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="shrink-0 inline-flex items-center gap-1 bg-emerald-700 hover:bg-emerald-800 text-white text-[10px] font-bold px-2.5 py-1.5 rounded-lg transition-colors cursor-pointer"
-                      >
-                        View Record
-                      </a>
-                    )}
+                    <div className="flex shrink-0 items-center gap-1.5">
+                      {doc && (
+                        <>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setPreview({ url: doc.url, fileName: doc.fileName, mimeType: doc.mimeType })
+                            }
+                            className="inline-flex items-center gap-1 bg-emerald-700 hover:bg-emerald-800 text-white text-[10px] font-bold px-2.5 py-1.5 rounded-lg transition-colors cursor-pointer"
+                          >
+                            View
+                          </button>
+                          <a
+                            href={doc.url.includes("?") ? `${doc.url}&download=1` : `${doc.url}?download=1`}
+                            className="inline-flex items-center gap-1 border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-[10px] font-bold px-2.5 py-1.5 rounded-lg transition-colors cursor-pointer"
+                          >
+                            Save
+                          </a>
+                        </>
+                      )}
+                      {canManageDocs && (
+                        <>
+                          <input
+                            ref={(el) => {
+                              fileInputs.current[field] = el;
+                            }}
+                            type="file"
+                            accept="image/jpeg,image/png,image/webp,application/pdf"
+                            className="hidden"
+                            onChange={(event) => {
+                              const file = event.target.files?.[0];
+                              event.target.value = "";
+                              if (file) void handleReplace(field, file);
+                            }}
+                          />
+                          <button
+                            type="button"
+                            disabled={uploadingField === field}
+                            onClick={() => fileInputs.current[field]?.click()}
+                            className="inline-flex items-center gap-1 border border-emerald-200 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2.5 py-1.5 rounded-lg transition-colors disabled:opacity-60 cursor-pointer disabled:cursor-wait"
+                          >
+                            {uploadingField === field ? (
+                              <Loader2 className="h-3 w-3 animate-spin" />
+                            ) : (
+                              <Upload className="h-3 w-3" />
+                            )}
+                            {doc ? "Replace" : "Upload"}
+                          </button>
+                        </>
+                      )}
+                    </div>
                   </div>
                 );
               })}
@@ -572,7 +681,7 @@ function CandidateDossierContent({ params }: PageProps) {
                       {edu.documentUrl && (
                         <div className="flex items-center gap-1.5 text-emerald-700 font-semibold pt-1">
                           <FileCheck className="w-3 h-3" />
-                          <span className="text-[11px]">{edu.documentUrl}</span>
+                          <span className="text-[11px] break-all">{edu.documentUrl}</span>
                         </div>
                       )}
                     </div>
@@ -611,6 +720,7 @@ function CandidateDossierContent({ params }: PageProps) {
           </div>
         </div>
       </div>
+      <DocumentPreviewModal target={preview} onClose={() => setPreview(null)} />
     </div>
   );
 }

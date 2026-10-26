@@ -218,6 +218,17 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    await db.logAudit({
+      actorId: session?.id ?? "public",
+      actorName: session?.name ?? newCandidate.fullName,
+      actorRole: session ? session.roleCategory : "Candidate (Public Registration)",
+      actorDistrict: session?.district ?? newCandidate.domicileDistrict,
+      action: "candidate.create",
+      entityType: "candidate",
+      entityId: newCandidate.id,
+      detail: `${newCandidate.fullName} registered for ${newCandidate.constituency} (${newCandidate.domicileDistrict}).`,
+    });
+
     return NextResponse.json({
       success: true,
       data: { ...newCandidate, photoUrl: finalPhotoUrl },

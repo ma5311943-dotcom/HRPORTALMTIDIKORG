@@ -247,6 +247,27 @@ export const messages = mysqlTable(
   ]
 );
 
+export const auditLog = mysqlTable(
+  "audit_log",
+  {
+    id: varchar("id", { length: 64 }).primaryKey(),
+    actorId: varchar("actor_id", { length: 64 }).notNull(),
+    actorName: varchar("actor_name", { length: 191 }).notNull(),
+    actorRole: varchar("actor_role", { length: 128 }).notNull(),
+    actorDistrict: varchar("actor_district", { length: 100 }),
+    action: varchar("action", { length: 64 }).notNull(),
+    entityType: varchar("entity_type", { length: 32 }).notNull(),
+    entityId: varchar("entity_id", { length: 64 }),
+    detail: varchar("detail", { length: 500 }),
+    createdAt: varchar("created_at", { length: 30 }).notNull(),
+  },
+  (table) => [
+    index("audit_log_created_idx").on(table.createdAt),
+    index("audit_log_action_idx").on(table.action),
+    index("audit_log_district_idx").on(table.actorDistrict),
+  ]
+);
+
 export const schema = {
   users,
   districts,
@@ -255,4 +276,5 @@ export const schema = {
   candidateDocuments,
   allocations,
   messages,
+  auditLog,
 };

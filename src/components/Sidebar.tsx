@@ -15,8 +15,14 @@ import {
   ChevronRight,
   ChevronDown,
   X,
+  KeyRound,
+  ScrollText,
+  IdCard,
 } from "lucide-react";
 import { UserSession } from "@/lib/auth";
+import { toast } from "sonner";
+import ChangePasswordModal from "@/components/ui/ChangePasswordModal";
+import { Avatar } from "@/components/ui/kit";
 
 interface SidebarProps {
   activeTab: string;
@@ -32,6 +38,7 @@ interface SidebarProps {
   onCloseMobile: () => void;
   isCollapsed: boolean;
   onToggleCollapse: () => void;
+  onNavigateTab?: (tab: string) => void;
 }
 
 export default function Sidebar({
@@ -48,8 +55,11 @@ export default function Sidebar({
   onCloseMobile,
   isCollapsed,
   onToggleCollapse,
+  onNavigateTab,
 }: SidebarProps) {
   const [currentTime, setCurrentTime] = useState<string>("");
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const isAdmin = user.roleCategory === "Admin";
 
   useEffect(() => {
     const updateTime = () => {
@@ -122,6 +132,24 @@ export default function Sidebar({
             label: "HR Reports",
             icon: FileText,
             desc: "Staff rosters & audits",
+            badge: 0,
+          },
+        ]
+      : []),
+    ...(isAdmin
+      ? [
+          {
+            id: "accounts",
+            label: "Officer Accounts",
+            icon: IdCard,
+            desc: "Usernames, passwords & access",
+            badge: 0,
+          },
+          {
+            id: "audit",
+            label: "Audit Log",
+            icon: ScrollText,
+            desc: "System activity trail",
             badge: 0,
           },
         ]
@@ -222,10 +250,12 @@ export default function Sidebar({
             <div className="space-y-1.5">
               <div className="flex items-center gap-2.5">
                 <div className="relative shrink-0">
-                  <img
-                    src={user.avatar}
+                  <Avatar
+                    src={user.avatar || undefined}
+                    name={user.name}
                     alt={user.name}
-                    className="w-9 h-9 rounded-full object-cover border border-emerald-600/30 ring-2 ring-white shadow-xs"
+                    className="w-9 h-9 rounded-full border border-emerald-600/30 ring-2 ring-white shadow-xs"
+                    textClassName="text-[10px]"
                   />
                   <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-500 ring-2 ring-white" />
                 </div>
@@ -249,10 +279,12 @@ export default function Sidebar({
                 title={`Signed in as ${user.name} (${user.role})`}
                 className="relative"
               >
-                <img
-                  src={user.avatar}
+                <Avatar
+                  src={user.avatar || undefined}
+                  name={user.name}
                   alt={user.name}
-                  className="w-8 h-8 rounded-full object-cover border border-emerald-600/30 ring-2 ring-white"
+                  className="w-8 h-8 rounded-full border border-emerald-600/30 ring-2 ring-white"
+                  textClassName="text-[9px]"
                 />
                 <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-500 ring-2 ring-white" />
               </div>
@@ -309,7 +341,8 @@ export default function Sidebar({
               <button
                 key={item.id}
                 onClick={() => {
-                  setActiveTab(item.id);
+                  if (onNavigateTab) onNavigateTab(item.id);
+                  else setActiveTab(item.id);
                   onCloseMobile();
                 }}
                 title={isCollapsed ? item.label : undefined}
@@ -358,6 +391,17 @@ export default function Sidebar({
         {/* Bottom Actions & Status Section */}
         <div className="p-3 border-t border-slate-100 bg-slate-50/80 space-y-2 shrink-0">
           <button
+            onClick={() => setShowPasswordModal(true)}
+            title="Change your account password"
+            className={`w-full flex items-center rounded-xl text-slate-700 hover:text-emerald-900 bg-white hover:bg-emerald-50 border border-slate-200 hover:border-emerald-200 transition-all text-xs font-semibold cursor-pointer shadow-2xs ${
+              isCollapsed ? "justify-center p-2.5" : "gap-2.5 px-3 py-2"
+            }`}
+          >
+            <KeyRound className="w-4 h-4 text-emerald-700 shrink-0" />
+            {!isCollapsed && <span>Change Password</span>}
+          </button>
+
+          <button
             onClick={onLogout}
             title="Sign Out of Portal"
             className={`w-full flex items-center rounded-xl text-red-700 hover:text-red-800 bg-red-50 hover:bg-red-100 border border-red-200 transition-all text-xs font-semibold cursor-pointer shadow-2xs ${
@@ -382,6 +426,14 @@ export default function Sidebar({
           )}
         </div>
       </aside>
+
+      {showPasswordModal && (
+        <ChangePasswordModal
+          variant={user.isCandidate ? "candidate" : "officer"}
+          onClose={() => setShowPasswordModal(false)}
+          onSuccess={() => toast.success("Password changed successfully")}
+        />
+      )}
     </>
   );
 }

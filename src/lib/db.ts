@@ -21,6 +21,86 @@ type AllocationRow = typeof schema.allocations.$inferSelect;
 type MessageRow = typeof schema.messages.$inferSelect;
 type DistrictRow = typeof schema.districts.$inferSelect;
 type DocumentRow = typeof schema.candidateDocuments.$inferSelect;
+type AuditRow = typeof schema.auditLog.$inferSelect;
+type UserRow = typeof schema.users.$inferSelect;
+
+export type OfficerAccount = {
+  id: string;
+  username: string;
+  email: string;
+  name: string;
+  title: string;
+  department: string;
+  district: string;
+  roleKey: string;
+  roleCategory: string;
+  avatar: string;
+  isActive: boolean;
+  lastLoginAt?: string;
+};
+
+export type AuditEntry = {
+  id: number;
+  actorId: string;
+  actorName: string;
+  actorRole: string;
+  actorDistrict?: string;
+  action: string;
+  entityType: string;
+  entityId?: string;
+  detail?: string;
+  createdAt: string;
+};
+
+export type DistrictQuotaUsage = {
+  district: string;
+  quota: number;
+  activeAllocations: number;
+  remaining: number;
+};
+
+export type NewAuditEntry = {
+  actorId: string;
+  actorName: string;
+  actorRole: string | undefined;
+  actorDistrict?: string | undefined;
+  action: string;
+  entityType: string;
+  entityId?: string | undefined;
+  detail?: string | undefined;
+};
+
+function mapAudit(row: AuditRow) {
+  return {
+    id: row.id,
+    actorId: row.actorId,
+    actorName: row.actorName,
+    actorRole: row.actorRole,
+    actorDistrict: row.actorDistrict ?? undefined,
+    action: row.action,
+    entityType: row.entityType,
+    entityId: row.entityId ?? undefined,
+    detail: row.detail ?? undefined,
+    createdAt: row.createdAt,
+  };
+}
+
+function mapOfficerAccount(row: UserRow): OfficerAccount {
+  return {
+    id: row.id,
+    username: row.username,
+    email: row.email,
+    name: row.name,
+    title: row.title,
+    department: row.department,
+    district: row.district,
+    roleKey: row.roleKey,
+    roleCategory: row.roleCategory,
+    avatar: row.avatar,
+    isActive: row.isActive,
+    lastLoginAt: row.lastLoginAt ?? undefined,
+  };
+}
 
 function nowIso() {
   return new Date().toISOString();
@@ -999,6 +1079,139 @@ export const db = {
         .slice(0, 8)
         .map(mapAllocation),
     };
+  },
+
+  async logAudit(entry: NewAuditEntry): Promise<void> {
+    try {
+      const id = `audit-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+      await getDb().insert(schema.auditLog).values({
+        id,
+        actorId: entry.actorId,
+        actorName: entry.actorName,
+        actorRole: entry.actorRole ?? "Unknown",
+        actorDistrict: entry.actorDistrict ?? null,
+        action: entry.action,
+        entityType: entry.entityType,
+        entityId: entry.entityId ?? null,
+        detail: entry.detail ?? null,
+        createdAt: nowIso(),
+      });
+    } catch {
+      return;
+    }
+  },
+
+  async getAuditLog(options?: { action?: string; district?: string; limit?: number }) {
+    const database = getDb();
+    const conditions = [];
+    if (options?.action && options.action !== "All") {
+      conditions.push(eq(schema.auditLog.action, options.action));
+    }
+    if (options?.district && options.district !== "All") {
+      conditions.push(
+        or(
+          eq(schema.auditLog.actorDistrict, options.district),
+          eq(schema.auditLog.actorDistrict, "All")
+        )!
+      );
+    }
+    const rows = await database
+      .select()
+      .from(schema.auditLog)
+      .where(conditions.length > 0 ? and(...conditions) : undefined)
+      .orderBy(desc(schema.auditLog.createdAt))
+      .limit(Math.min(500, Math.max(1, options?.limit ?? 200)));
+    return rows.map(mapAudit);
+  },
+
+  async getDistrictQuotaUsage(districtName: string): Promise<DistrictQuotaUsage | null> {
+    const database = getDb();
+    const [districtRow] = await database
+      .select()
+      .from(schema.districts)
+      .where(sql`lower(${schema.districts.name}) = ${districtName.toLowerCase()}`)
+      .limit(1);
+    if (!districtRow) return null;
+    const [activeRow] = await database
+      .select({ count: sql<number>`count(*)` })
+      .from(schema.allocations)
+      .where(
+        and(
+          sql`lower(${schema.allocations.district}) = ${districtName.toLowerCase()}`,
+          eq(schema.allocations.status, "Active")
+        )
+      );
+    const activeAllocations = Number(activeRow?.count ?? 0);
+    return {
+      district: districtRow.name,
+      quota: districtRow.totalQuota,
+      activeAllocations,
+      remaining: Math.max(0, districtRow.totalQuota - activeAllocations),
+    };
+  },
+
+  async getDistrictQuotaUsageAll(): Promise<DistrictQuotaUsage[]> {
+    const database = getDb();
+    const districtRows = await database.select().from(schema.districts).orderBy(schema.districts.name);
+    if (districtRows.length === 0) return [];
+    const activeRows = await database
+      .select({ district: schema.allocations.district, count: sql<number>`count(*)` })
+      .from(schema.allocations)
+      .where(eq(schema.allocations.status, "Active"))
+      .groupBy(schema.allocations.district);
+    const activeByLower = new Map(
+      activeRows.map((r) => [r.district.toLowerCase(), Number(r.count)])
+    );
+    return districtRows.map((d) => {
+      const activeAllocations = activeByLower.get(d.name.toLowerCase()) ?? 0;
+      return {
+        district: d.name,
+        quota: d.totalQuota,
+        activeAllocations,
+        remaining: Math.max(0, d.totalQuota - activeAllocations),
+      };
+    });
+  },
+
+  async bulkSetCandidateStatus(ids: string[], status: CandidateStatus): Promise<number> {
+    if (ids.length === 0) return 0;
+    const result = await getDb()
+      .update(schema.candidates)
+      .set({ status, updatedAt: nowIso() })
+      .where(inArray(schema.candidates.id, ids));
+    return Number(result[0].affectedRows ?? 0);
+  },
+
+  async listOfficerAccounts(): Promise<OfficerAccount[]> {
+    const rows = await getDb().select().from(schema.users).orderBy(schema.users.username);
+    return rows.map(mapOfficerAccount);
+  },
+
+  async updateOfficerAccount(
+    id: string,
+    patch: { username?: string; name?: string; isActive?: boolean; passwordHash?: string }
+  ): Promise<OfficerAccount> {
+    const database = getDb();
+    if (patch.username !== undefined) {
+      const username = patch.username.trim().toLowerCase();
+      if (!username) throw new DomainError(400, "Username cannot be empty.");
+      const [taken] = await database
+        .select({ id: schema.users.id })
+        .from(schema.users)
+        .where(and(eq(schema.users.username, username)))
+        .limit(1);
+      if (taken && taken.id !== id) {
+        throw new DomainError(409, "That username is already taken by another account.");
+      }
+      patch.username = username;
+    }
+    await database
+      .update(schema.users)
+      .set({ ...patch, updatedAt: nowIso() })
+      .where(eq(schema.users.id, id));
+    const [row] = await database.select().from(schema.users).where(eq(schema.users.id, id)).limit(1);
+    if (!row) throw new DomainError(404, "Account not found.");
+    return mapOfficerAccount(row);
   },
 };
 

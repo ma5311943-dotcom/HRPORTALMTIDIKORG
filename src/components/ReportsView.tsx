@@ -2,16 +2,18 @@
 
 import React, { useState, useMemo } from "react";
 import { Candidate, District, Allocation } from "@/types";
-import { 
-  FileText, 
-  Printer, 
-  Copy, 
-  Award, 
+import {
+  FileText,
+  Printer,
+  Copy,
+  Award,
   Sparkles,
   MapPin,
-  ShieldCheck
+  ShieldCheck,
+  Sheet
 } from "lucide-react";
 import { toast } from "sonner";
+import { DonutChart, EmptyState, SortHeader, useSortable } from "@/components/ui/kit";
 
 interface ReportsViewProps {
   candidates: Candidate[];
@@ -83,6 +85,44 @@ export default function ReportsView({
 
   const handlePrint = () => {
     window.print();
+  };
+
+  /* Gazette roster: sorting */
+  const gazetteRows = useMemo(
+    () =>
+      filteredAllocations.map((a) => ({
+        appointmentRefNo: a.appointmentRefNo,
+        candidateName: a.candidateName,
+        candidateCnic: a.candidateCnic,
+        roleTitle: a.roleTitle,
+        constituency: a.constituency,
+        department: a.department,
+      })),
+    [filteredAllocations]
+  );
+  const { sorted: sortedGazette, sortKey, sortDir, toggle } = useSortable(gazetteRows, "appointmentRefNo");
+
+  const handleExportCsv = () => {
+    const header = ["Gazette Ref", "Appointee Name", "CNIC", "Designation", "Constituency", "Department"];
+    const esc = (v: string) => `"${(v ?? "").replace(/"/g, '""')}"`;
+    const lines = [
+      header.map(esc).join(","),
+      ...sortedGazette.map((r) =>
+        [r.appointmentRefNo, r.candidateName, r.candidateCnic, r.roleTitle, r.constituency, r.department]
+          .map(esc)
+          .join(",")
+      ),
+    ];
+    const blob = new Blob(["\uFEFF" + lines.join("\n")], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `gazette-roster-${selectedDistrict.toLowerCase().replace(/\s+/g, "-")}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast.success("CSV exported", {
+      description: `${sortedGazette.length} gazette records downloaded.`,
+    });
   };
 
   const handleCopyPressRelease = () => {
@@ -168,6 +208,14 @@ export default function ReportsView({
             >
               <Copy className="w-3.5 h-3.5 text-emerald-200" />
               <span>Copy Release</span>
+            </button>
+
+            <button
+              onClick={handleExportCsv}
+              className="flex items-center gap-1.5 bg-white/15 hover:bg-white/25 text-white text-xs font-bold px-3.5 py-2 rounded-xl border border-white/20 backdrop-blur-sm transition-all cursor-pointer"
+            >
+              <Sheet className="w-3.5 h-3.5 text-emerald-200" />
+              <span>Export CSV</span>
             </button>
 
             <button
@@ -260,11 +308,14 @@ export default function ReportsView({
               <span className="text-slate-500 block">Registered Applicants</span>
               <span className="text-xl font-bold text-slate-800">{filteredCandidates.length}</span>
             </div>
-            <div className="bg-white p-3 rounded-xl border border-emerald-200">
-              <span className="text-slate-500 block">Verified Credentials</span>
-              <span className="text-xl font-bold text-emerald-700">
-                {filteredCandidates.length > 0 ? `${verifiedCredentialsRatio}%` : "—"}
-              </span>
+            <div className="bg-white p-3 rounded-xl border border-emerald-200 flex items-center justify-between gap-2">
+              <div>
+                <span className="text-slate-500 block">Verified Credentials</span>
+                <span className="text-xl font-bold text-emerald-700">
+                  {filteredCandidates.length > 0 ? `${verifiedCredentialsRatio}%` : "—"}
+                </span>
+              </div>
+              <DonutChart value={verifiedCredentialsRatio} size={40} stroke={6} color="#059669" />
             </div>
             <div className="bg-white p-3 rounded-xl border border-emerald-200">
               <span className="text-slate-500 block">Duplicate Allotments</span>
@@ -306,36 +357,46 @@ export default function ReportsView({
             Certified Appointee Gazette Registry
           </h3>
 
-          <div className="border border-slate-200 rounded-xl overflow-x-auto">
+          <div className="border border-slate-200 rounded-xl overflow-x-auto max-h-[460px] overflow-y-auto">
             <table className="w-full min-w-[720px] text-left border-collapse text-xs">
-              <thead>
-                <tr className="bg-slate-100 text-slate-700 font-bold border-b border-slate-200">
-                  <th className="py-2.5 px-3">Gazette Ref</th>
-                  <th className="py-2.5 px-3">Appointee Name</th>
+              <thead className="sticky top-0 z-10">
+                <tr className="bg-slate-100 text-slate-700 font-bold border-b border-slate-200 shadow-[0_1px_0_0_#e2e8f0]">
+                  <th className="py-2.5 px-3">
+                    <SortHeader label="Gazette Ref" field="appointmentRefNo" sortKey={sortKey} sortDir={sortDir} onToggle={toggle} />
+                  </th>
+                  <th className="py-2.5 px-3">
+                    <SortHeader label="Appointee Name" field="candidateName" sortKey={sortKey} sortDir={sortDir} onToggle={toggle} />
+                  </th>
                   <th className="py-2.5 px-3">CNIC Number</th>
-                  <th className="py-2.5 px-3">Designation</th>
+                  <th className="py-2.5 px-3">
+                    <SortHeader label="Designation" field="roleTitle" sortKey={sortKey} sortDir={sortDir} onToggle={toggle} />
+                  </th>
                   <th className="py-2.5 px-3">Constituency</th>
                   <th className="py-2.5 px-3">Department</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
-                {filteredAllocations.length === 0 && (
+                {sortedGazette.length === 0 && (
                   <tr>
-                    <td colSpan={6} className="px-3 py-6 text-center text-xs text-slate-500">
-                      No active Gazette appointments for this scope.
+                    <td colSpan={6} className="px-3 py-4">
+                      <EmptyState
+                        icon={ShieldCheck}
+                        title="No active Gazette appointments"
+                        hint="No active gazette appointments for this scope."
+                      />
                     </td>
                   </tr>
                 )}
-                {filteredAllocations.map((alloc) => (
-                  <tr key={alloc.id}>
+                {sortedGazette.map((row) => (
+                  <tr key={row.appointmentRefNo}>
                     <td className="py-2 px-3 font-mono text-emerald-700 font-bold">
-                      {alloc.appointmentRefNo}
+                      {row.appointmentRefNo}
                     </td>
-                    <td className="py-2 px-3 font-bold text-slate-900">{alloc.candidateName}</td>
-                    <td className="py-2 px-3 font-mono text-slate-500">{alloc.candidateCnic}</td>
-                    <td className="py-2 px-3 font-semibold text-slate-800">{alloc.roleTitle}</td>
-                    <td className="py-2 px-3 text-emerald-700 font-bold">{alloc.constituency}</td>
-                    <td className="py-2 px-3 text-slate-600">{alloc.department}</td>
+                    <td className="py-2 px-3 font-bold text-slate-900">{row.candidateName}</td>
+                    <td className="py-2 px-3 font-mono text-slate-500">{row.candidateCnic}</td>
+                    <td className="py-2 px-3 font-semibold text-slate-800">{row.roleTitle}</td>
+                    <td className="py-2 px-3 text-emerald-700 font-bold">{row.constituency}</td>
+                    <td className="py-2 px-3 text-slate-600">{row.department}</td>
                   </tr>
                 ))}
               </tbody>
