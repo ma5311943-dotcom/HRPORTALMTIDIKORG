@@ -745,7 +745,7 @@ export default function CandidateRegistrationView({
                       {matricDocName ? "Change File" : "Upload File"}
                     </span>
                     {matricDocName ? (
-                      <span className="inline-flex items-center gap-1 bg-emerald-50 text-emerald-800 border border-emerald-200 px-2 py-0.5 rounded text-[11px] font-semibold truncate max-w-[180px]">
+                      <span className="inline-flex items-center gap-1 bg-emerald-50 text-emerald-800 border border-emerald-200 px-2 py-0.5 rounded text-[11px] font-semibold truncate max-w-[180px]" title={matricDocName}>
                         <span className="text-[9px] bg-red-600 text-white font-bold px-1 rounded uppercase">
                           {matricDocName.endsWith(".pdf") ? "PDF" : "IMG"}
                         </span>
@@ -841,7 +841,7 @@ export default function CandidateRegistrationView({
                       {fscDocName ? "Change File" : "Upload File"}
                     </span>
                     {fscDocName ? (
-                      <span className="inline-flex items-center gap-1 bg-emerald-50 text-emerald-800 border border-emerald-200 px-2 py-0.5 rounded text-[11px] font-semibold truncate max-w-[180px]">
+                      <span className="inline-flex items-center gap-1 bg-emerald-50 text-emerald-800 border border-emerald-200 px-2 py-0.5 rounded text-[11px] font-semibold truncate max-w-[180px]" title={fscDocName}>
                         <span className="text-[9px] bg-red-600 text-white font-bold px-1 rounded uppercase">
                           {fscDocName.endsWith(".pdf") ? "PDF" : "IMG"}
                         </span>
@@ -936,7 +936,7 @@ export default function CandidateRegistrationView({
                     {cnicFrontName ? "Change" : "Upload"}
                   </span>
                   {cnicFrontName ? (
-                    <span className="inline-flex items-center gap-1 bg-emerald-50 text-emerald-800 border border-emerald-200 px-2 py-0.5 rounded text-[11px] font-semibold truncate max-w-[140px]">
+                    <span className="inline-flex items-center gap-1 bg-emerald-50 text-emerald-800 border border-emerald-200 px-2 py-0.5 rounded text-[11px] font-semibold truncate max-w-[140px]" title={cnicFrontName}>
                       <span className="text-[9px] bg-red-600 text-white font-bold px-1 rounded uppercase">
                         {cnicFrontName.endsWith(".pdf") ? "PDF" : "IMG"}
                       </span>
@@ -964,7 +964,7 @@ export default function CandidateRegistrationView({
                     {cnicBackName ? "Change" : "Upload"}
                   </span>
                   {cnicBackName ? (
-                    <span className="inline-flex items-center gap-1 bg-emerald-50 text-emerald-800 border border-emerald-200 px-2 py-0.5 rounded text-[11px] font-semibold truncate max-w-[140px]">
+                    <span className="inline-flex items-center gap-1 bg-emerald-50 text-emerald-800 border border-emerald-200 px-2 py-0.5 rounded text-[11px] font-semibold truncate max-w-[140px]" title={cnicBackName}>
                       <span className="text-[9px] bg-red-600 text-white font-bold px-1 rounded uppercase">
                         {cnicBackName.endsWith(".pdf") ? "PDF" : "IMG"}
                       </span>

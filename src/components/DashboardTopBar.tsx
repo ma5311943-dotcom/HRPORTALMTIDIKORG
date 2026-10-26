@@ -127,7 +127,7 @@ export default function DashboardTopBar({
           <div className="hidden md:flex items-center gap-1.5 bg-slate-50 hover:bg-slate-100 transition-colors rounded-lg px-2.5 py-1.5 border border-slate-200">
             <MapPin className="w-3.5 h-3.5 text-emerald-600" />
             {user.isCandidate ? (
-              <span className="text-xs font-semibold text-slate-700 max-w-[140px] truncate">
+              <span className="text-xs font-semibold text-slate-700 max-w-[140px] truncate" title={user.district}>
                 {user.district}
               </span>
             ) : (

@@ -100,7 +100,7 @@ export default function CandidatePortalView({
                   {candidate.status}
                 </span>
               </div>
-              <h1 className="mt-1 truncate text-xl font-bold sm:text-2xl">{candidate.fullName}</h1>
+              <h1 className="mt-1 text-xl font-bold leading-tight sm:text-2xl">{candidate.fullName}</h1>
               <p className="text-xs text-emerald-100/80">
                 {candidate.constituency} • District {candidate.domicileDistrict}
               </p>
@@ -143,7 +143,7 @@ export default function CandidatePortalView({
                     <Icon className="h-3 w-3" />
                     {field.label}
                   </div>
-                  <div className="truncate font-semibold text-slate-800">{field.value || "—"}</div>
+                  <div className="font-semibold text-slate-800 break-words">{field.value || "—"}</div>
                 </div>
               );
             })}

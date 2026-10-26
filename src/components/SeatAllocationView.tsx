@@ -580,8 +580,8 @@ export default function SeatAllocationView({
                           className="w-7 h-7 rounded-full object-cover border border-slate-200 shadow-xs shrink-0"
                         />
                         <div className="min-w-0">
-                          <div className="font-bold text-slate-900 truncate max-w-[150px]">{alloc.candidateName}</div>
-                          <div className="text-[10px] font-mono text-slate-500 truncate max-w-[170px]">
+                          <div className="font-bold text-slate-900 truncate max-w-[150px]" title={alloc.candidateName}>{alloc.candidateName}</div>
+                          <div className="text-[10px] font-mono text-slate-500 truncate max-w-[170px]" title={`${alloc.candidateCnic} • ${alloc.partyAffiliation}`}>
                             {alloc.candidateCnic} • <span className="font-semibold text-emerald-800">{alloc.partyAffiliation}</span>
                           </div>
                         </div>
@@ -598,7 +598,7 @@ export default function SeatAllocationView({
                       <div className="text-[10px] text-emerald-700 font-semibold">{alloc.constituency}</div>
                     </td>
                     <td className="py-2.5 px-2.5 sm:px-3 hidden xl:table-cell">
-                      <div className="text-slate-800 text-[11px] truncate max-w-[170px]">{alloc.allocatedBy}</div>
+                      <div className="text-slate-800 text-[11px] truncate max-w-[170px]" title={alloc.allocatedBy}>{alloc.allocatedBy}</div>
                       <div className="text-[10px] text-slate-400">Date: {alloc.allocatedDate}</div>
                     </td>
                     <td className="py-2.5 px-2.5 sm:px-3 whitespace-nowrap">
