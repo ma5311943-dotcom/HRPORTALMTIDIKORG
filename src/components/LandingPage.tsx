@@ -226,7 +226,7 @@ export default function LandingPage({
                         key={view}
                         type="button"
                         onClick={() => setActiveHeroVisual(view)}
-                        className={`rounded-lg px-2.5 py-1 text-[10px] font-semibold capitalize transition-all ${
+                        className={`rounded-lg px-2.5 py-1 text-[10px] font-semibold capitalize transition-all cursor-pointer ${
                           activeHeroVisual === view
                             ? "bg-white text-emerald-900 shadow-sm"
                             : "text-slate-200 hover:text-white"
@@ -377,7 +377,7 @@ export default function LandingPage({
                   <button
                     type="submit"
                     disabled={isSearching}
-                    className="flex items-center justify-center gap-2 rounded-xl bg-emerald-700 px-6 py-3 text-sm font-bold text-white shadow-md transition-all hover:bg-emerald-800 disabled:cursor-not-allowed disabled:opacity-70"
+                    className="flex items-center justify-center gap-2 rounded-xl bg-emerald-700 px-6 py-3 text-sm font-bold text-white shadow-md transition-all hover:bg-emerald-800 disabled:cursor-not-allowed disabled:opacity-70 cursor-pointer"
                   >
                     <span>{isSearching ? "Verifying..." : "Verify Record"}</span>
                     <ArrowRight className="h-4 w-4" />
@@ -393,7 +393,7 @@ export default function LandingPage({
                       key={sample.cnic}
                       type="button"
                       onClick={() => handleQuickSampleCnic(sample.cnic)}
-                      className="rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-1 font-mono text-[10px] font-semibold text-slate-600 transition-all hover:border-emerald-300 hover:bg-emerald-50 hover:text-emerald-800 sm:text-[11px]"
+                      className="rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-1 font-mono text-[10px] font-semibold text-slate-600 transition-all hover:border-emerald-300 hover:bg-emerald-50 hover:text-emerald-800 sm:text-[11px] cursor-pointer"
                     >
                       {sample.label}
                     </button>

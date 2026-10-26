@@ -436,7 +436,7 @@ export default function Home() {
             <button
               type="button"
               onClick={() => void fetchAllData()}
-              className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-emerald-700 px-4 py-2.5 text-xs font-bold text-white transition-colors hover:bg-emerald-800"
+              className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-emerald-700 px-4 py-2.5 text-xs font-bold text-white transition-colors hover:bg-emerald-800 cursor-pointer"
             >
               <RefreshCw className="h-4 w-4" />
               Retry Sync
@@ -444,7 +444,7 @@ export default function Home() {
             <button
               type="button"
               onClick={handleLogout}
-              className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-xs font-semibold text-slate-700 transition-colors hover:bg-slate-50"
+              className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-xs font-semibold text-slate-700 transition-colors hover:bg-slate-50 cursor-pointer"
             >
               Sign Out
             </button>
@@ -452,7 +452,7 @@ export default function Home() {
           <button
             type="button"
             onClick={() => setViewMode("landing")}
-            className="mt-3 text-xs font-semibold text-emerald-800 hover:underline"
+            className="mt-3 text-xs font-semibold text-emerald-800 hover:underline cursor-pointer"
           >
             Return to public landing page
           </button>
@@ -677,7 +677,7 @@ export default function Home() {
                 <button
                   type="button"
                   onClick={() => setViewMode("landing")}
-                  className="inline-flex items-center gap-1 text-emerald-700 hover:text-emerald-800 font-semibold transition-colors"
+                  className="inline-flex items-center gap-1 text-emerald-700 hover:text-emerald-800 font-semibold transition-colors cursor-pointer"
                 >
                   <span>Public Portal</span>
                   <ExternalLink className="w-3 h-3" />

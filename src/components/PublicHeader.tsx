@@ -120,7 +120,7 @@ export default function PublicHeader({ activePage = "home" }: PublicHeaderProps)
             <button
               type="button"
               onClick={() => setIsMobileMenuOpen((open) => !open)}
-              className="rounded-xl p-2 text-slate-700 transition-colors hover:bg-slate-100 lg:hidden"
+              className="rounded-xl p-2 text-slate-700 transition-colors hover:bg-slate-100 lg:hidden cursor-pointer"
               aria-label={isMobileMenuOpen ? "Close navigation menu" : "Open navigation menu"}
               aria-expanded={isMobileMenuOpen}
               aria-controls="public-mobile-nav"
