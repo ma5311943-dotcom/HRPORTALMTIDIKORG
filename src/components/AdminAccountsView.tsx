@@ -178,7 +178,7 @@ export default function AdminAccountsView() {
 
       {/* Accounts Table */}
       <div className="rounded-2xl border border-slate-200 bg-white shadow-sm p-4 sm:p-5">
-        <div className="max-h-[560px] overflow-auto">
+        <div className="overflow-x-auto lg:max-h-[560px] lg:overflow-y-auto">
           <table className="w-full min-w-[720px] text-left border-collapse text-xs">
             <thead className="sticky top-0 z-10">
               <tr className="bg-slate-50 text-slate-600 uppercase font-bold text-[10px] tracking-wider border-b border-slate-200 shadow-[0_1px_0_0_#e2e8f0]">

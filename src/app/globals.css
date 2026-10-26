@@ -88,6 +88,35 @@ a {
   -webkit-tap-highlight-color: transparent;
 }
 
+/* Thin greenish scrollbars everywhere */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #10b981 #eef5f1;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #eef5f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #34d399, #059669);
+  border-radius: 999px;
+  border: 2px solid #eef5f1;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #047857;
+}
+
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
 body {
   font-family: var(--font-sans);
   background-color: var(--page);

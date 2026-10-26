@@ -621,7 +621,7 @@ export default function SeatAllocationView({
         </div>
 
         {/* Table */}
-        <div className="overflow-x-auto -mx-4 sm:-mx-5 px-4 sm:px-5 max-h-[560px] overflow-y-auto">
+        <div className="overflow-x-auto -mx-4 sm:-mx-5 px-4 sm:px-5 lg:max-h-[560px] lg:overflow-y-auto">
           <table className="w-full min-w-[760px] lg:min-w-full text-left border-collapse text-xs">
             <thead className="sticky top-0 z-10">
               <tr className="bg-slate-50 text-slate-600 uppercase font-bold text-[10px] tracking-wider border-b border-slate-200 shadow-[0_1px_0_0_#e2e8f0]">

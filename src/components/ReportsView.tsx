@@ -357,7 +357,7 @@ export default function ReportsView({
             Certified Appointee Gazette Registry
           </h3>
 
-          <div className="border border-slate-200 rounded-xl overflow-x-auto max-h-[460px] overflow-y-auto">
+          <div className="border border-slate-200 rounded-xl overflow-x-auto lg:max-h-[460px] lg:overflow-y-auto">
             <table className="w-full min-w-[720px] text-left border-collapse text-xs">
               <thead className="sticky top-0 z-10">
                 <tr className="bg-slate-100 text-slate-700 font-bold border-b border-slate-200 shadow-[0_1px_0_0_#e2e8f0]">
