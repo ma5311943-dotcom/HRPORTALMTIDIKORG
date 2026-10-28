@@ -277,6 +277,28 @@ html {
   -webkit-overflow-scrolling: touch;
 }
 
+.ledger-responsive {
+  container-type: inline-size;
+}
+
+.ledger-card-view {
+  display: block;
+}
+
+.ledger-table-view {
+  display: none;
+}
+
+@container (min-width: 1060px) {
+  .ledger-card-view {
+    display: none;
+  }
+
+  .ledger-table-view {
+    display: block;
+  }
+}
+
 @media print {
   body.printing-gazette .dashboard-shell {
     display: none !important;
