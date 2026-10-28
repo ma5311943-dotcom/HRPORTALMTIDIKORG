@@ -992,6 +992,14 @@ export const db = {
       database.select().from(schema.allocations),
     ]);
 
+    // Filter strictly to Dera Ismail Khan / D.I. Khan only
+    const filteredDistrictRows = districtRows.filter(
+      (r) =>
+        r.name.toLowerCase().includes("dera ismail khan") ||
+        r.name.toLowerCase().includes("d.i. khan") ||
+        r.name.toLowerCase().includes("di khan")
+    );
+
     let candidates = allCandidates;
     let allocations = allAllocations;
 
@@ -1048,7 +1056,7 @@ export const db = {
       }
     });
 
-    const districtStats = districtRows.map((districtRow) => {
+    const districtStats = filteredDistrictRows.map((districtRow) => {
       const registered = allCandidates.filter(
         (candidate) =>
           candidate.domicileDistrict.toLowerCase() === districtRow.name.toLowerCase()
@@ -1076,7 +1084,7 @@ export const db = {
       totalRegistered,
       totalAllocated,
       totalVerified,
-      totalDistricts: districtRows.length,
+      totalDistricts: filteredDistrictRows.length,
       districtStats,
       roleStats,
       partyStats,
@@ -1160,7 +1168,14 @@ export const db = {
   async getDistrictQuotaUsageAll(): Promise<DistrictQuotaUsage[]> {
     const database = getDb();
     const districtRows = await database.select().from(schema.districts).orderBy(schema.districts.name);
-    if (districtRows.length === 0) return [];
+    // Filter strictly to Dera Ismail Khan / D.I. Khan only
+    const filteredDistrictRows = districtRows.filter(
+      (r) =>
+        r.name.toLowerCase().includes("dera ismail khan") ||
+        r.name.toLowerCase().includes("d.i. khan") ||
+        r.name.toLowerCase().includes("di khan")
+    );
+    if (filteredDistrictRows.length === 0) return [];
     const activeRows = await database
       .select({ district: schema.allocations.district, count: sql<number>`count(*)` })
       .from(schema.allocations)
@@ -1169,7 +1184,7 @@ export const db = {
     const activeByLower = new Map(
       activeRows.map((r) => [r.district.toLowerCase(), Number(r.count)])
     );
-    return districtRows.map((d) => {
+    return filteredDistrictRows.map((d) => {
       const activeAllocations = activeByLower.get(d.name.toLowerCase()) ?? 0;
       return {
         district: d.name,

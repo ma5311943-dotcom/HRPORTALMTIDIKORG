@@ -45,8 +45,6 @@ export const DI_KHAN_TEHSILS = [
   "Kulachi",
   "Daraban",
   "Parova",
-  "Hathala",
-  "Darazinda",
 ] as const;
 
 export type DIKhanTehsil = typeof DI_KHAN_TEHSILS[number];

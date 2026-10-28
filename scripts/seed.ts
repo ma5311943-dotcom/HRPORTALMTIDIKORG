@@ -18,30 +18,6 @@ const initialDistricts: District[] = [
     constituencies: ["NA-44", "NA-45", "PK-111", "PK-112", "PK-113", "PK-114", "PK-115"],
     totalQuota: 350,
     allocatedCount: 5
-  },
-  {
-    id: "tank",
-    name: "Tank",
-    province: "Khyber Pakhtunkhwa",
-    constituencies: ["NA-42"],
-    totalQuota: 40,
-    allocatedCount: 0
-  },
-  {
-    id: "bannu",
-    name: "Bannu",
-    province: "Khyber Pakhtunkhwa",
-    constituencies: ["NA-41"],
-    totalQuota: 50,
-    allocatedCount: 0
-  },
-  {
-    id: "lakki",
-    name: "Lakki Marwat",
-    province: "Khyber Pakhtunkhwa",
-    constituencies: ["NA-40"],
-    totalQuota: 60,
-    allocatedCount: 0
   }
 ];
 

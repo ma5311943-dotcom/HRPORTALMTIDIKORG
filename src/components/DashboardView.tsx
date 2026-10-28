@@ -386,7 +386,7 @@ export default function DashboardView({
                 Tehsil Quota & Regional Recruitment Distribution
               </h3>
               <p className="text-xs text-slate-500">
-                Staff distribution across D.I. Khan administrative tehsils and surrounding zones
+                Staff distribution across D.I. Khan administrative tehsils
               </p>
             </div>
 
