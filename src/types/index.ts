@@ -40,11 +40,13 @@ export const DHQ_STAFF_ROLES: RoleCategory[] = [
 ];
 
 export const DI_KHAN_TEHSILS = [
-  "Daraban",
-  "Kulachi",
-  "Paharpur",
   "Dera",
+  "Paharpur",
+  "Kulachi",
+  "Daraban",
   "Parova",
+  "Hathala",
+  "Darazinda",
 ] as const;
 
 export type DIKhanTehsil = typeof DI_KHAN_TEHSILS[number];

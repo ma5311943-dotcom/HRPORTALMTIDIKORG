@@ -13,7 +13,7 @@ import {
   Sheet
 } from "lucide-react";
 import { toast } from "sonner";
-import { DonutChart, EmptyState, SortHeader, useSortable } from "@/components/ui/kit";
+import { SortHeader, useSortable } from "@/components/ui/kit";
 
 interface ReportsViewProps {
   candidates: Candidate[];
@@ -38,20 +38,77 @@ export default function ReportsView({
     })
   );
 
+  // Category & Reference Audit Filters
+  const [selectedRoleCategory, setSelectedRoleCategory] = useState<string>("All");
+  const [referenceAuditFilter, setReferenceAuditFilter] = useState<"All" | "WithRef" | "NoRef">("All");
+  const [printPageSize, setPrintPageSize] = useState<number>(10);
+
   // Filtered allocations for selected district or all
   const filteredAllocations = useMemo(() => {
-    if (selectedDistrict === "All") return allocations.filter(a => a.status === "Active");
-    return allocations.filter(
-      a => a.district.toLowerCase() === selectedDistrict.toLowerCase() && a.status === "Active"
-    );
-  }, [allocations, selectedDistrict]);
+    let list = allocations.filter((a) => a.status === "Active");
+    if (selectedDistrict !== "All") {
+      list = list.filter(
+        (a) => a.district.toLowerCase() === selectedDistrict.toLowerCase()
+      );
+    }
+    if (selectedRoleCategory !== "All") {
+      list = list.filter((a) => a.roleCategory === selectedRoleCategory);
+    }
+    if (referenceAuditFilter !== "All") {
+      list = list.filter((a) => {
+        const c = candidates.find((cand) => cand.id === a.candidateId || cand.cnic === a.candidateCnic);
+        const hasRef = Boolean(
+          (c?.referenceCode && c.referenceCode.trim() !== "") ||
+          (a.partyAffiliation && a.partyAffiliation !== "MERIT-OPEN")
+        );
+        return referenceAuditFilter === "WithRef" ? hasRef : !hasRef;
+      });
+    }
+    return list;
+  }, [allocations, candidates, selectedDistrict, selectedRoleCategory, referenceAuditFilter]);
 
   const filteredCandidates = useMemo(() => {
-    if (selectedDistrict === "All") return candidates;
-    return candidates.filter(
-      c => c.domicileDistrict.toLowerCase() === selectedDistrict.toLowerCase()
-    );
-  }, [candidates, selectedDistrict]);
+    let list = candidates;
+    if (selectedDistrict !== "All") {
+      list = list.filter(
+        (c) => c.domicileDistrict.toLowerCase() === selectedDistrict.toLowerCase()
+      );
+    }
+    if (selectedRoleCategory !== "All") {
+      list = list.filter((c) => c.appliedRole === selectedRoleCategory);
+    }
+    if (referenceAuditFilter !== "All") {
+      list = list.filter((c) => {
+        const hasRef = Boolean(c.referenceCode && c.referenceCode.trim() !== "");
+        return referenceAuditFilter === "WithRef" ? hasRef : !hasRef;
+      });
+    }
+    return list;
+  }, [candidates, selectedDistrict, selectedRoleCategory, referenceAuditFilter]);
+
+  // Reference audit statistics
+  const referenceAuditStats = useMemo(() => {
+    let withRef = 0;
+    let withoutRef = 0;
+    const staffRecommenderCounts: Record<string, number> = {};
+
+    filteredCandidates.forEach((c) => {
+      const ref = c.referenceCode?.trim() || (c.partyAffiliation !== "MERIT-OPEN" ? c.partyAffiliation : null);
+      if (ref) {
+        withRef += 1;
+        staffRecommenderCounts[ref] = (staffRecommenderCounts[ref] || 0) + 1;
+      } else {
+        withoutRef += 1;
+      }
+    });
+
+    return {
+      total: filteredCandidates.length,
+      withRef,
+      withoutRef,
+      staffRecommenderCounts,
+    };
+  }, [filteredCandidates]);
 
   const roleBreakdown = useMemo(() => {
     const counts: Record<string, number> = {};
@@ -90,25 +147,53 @@ export default function ReportsView({
   /* Gazette roster: sorting */
   const gazetteRows = useMemo(
     () =>
-      filteredAllocations.map((a) => ({
-        appointmentRefNo: a.appointmentRefNo,
-        candidateName: a.candidateName,
-        candidateCnic: a.candidateCnic,
-        roleTitle: a.roleTitle,
-        constituency: a.constituency,
-        department: a.department,
-      })),
-    [filteredAllocations]
+      filteredAllocations.map((a) => {
+        const c = candidates.find((cand) => cand.id === a.candidateId || cand.cnic === a.candidateCnic);
+        return {
+          appointmentRefNo: a.appointmentRefNo,
+          candidateName: a.candidateName,
+          fatherName: c?.fatherName || "—",
+          candidateCnic: a.candidateCnic,
+          address: c?.address || "D.I. Khan",
+          tehsil: c?.tehsil || a.district,
+          roleTitle: a.roleCategory || a.roleTitle,
+          reference: c?.referenceCode || a.partyAffiliation || "Unassigned",
+          department: a.department,
+        };
+      }),
+    [filteredAllocations, candidates]
   );
   const { sorted: sortedGazette, sortKey, sortDir, toggle } = useSortable(gazetteRows, "appointmentRefNo");
 
   const handleExportCsv = () => {
-    const header = ["Gazette Ref", "Appointee Name", "CNIC", "Designation", "Constituency", "Department"];
+    const header = [
+      "Sr#",
+      "Gazette Ref",
+      "Appointee Name",
+      "Father Name",
+      "CNIC",
+      "Address",
+      "Tehsil",
+      "Category/Role",
+      "Staff Reference",
+      "Department",
+    ];
     const esc = (v: string) => `"${(v ?? "").replace(/"/g, '""')}"`;
     const lines = [
       header.map(esc).join(","),
-      ...sortedGazette.map((r) =>
-        [r.appointmentRefNo, r.candidateName, r.candidateCnic, r.roleTitle, r.constituency, r.department]
+      ...sortedGazette.map((r, idx) =>
+        [
+          String(idx + 1),
+          r.appointmentRefNo,
+          r.candidateName,
+          r.fatherName,
+          r.candidateCnic,
+          r.address,
+          r.tehsil,
+          r.roleTitle,
+          r.reference,
+          r.department,
+        ]
           .map(esc)
           .join(",")
       ),
@@ -117,7 +202,7 @@ export default function ReportsView({
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `gazette-roster-${selectedDistrict.toLowerCase().replace(/\s+/g, "-")}.csv`;
+    a.download = `dhq-dikhan-roster-${selectedRoleCategory.toLowerCase().replace(/\s+/g, "-")}.csv`;
     a.click();
     URL.revokeObjectURL(url);
     toast.success("CSV exported", {
@@ -185,7 +270,7 @@ export default function ReportsView({
           </div>
 
           <div className="flex flex-wrap items-center gap-2.5 shrink-0">
-            {/* District Selector */}
+            {/* Division / District Selector */}
             <div className="flex items-center gap-2 bg-white/10 px-3 py-2 rounded-xl border border-white/20 backdrop-blur-sm">
               <MapPin className="w-3.5 h-3.5 text-emerald-300" />
               <select
@@ -193,12 +278,62 @@ export default function ReportsView({
                 onChange={(e) => setSelectedDistrict(e.target.value)}
                 className="bg-transparent text-xs font-bold text-white focus:outline-none cursor-pointer [&>option]:text-slate-900"
               >
-                <option value="All">All Tehsils (D.I. Khan Total)</option>
+                <option value="All">D.I. Khan Division (Entire)</option>
                 {districts.map((d) => (
                   <option key={d.id} value={d.name}>
                     {d.name}
                   </option>
                 ))}
+              </select>
+            </div>
+
+            {/* Category / Role Filter */}
+            <div className="flex items-center gap-2 bg-white/10 px-3 py-2 rounded-xl border border-white/20 backdrop-blur-sm">
+              <span className="text-[10px] uppercase font-bold text-emerald-200">Category:</span>
+              <select
+                value={selectedRoleCategory}
+                onChange={(e) => setSelectedRoleCategory(e.target.value)}
+                className="bg-transparent text-xs font-bold text-white focus:outline-none cursor-pointer [&>option]:text-slate-900"
+              >
+                <option value="All">All Categories</option>
+                <option value="Ward Boy">Ward Boy</option>
+                <option value="Helper Boy">Helper Boy</option>
+                <option value="Stretcher Puller">Stretcher Puller</option>
+                <option value="Security Guard">Security Guard</option>
+                <option value="Male Ward Attendant">Male Ward Attendant</option>
+                <option value="Female Ward Attendant">Female Ward Attendant</option>
+                <option value="Junior Clerk">Junior Clerk</option>
+                <option value="Reception">Reception</option>
+                <option value="Computer Operator">Computer Operator</option>
+              </select>
+            </div>
+
+            {/* Audit / Reference Filter */}
+            <div className="flex items-center gap-2 bg-white/10 px-3 py-2 rounded-xl border border-white/20 backdrop-blur-sm">
+              <span className="text-[10px] uppercase font-bold text-emerald-200">Audit:</span>
+              <select
+                value={referenceAuditFilter}
+                onChange={(e) => setReferenceAuditFilter(e.target.value as "All" | "WithRef" | "NoRef")}
+                className="bg-transparent text-xs font-bold text-white focus:outline-none cursor-pointer [&>option]:text-slate-900"
+              >
+                <option value="All">All Records</option>
+                <option value="WithRef">Staff Referred (Logged)</option>
+                <option value="NoRef">⚠️ Unassigned / No Ref</option>
+              </select>
+            </div>
+
+            {/* Print Per Page Selector */}
+            <div className="flex items-center gap-2 bg-white/10 px-3 py-2 rounded-xl border border-white/20 backdrop-blur-sm">
+              <span className="text-[10px] uppercase font-bold text-emerald-200">Per Page:</span>
+              <select
+                value={printPageSize}
+                onChange={(e) => setPrintPageSize(Number(e.target.value))}
+                className="bg-transparent text-xs font-bold text-white focus:outline-none cursor-pointer [&>option]:text-slate-900"
+              >
+                <option value={5}>5 / page</option>
+                <option value={10}>10 / page</option>
+                <option value={20}>20 / page</option>
+                <option value={50}>50 / page</option>
               </select>
             </div>
 
@@ -305,29 +440,52 @@ export default function ReportsView({
               <span className="text-xl font-bold text-emerald-700">{filteredAllocations.length}</span>
             </div>
             <div className="bg-white p-3 rounded-xl border border-emerald-200">
-              <span className="text-slate-500 block">Registered Applicants</span>
-              <span className="text-xl font-bold text-slate-800">{filteredCandidates.length}</span>
+              <span className="text-slate-500 block">Staff Logged References</span>
+              <span className="text-xl font-bold text-emerald-700">{referenceAuditStats.withRef}</span>
+              <span className="text-[10px] text-slate-400">Accounted applicants</span>
             </div>
-            <div className="bg-white p-3 rounded-xl border border-emerald-200 flex items-center justify-between gap-2">
-              <div>
-                <span className="text-slate-500 block">Verified Credentials</span>
-                <span className="text-xl font-bold text-emerald-700">
-                  {filteredCandidates.length > 0 ? `${verifiedCredentialsRatio}%` : "—"}
-                </span>
-              </div>
-              <DonutChart value={verifiedCredentialsRatio} size={40} stroke={6} color="#059669" />
+            <div className="bg-white p-3 rounded-xl border border-amber-200 bg-amber-50/40">
+              <span className="text-amber-800 block">Unassigned / No Ref</span>
+              <span className="text-xl font-bold text-amber-700">{referenceAuditStats.withoutRef}</span>
+              <span className="text-[10px] text-amber-600">Audit flag / unassigned</span>
             </div>
             <div className="bg-white p-3 rounded-xl border border-emerald-200">
-              <span className="text-slate-500 block">Duplicate Allotments</span>
-              <span className={`text-xl font-bold ${duplicateAllotmentCount > 0 ? "text-red-600" : "text-emerald-700"}`}>
-                {duplicateAllotmentCount}
-              </span>
+              <span className="text-slate-500 block">Selected Category</span>
+              <span className="text-sm font-bold text-slate-800 truncate block mt-1">{selectedRoleCategory}</span>
             </div>
           </div>
         </div>
 
+        {/* Staff Referral Audit Accountability Widget */}
+        <div className="space-y-3 font-sans print:hidden">
+          <h3 className="text-xs font-bold uppercase text-slate-500 tracking-wider flex items-center justify-between">
+            <span className="flex items-center gap-1.5">
+              <ShieldCheck className="w-4 h-4 text-emerald-700" />
+              Staff Referral Audit &amp; Accountability Ledger
+            </span>
+            <span className="text-[11px] text-slate-400 font-normal">
+              Showing source accountability across {Object.keys(referenceAuditStats.staffRecommenderCounts).length} staff codes
+            </span>
+          </h3>
+
+          <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-2.5 text-xs">
+            {Object.entries(referenceAuditStats.staffRecommenderCounts).map(([staff, count]) => (
+              <div key={staff} className="bg-slate-50 p-2.5 rounded-xl border border-slate-200">
+                <span className="font-semibold text-slate-700 block truncate text-[11px]">{staff}</span>
+                <span className="text-emerald-700 font-mono font-bold text-xs">{count} candidates</span>
+              </div>
+            ))}
+            {referenceAuditStats.withoutRef > 0 && (
+              <div className="bg-amber-50 p-2.5 rounded-xl border border-amber-300">
+                <span className="font-semibold text-amber-800 block truncate text-[11px]">No Staff Logged</span>
+                <span className="text-amber-700 font-mono font-bold text-xs">{referenceAuditStats.withoutRef} unassigned</span>
+              </div>
+            )}
+          </div>
+        </div>
+
         {/* Role Classification Breakdown */}
-        <div className="space-y-3 font-sans">
+        <div className="space-y-3 font-sans print:hidden">
           <h3 className="text-xs font-bold uppercase text-slate-500 tracking-wider flex items-center gap-1.5">
             <Award className="w-4 h-4 text-emerald-700" />
             Distribution by Role Classification
@@ -350,58 +508,82 @@ export default function ReportsView({
           </div>
         </div>
 
-        {/* Tabulated Gazette Roster */}
+        {/* Tabulated Gazette Roster with Chunked Printable Pages */}
         <div className="space-y-3 font-sans">
-          <h3 className="text-xs font-bold uppercase text-slate-500 tracking-wider flex items-center gap-1.5">
-            <ShieldCheck className="w-4 h-4 text-emerald-700" />
-            Certified Appointee Gazette Registry
-          </h3>
-
-          <div className="border border-slate-200 rounded-xl overflow-x-auto lg:max-h-[460px] lg:overflow-y-auto">
-            <table className="w-full min-w-[720px] text-left border-collapse text-xs">
-              <thead className="sticky top-0 z-10">
-                <tr className="bg-slate-100 text-slate-700 font-bold border-b border-slate-200 shadow-[0_1px_0_0_#e2e8f0]">
-                  <th className="py-2.5 px-3">
-                    <SortHeader label="Gazette Ref" field="appointmentRefNo" sortKey={sortKey} sortDir={sortDir} onToggle={toggle} />
-                  </th>
-                  <th className="py-2.5 px-3">
-                    <SortHeader label="Appointee Name" field="candidateName" sortKey={sortKey} sortDir={sortDir} onToggle={toggle} />
-                  </th>
-                  <th className="py-2.5 px-3">CNIC Number</th>
-                  <th className="py-2.5 px-3">
-                    <SortHeader label="Designation" field="roleTitle" sortKey={sortKey} sortDir={sortDir} onToggle={toggle} />
-                  </th>
-                  <th className="py-2.5 px-3">Constituency</th>
-                  <th className="py-2.5 px-3">Department</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100">
-                {sortedGazette.length === 0 && (
-                  <tr>
-                    <td colSpan={6} className="px-3 py-4">
-                      <EmptyState
-                        icon={ShieldCheck}
-                        title="No active Gazette appointments"
-                        hint="No active gazette appointments for this scope."
-                      />
-                    </td>
-                  </tr>
-                )}
-                {sortedGazette.map((row) => (
-                  <tr key={row.appointmentRefNo}>
-                    <td className="py-2 px-3 font-mono text-emerald-700 font-bold">
-                      {row.appointmentRefNo}
-                    </td>
-                    <td className="py-2 px-3 font-bold text-slate-900">{row.candidateName}</td>
-                    <td className="py-2 px-3 font-mono text-slate-500">{row.candidateCnic}</td>
-                    <td className="py-2 px-3 font-semibold text-slate-800">{row.roleTitle}</td>
-                    <td className="py-2 px-3 text-emerald-700 font-bold">{row.constituency}</td>
-                    <td className="py-2 px-3 text-slate-600">{row.department}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div className="flex items-center justify-between">
+            <h3 className="text-xs font-bold uppercase text-slate-500 tracking-wider flex items-center gap-1.5">
+              <ShieldCheck className="w-4 h-4 text-emerald-700" />
+              Certified Candidate &amp; Appointee Record ({sortedGazette.length} Records)
+            </h3>
+            <span className="text-[11px] text-slate-400 print:hidden">
+              Print format: {printPageSize} records per printable page
+            </span>
           </div>
+
+          {/* Group into print chunks based on printPageSize */}
+          {Array.from({ length: Math.ceil((sortedGazette.length || 1) / printPageSize) }).map((_, pageIdx) => {
+            const chunk = sortedGazette.slice(pageIdx * printPageSize, (pageIdx + 1) * printPageSize);
+            return (
+              <div
+                key={pageIdx}
+                className="print:break-after-page mb-6 border border-slate-200 rounded-xl overflow-hidden shadow-2xs"
+              >
+                <div className="bg-slate-100/80 px-4 py-2 border-b border-slate-200 text-[11px] font-bold text-slate-700 flex justify-between items-center">
+                  <span>DHQ Teaching Hospital D.I. Khan — Page {pageIdx + 1} of {Math.ceil((sortedGazette.length || 1) / printPageSize)}</span>
+                  <span>Category: {selectedRoleCategory}</span>
+                </div>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left border-collapse text-xs">
+                    <thead>
+                      <tr className="bg-slate-50 text-slate-700 font-bold border-b border-slate-200">
+                        <th className="py-2 px-2.5 w-10 text-center">Sr#</th>
+                        <th className="py-2 px-2.5">
+                          <SortHeader label="Candidate Name" field="candidateName" sortKey={sortKey} sortDir={sortDir} onToggle={toggle} />
+                        </th>
+                        <th className="py-2 px-2.5">Father&apos;s Name</th>
+                        <th className="py-2 px-2.5">CNIC</th>
+                        <th className="py-2 px-2.5">Address</th>
+                        <th className="py-2 px-2.5">Tehsil</th>
+                        <th className="py-2 px-2.5">Category</th>
+                        <th className="py-2 px-2.5">Staff Reference</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100">
+                      {chunk.length === 0 && (
+                        <tr>
+                          <td colSpan={8} className="px-3 py-6 text-center text-slate-400">
+                            No matching candidate records found for this filter.
+                          </td>
+                        </tr>
+                      )}
+                      {chunk.map((row, idx) => (
+                        <tr key={row.appointmentRefNo || idx} className="hover:bg-slate-50/60">
+                          <td className="py-2 px-2.5 text-center font-mono text-slate-500 font-medium">
+                            {pageIdx * printPageSize + idx + 1}
+                          </td>
+                          <td className="py-2 px-2.5 font-bold text-slate-900">{row.candidateName}</td>
+                          <td className="py-2 px-2.5 text-slate-700">{row.fatherName}</td>
+                          <td className="py-2 px-2.5 font-mono text-slate-500 text-[11px]">{row.candidateCnic}</td>
+                          <td className="py-2 px-2.5 text-slate-600 text-[11px] max-w-[160px] truncate">{row.address}</td>
+                          <td className="py-2 px-2.5 font-semibold text-emerald-700">{row.tehsil}</td>
+                          <td className="py-2 px-2.5 font-medium text-slate-800">{row.roleTitle}</td>
+                          <td className="py-2 px-2.5">
+                            <span className={`inline-block px-2 py-0.5 rounded text-[10px] font-bold font-mono ${
+                              row.reference === "Unassigned" || row.reference === "MERIT-OPEN"
+                                ? "bg-amber-100 text-amber-800"
+                                : "bg-emerald-100 text-emerald-800"
+                            }`}>
+                              {row.reference}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            );
+          })}
         </div>
 
         {/* Official Certification Signature Block */}
