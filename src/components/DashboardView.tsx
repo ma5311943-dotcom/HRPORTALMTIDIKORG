@@ -523,10 +523,10 @@ export default function DashboardView({
             </p>
             <button
               onClick={handleExportWord}
-              className="w-full flex items-center justify-center gap-2 bg-[#10b981] hover:bg-[#059669] text-[#052e16] font-black py-3 px-4 rounded-xl text-xs transition-all shadow-md cursor-pointer hover:scale-[1.01]"
+              className="w-full min-w-0 flex items-center justify-center gap-2 bg-[#10b981] hover:bg-[#059669] text-[#052e16] font-black py-3 px-3 sm:px-4 rounded-xl text-[11px] sm:text-xs leading-snug text-center transition-all shadow-md cursor-pointer hover:scale-[1.01]"
             >
-              <FileText className="w-4 h-4 text-[#052e16]" />
-              <span>Download Formatted Roster (.doc)</span>
+              <FileText className="w-4 h-4 shrink-0 text-[#052e16]" />
+              <span className="min-w-0">Download Formatted Roster (.doc)</span>
             </button>
           </div>
         </div>
