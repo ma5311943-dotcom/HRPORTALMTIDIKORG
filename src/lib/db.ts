@@ -1,6 +1,6 @@
 import { and, desc, eq, inArray, like, or, sql } from "drizzle-orm";
 import { getDb, schema } from "@/db/client";
-import { publicCandidate as stripCandidateSecret } from "@/lib/candidate";
+import { publicCandidate as stripCandidateSecret, type StoredCandidate } from "@/lib/candidate";
 import { DomainError, isDuplicateKeyError } from "@/lib/errors";
 import type {
   Allocation,
@@ -15,7 +15,6 @@ import type {
   SystemAnalytics,
 } from "@/types";
 
-export type StoredCandidate = Candidate & { passwordHash?: string };
 type CandidateRow = typeof schema.candidates.$inferSelect;
 type AllocationRow = typeof schema.allocations.$inferSelect;
 type MessageRow = typeof schema.messages.$inferSelect;
@@ -198,6 +197,15 @@ function likePattern(value: string) {
   return `%${value.replace(/[%_]/g, "\\$&")}%`;
 }
 
+function isDiKhanDistrict(name: string) {
+  const normalized = name.toLowerCase();
+  return (
+    normalized.includes("dera ismail khan") ||
+    normalized.includes("d.i. khan") ||
+    normalized.includes("di khan")
+  );
+}
+
 function documentFieldUrl(candidateId: string, field: CandidateDocumentField) {
   return `/api/candidates/${candidateId}/documents?field=${field}`;
 }
@@ -224,22 +232,8 @@ export const db = {
   async getDistricts(): Promise<District[]> {
     const rows = await getDb().select().from(schema.districts).orderBy(desc(schema.districts.totalQuota));
     // Filter strictly to D.I. Khan / Dera Ismail Khan Division (removes Lakki Marwat, Bannu, Tank)
-    const dikhanRows = rows.filter(
-      (r) =>
-        r.name.toLowerCase().includes("dera ismail khan") ||
-        r.name.toLowerCase().includes("d.i. khan") ||
-        r.name.toLowerCase().includes("di khan")
-    );
+    const dikhanRows = rows.filter((row) => isDiKhanDistrict(row.name));
     return (dikhanRows.length > 0 ? dikhanRows : rows).map(mapDistrict);
-  },
-
-  async getDistrictByName(name: string): Promise<District | undefined> {
-    const [row] = await getDb()
-      .select()
-      .from(schema.districts)
-      .where(eq(schema.districts.name, name))
-      .limit(1);
-    return row ? mapDistrict(row) : undefined;
   },
 
   async getCandidates(filters?: {
@@ -296,15 +290,6 @@ export const db = {
       .where(eq(schema.candidates.cnicDigits, cnic.replace(/[^0-9]/g, "")))
       .limit(1);
     return row ? stripCandidateSecret(mapCandidate(row)) : undefined;
-  },
-
-  async getStoredCandidateByCnic(cnic: string): Promise<StoredCandidate | undefined> {
-    const [row] = await getDb()
-      .select()
-      .from(schema.candidates)
-      .where(eq(schema.candidates.cnicDigits, cnic.replace(/[^0-9]/g, "")))
-      .limit(1);
-    return row ? mapCandidate(row) : undefined;
   },
 
   async createCandidate(
@@ -567,6 +552,8 @@ export const db = {
       const year = new Date().getFullYear();
       const serial = String(Number(serialRow?.value ?? 0) + 1).padStart(3, "0");
       const appointmentRefNo = `DHQ-${prefix}/${year}/${serial}`;
+      const joiningOrderNo =
+        allocationData.joiningOrderNo ?? candidate.joiningOrderNo ?? `JOIN-DHQ/${year}/${serial}`;
       const now = nowIso();
       const id = `alloc-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 
@@ -586,7 +573,7 @@ export const db = {
         status: "Active",
         allocatedBy: allocationData.allocatedBy,
         appointmentRefNo,
-        joiningOrderNo: allocationData.joiningOrderNo ?? candidate.joiningOrderNo ?? `JOIN-DHQ/${year}/${serial}`,
+        joiningOrderNo,
         salaryOrStipend: allocationData.salaryOrStipend ?? null,
         remarks: allocationData.remarks ?? null,
         revokedBy: null,
@@ -630,7 +617,7 @@ export const db = {
         status: "Active",
         allocatedBy: allocationData.allocatedBy,
         appointmentRefNo,
-        joiningOrderNo: allocationData.joiningOrderNo ?? null,
+        joiningOrderNo,
         salaryOrStipend: allocationData.salaryOrStipend ?? null,
         remarks: allocationData.remarks ?? null,
         revokedBy: null,
@@ -956,13 +943,6 @@ export const db = {
     };
   },
 
-  async markMessageRead(id: string): Promise<void> {
-    await getDb()
-      .update(schema.messages)
-      .set({ unread: false, updatedAt: nowIso() })
-      .where(eq(schema.messages.id, id));
-  },
-
   async markMessagesRead(ids?: string[], districtFilter?: string): Promise<number> {
     if (ids && ids.length === 0) return 0;
     const conditions = [eq(schema.messages.unread, true)];
@@ -993,12 +973,7 @@ export const db = {
     ]);
 
     // Filter strictly to Dera Ismail Khan / D.I. Khan only
-    const filteredDistrictRows = districtRows.filter(
-      (r) =>
-        r.name.toLowerCase().includes("dera ismail khan") ||
-        r.name.toLowerCase().includes("d.i. khan") ||
-        r.name.toLowerCase().includes("di khan")
-    );
+    const filteredDistrictRows = districtRows.filter((row) => isDiKhanDistrict(row.name));
 
     let candidates = allCandidates;
     let allocations = allAllocations;
@@ -1169,12 +1144,7 @@ export const db = {
     const database = getDb();
     const districtRows = await database.select().from(schema.districts).orderBy(schema.districts.name);
     // Filter strictly to Dera Ismail Khan / D.I. Khan only
-    const filteredDistrictRows = districtRows.filter(
-      (r) =>
-        r.name.toLowerCase().includes("dera ismail khan") ||
-        r.name.toLowerCase().includes("d.i. khan") ||
-        r.name.toLowerCase().includes("di khan")
-    );
+    const filteredDistrictRows = districtRows.filter((row) => isDiKhanDistrict(row.name));
     if (filteredDistrictRows.length === 0) return [];
     const activeRows = await database
       .select({ district: schema.allocations.district, count: sql<number>`count(*)` })
