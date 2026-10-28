@@ -308,10 +308,10 @@ export default function Sidebar({
                 onChange={(e) => setSelectedDistrict(e.target.value)}
                 className="w-full bg-slate-50 text-slate-800 text-xs font-semibold rounded-xl px-2.5 py-2 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-600 cursor-pointer appearance-none pr-7 truncate transition-colors shadow-2xs hover:bg-slate-100/60"
               >
-                <option value="All" className="bg-white text-slate-900">All Districts (National Master Roster)</option>
+                <option value="All" className="bg-white text-slate-900">D.I. Khan Division</option>
                 {districts.map((d) => (
                   <option key={d} value={d} className="bg-white text-slate-900">
-                    District {d}
+                    {d}
                   </option>
                 ))}
               </select>

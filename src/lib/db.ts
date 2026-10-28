@@ -223,7 +223,14 @@ function mapDocumentSummary(row: DocumentRow): CandidateDocumentSummary {
 export const db = {
   async getDistricts(): Promise<District[]> {
     const rows = await getDb().select().from(schema.districts).orderBy(desc(schema.districts.totalQuota));
-    return rows.map(mapDistrict);
+    // Filter strictly to D.I. Khan / Dera Ismail Khan Division (removes Lakki Marwat, Bannu, Tank)
+    const dikhanRows = rows.filter(
+      (r) =>
+        r.name.toLowerCase().includes("dera ismail khan") ||
+        r.name.toLowerCase().includes("d.i. khan") ||
+        r.name.toLowerCase().includes("di khan")
+    );
+    return (dikhanRows.length > 0 ? dikhanRows : rows).map(mapDistrict);
   },
 
   async getDistrictByName(name: string): Promise<District | undefined> {

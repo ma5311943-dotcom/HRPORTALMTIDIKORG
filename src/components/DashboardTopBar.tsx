@@ -137,10 +137,10 @@ export default function DashboardTopBar({
                 className="bg-transparent text-xs font-semibold text-slate-700 focus:outline-none cursor-pointer max-w-[140px]"
                 aria-label="Select district scope"
               >
-                <option value="All">All Districts</option>
+                <option value="All">D.I. Khan Division</option>
                 {districts.map((d) => (
                   <option key={d} value={d}>
-                    District {d}
+                    {d}
                   </option>
                 ))}
               </select>
