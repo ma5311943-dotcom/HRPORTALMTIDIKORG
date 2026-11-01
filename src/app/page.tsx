@@ -601,7 +601,7 @@ export default function Home() {
                   </div>
                   <div>
                     <h4 className="font-bold text-slate-900 text-xs uppercase tracking-wide">
-                      HR MMTI D.I. Khan • DHQ Teaching Hospital
+                      HR MMTI D.I. Khan • MMTI Teaching Institute
                     </h4>
                     <p className="text-[11px] text-slate-500">
                       Medical Teaching Institution • Government of Khyber Pakhtunkhwa
@@ -648,11 +648,11 @@ export default function Home() {
                   </div>
                   <div className="flex items-center gap-1.5">
                     <Mail className="w-3 h-3 text-slate-400 shrink-0" />
-                    <span>hr@dhqhospitaldikhm.pk</span>
+                    <span>hr@mmtihospital.pk</span>
                   </div>
                   <div className="flex items-center gap-1.5">
                     <MapPin className="w-3 h-3 text-slate-400 shrink-0" />
-                    <span>DHQ Hospital Road, D.I. Khan</span>
+                    <span>MMTI Complex Road, D.I. Khan</span>
                   </div>
                 </div>
               </div>

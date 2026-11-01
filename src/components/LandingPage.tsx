@@ -125,7 +125,7 @@ export default function LandingPage({
         <div className="absolute inset-0 z-0">
           <img
             src="/images/landing_hero_governance.jpg"
-            alt="DHQ Hospital"
+            alt="MMTI Hospital"
             className="h-full w-full object-cover object-center filter brightness-[0.45] contrast-[1.05]"
           />
           {/* Pure dark-green vignette: #051c13 on edges, #072418 in center, zero blue */}
@@ -146,12 +146,12 @@ export default function LandingPage({
               </div>
 
               <h1 className="text-3xl font-bold leading-tight tracking-tight text-white sm:text-4xl lg:text-[2.9rem] xl:text-5xl">
-                DHQ Hospital Staff Recruitment,
+                MMTI Staff Recruitment,
                 <span className="block text-pak-gold-soft">Verified &amp; Transparent.</span>
               </h1>
 
               <p className="mx-auto max-w-2xl text-sm leading-relaxed text-emerald-50/85 sm:text-base lg:mx-0">
-                Official centralized recruitment system for 9 DHQ staff categories across 5 D.I. Khan tehsils:
+                Official centralized recruitment system for 9 staff categories across 5 D.I. Khan tehsils:
                 <strong> Daraban, Kulachi, Paharpur, Dera, and Parova</strong>. Featuring NADRA verification,
                 Hospital Director appointment orders, and zero political plain text.
               </p>

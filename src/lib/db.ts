@@ -551,9 +551,9 @@ export const db = {
       const prefix = allocationData.district.substring(0, 3).toUpperCase();
       const year = new Date().getFullYear();
       const serial = String(Number(serialRow?.value ?? 0) + 1).padStart(3, "0");
-      const appointmentRefNo = `DHQ-${prefix}/${year}/${serial}`;
+      const appointmentRefNo = `MMTI-${prefix}/${year}/${serial}`;
       const joiningOrderNo =
-        allocationData.joiningOrderNo ?? candidate.joiningOrderNo ?? `JOIN-DHQ/${year}/${serial}`;
+        allocationData.joiningOrderNo ?? candidate.joiningOrderNo ?? `JOIN-MMTI/${year}/${serial}`;
       const now = nowIso();
       const id = `alloc-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 

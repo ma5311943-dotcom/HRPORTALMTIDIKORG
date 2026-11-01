@@ -154,7 +154,7 @@ export default function DashboardView({
       title="No appointments match this filter"
       hint={
         selectedRoleFilter === "All"
-          ? "No DHQ staff appointments have been issued yet for this district."
+          ? "No MMTI staff appointments have been issued yet for this district."
           : `No appointments for the selected role filter "${selectedRoleFilter}".`
       }
       action={
@@ -186,7 +186,7 @@ export default function DashboardView({
       return { candidate: c, allocation: alloc };
     });
 
-    const filterText = selectedRoleFilter === "All" ? "All DHQ Staff Categories" : `${selectedRoleFilter} Category`;
+    const filterText = selectedRoleFilter === "All" ? "All MMTI Staff Categories" : `${selectedRoleFilter} Category`;
     exportStaffRosterToWord(records, `MMTI D.I. Khan - ${filterText} Staff Roster`);
     toast.success("Single-Click Export Successful!", {
       description: `Downloaded formatted Word document with ${records.length} records.`,
@@ -201,7 +201,7 @@ export default function DashboardView({
         <div className="absolute inset-0 z-0">
           <img
             src="/images/hero_dashboard_banner.jpg"
-            alt="DHQ Hospital Campus"
+            alt="MMTI Hospital Campus"
             className="h-full w-full object-cover object-center filter brightness-[0.75] contrast-[1.05]"
           />
           <div className="absolute inset-0 bg-gradient-to-r from-[#072418]/85 via-[#0b3824]/65 to-[#051c13]/75" />
@@ -219,7 +219,7 @@ export default function DashboardView({
             </div>
 
             <h2 className="text-2xl sm:text-3xl font-black tracking-tight text-white">
-              DHQ Hospital Staff Recruitment &amp; Verification Portal
+              MMTI Staff Recruitment &amp; Verification Portal
             </h2>
 
             <p className="text-emerald-100/80 text-sm leading-relaxed">
@@ -266,7 +266,7 @@ export default function DashboardView({
         </div>
       </div>
 
-      {/* 9 DHQ Hospital Staff Role Category Filter Bar */}
+      {/* 9 MMTI Staff Role Category Filter Bar */}
       <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
           <div>
@@ -275,7 +275,7 @@ export default function DashboardView({
               Instant Role Category Filter (Click to Filter Roster)
             </h3>
             <p className="text-xs text-slate-500">
-              Select any DHQ role below to immediately isolate staff members and export matching records
+              Select any MMTI role below to immediately isolate staff members and export matching records
             </p>
           </div>
 
@@ -538,7 +538,7 @@ export default function DashboardView({
           <div>
             <h3 className="text-base sm:text-lg font-bold text-slate-900 flex items-center gap-2">
               <FileCheck className="w-5 h-5 text-teal-700" />
-              DHQ Hospital Staff Appointment & Joining Ledger
+              MMTI Staff Appointment & Joining Ledger
             </h3>
             <p className="text-xs text-slate-500">
               Verified records with directive appointment numbers, joining order tracking, and Union Councils
@@ -579,7 +579,7 @@ export default function DashboardView({
                   <SortHeader label="Tehsil & Union Council" field="tehsil" sortKey={sortKey} sortDir={sortDir} onToggle={toggle} />
                 </th>
                 <th className="py-3 px-4">
-                  <SortHeader label="DHQ Assigned Role" field="roleCategory" sortKey={sortKey} sortDir={sortDir} onToggle={toggle} />
+                  <SortHeader label="MMTI Assigned Role" field="roleCategory" sortKey={sortKey} sortDir={sortDir} onToggle={toggle} />
                 </th>
                 <th className="py-3 px-4">Reference Code</th>
                 <th className="py-3 px-4">
@@ -702,7 +702,7 @@ export default function DashboardView({
                   <div className="text-[10px] font-semibold text-teal-700 truncate">{candidate.unionCouncil || alloc.constituency}</div>
                 </div>
                 <div className="min-w-0">
-                  <div className="text-[9px] font-bold uppercase tracking-wider text-slate-400">DHQ Assigned Role</div>
+                  <div className="text-[9px] font-bold uppercase tracking-wider text-slate-400">MMTI Assigned Role</div>
                   <span className={`inline-block px-2 py-0.5 rounded-md font-bold text-[10px] border ${roleStyle}`}>
                     {alloc.roleCategory}
                   </span>

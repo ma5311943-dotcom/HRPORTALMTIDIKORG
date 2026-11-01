@@ -295,10 +295,10 @@ export default function SeatAllocationView({
             </div>
             <h2 className="text-xl sm:text-2xl font-extrabold text-white flex items-center gap-2">
               <Award className="w-6 h-6 text-cyan-300" />
-              DHQ Hospital Staff — Appointment &amp; Job Allocation
+              MMTI Staff — Appointment &amp; Job Allocation
             </h2>
             <p className="text-xs text-teal-100/80 mt-1 max-w-xl">
-              Issue verified appointment &amp; joining order numbers, allocate official DHQ designations, and enforce strict duplicate prevention.
+              Issue verified appointment &amp; joining order numbers, allocate official MMTI designations, and enforce strict duplicate prevention.
             </p>
           </div>
 
@@ -328,7 +328,7 @@ export default function SeatAllocationView({
               <div className="min-w-0">
                 <h3 className="text-sm sm:text-base font-bold text-slate-900">New Official Seat / Job Allocation</h3>
                 <p className="text-[11px] text-slate-500">
-                  Assign verified applicants to DHQ hospital staff positions
+                  Assign verified applicants to MMTI staff positions
                 </p>
               </div>
               <button

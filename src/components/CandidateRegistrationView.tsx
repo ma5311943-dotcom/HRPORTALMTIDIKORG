@@ -481,11 +481,11 @@ export default function CandidateRegistrationView({
             <div className="flex items-center gap-2">
               <span className="w-3 h-3 rounded-full bg-emerald-700" />
               <h3 className="font-bold text-slate-900 text-base sm:text-lg">
-                DHQ Hospital Staff Enrollment Form
+                MMTI Staff Enrollment Form
               </h3>
             </div>
             <span className="text-xs font-mono text-emerald-700 font-bold bg-emerald-50 px-2 py-1 rounded border border-emerald-200 shrink-0">
-              Form DHQ-2026/HR
+              Form MMTI-2026/HR
             </span>
           </div>
 
@@ -599,7 +599,7 @@ export default function CandidateRegistrationView({
                 </label>
                 <input
                   type="email"
-                  placeholder="staff@dhq.pk"
+                  placeholder="staff@mmti.pk"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="w-full text-xs p-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-600 focus:outline-none"

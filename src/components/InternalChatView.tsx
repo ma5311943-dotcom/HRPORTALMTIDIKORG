@@ -121,7 +121,7 @@ export default function InternalChatView({
           <div>
             <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[11px] font-semibold text-emerald-100 backdrop-blur-sm mb-2">
               <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-              <span>DHQ Teaching Hospital • Secure Internal Communications</span>
+              <span>MMTI Teaching Institute • Secure Internal Communications</span>
             </div>
             <h2 className="text-xl sm:text-2xl font-extrabold text-white flex items-center gap-2">
               <MessageSquare className="w-6 h-6 text-emerald-300" />

@@ -72,7 +72,7 @@ export default function CandidatePortalView({
         <div className="absolute inset-0 z-0">
           <img
             src="/images/hero_dashboard_banner.jpg"
-            alt="DHQ Hospital Portal"
+            alt="MMTI Hospital Portal"
             className="h-full w-full object-cover object-center filter brightness-[0.70]"
           />
           <div className="absolute inset-0 bg-gradient-to-r from-emerald-950/85 via-teal-900/70 to-slate-950/75" />

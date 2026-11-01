@@ -202,7 +202,7 @@ export default function ReportsView({
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `dhq-dikhan-roster-${selectedRoleCategory.toLowerCase().replace(/\s+/g, "-")}.csv`;
+    a.download = `mmti-dikhan-roster-${selectedRoleCategory.toLowerCase().replace(/\s+/g, "-")}.csv`;
     a.click();
     URL.revokeObjectURL(url);
     toast.success("CSV exported", {

@@ -11,7 +11,7 @@ export default function PublicFooter() {
       <div className="absolute inset-0 z-0">
         <img
           src="/images/parliament_house.jpg"
-          alt="DHQ Secretariat"
+          alt="MMTI Secretariat"
           className="h-full w-full object-cover object-bottom filter brightness-[0.45] contrast-[1.05]"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-emerald-950/75 to-slate-900/80 mix-blend-multiply" />
@@ -68,7 +68,7 @@ export default function PublicFooter() {
               Legal Compliance
             </div>
             <p className="leading-relaxed">
-              Operating pursuant to the Government of KP Health Department, DHQ Hospital Recruitment
+              Operating pursuant to the Government of KP Health Department, MMTI Recruitment
               Rules and Civil Servants Act 2026.
             </p>
           </div>
@@ -89,7 +89,7 @@ export default function PublicFooter() {
                 <Phone className="h-3 w-3 shrink-0" /> 0966-710001
               </span>
               <span className="flex items-center gap-1.5">
-                <Mail className="h-3 w-3 shrink-0" /> hr@dhqhospitaldikhm.pk
+                <Mail className="h-3 w-3 shrink-0" /> hr@mmtihospital.pk
               </span>
             </p>
           </div>
@@ -99,7 +99,7 @@ export default function PublicFooter() {
             </div>
             <p className="flex items-start gap-1.5 leading-relaxed">
               <MapPin className="mt-0.5 h-3 w-3 shrink-0" />
-              DHQ Teaching Hospital, Civil Hospital Road, Dera Ismail Khan, KP.
+              Mufti Mehmood Memorial Teaching Institute (MMTI), Dera Ismail Khan, KP.
             </p>
           </div>
         </div>

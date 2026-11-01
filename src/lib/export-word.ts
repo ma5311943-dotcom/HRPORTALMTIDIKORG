@@ -52,7 +52,7 @@ export function exportStaffRosterToWord(
           </td>
           <td style="padding: 8px;">
             <strong style="color: #0f766e;">${roleTitle}</strong><br/>
-            <span style="color: #475569; font-size: 9.5pt;">${allocation?.department || "DHQ Hospital"}</span>
+            <span style="color: #475569; font-size: 9.5pt;">${allocation?.department || "MMTI Hospital"}</span>
           </td>
           <td style="padding: 8px;">
             <strong>${candidate.tehsil || "Dera"}</strong><br/>
@@ -170,7 +170,7 @@ export function exportStaffRosterToWord(
             <th style="width: 4%; text-align: center;">#</th>
             <th style="width: 18%;">Staff Name & Parentage</th>
             <th style="width: 15%;">CNIC / Father CNIC</th>
-            <th style="width: 18%;">Assigned DHQ Role</th>
+            <th style="width: 18%;">Assigned MMTI Role</th>
             <th style="width: 14%;">Tehsil & Union Council</th>
             <th style="width: 13%;">Reference Alias</th>
             <th style="width: 12%;">Appointment & Joining No</th>
@@ -183,7 +183,7 @@ export function exportStaffRosterToWord(
       </table>
 
       <div class="confidential-notice">
-        <strong>Official Compliance Notice:</strong> This document contains verified personnel data strictly governed by DHQ Hospital Recruitment Rules. In compliance with privacy standards, political designations are masked into authorized reference codes (DIR-OFFICE, REF-NA-01, REF-PA-01, MERIT-OPEN).
+        <strong>Official Compliance Notice:</strong> This document contains verified personnel data strictly governed by MMTI Recruitment Rules. In compliance with privacy standards, political designations are masked into authorized reference codes (DIR-OFFICE, REF-NA-01, REF-PA-01, MERIT-OPEN).
       </div>
 
       <div class="signatures">
@@ -209,7 +209,7 @@ export function exportStaffRosterToWord(
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
-  a.download = `DHQ_Staff_Roster_${new Date().toISOString().split("T")[0]}.doc`;
+  a.download = `MMTI_Staff_Roster_${new Date().toISOString().split("T")[0]}.doc`;
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);

@@ -89,7 +89,7 @@ export default function Sidebar({
       id: "dashboard",
       label: user.isCandidate ? "My Applicant Portal" : "Analytics Dashboard",
       icon: Building2,
-      desc: user.isCandidate ? "Application & appointment status" : "DHQ staff KPIs & quota tracking",
+      desc: user.isCandidate ? "Application & appointment status" : "MMTI staff KPIs & quota tracking",
       badge: 0,
     },
     ...(canBrowseCandidates
@@ -109,7 +109,7 @@ export default function Sidebar({
             id: "allocation",
             label: "Staff Appointment",
             icon: Award,
-            desc: "DHQ role assignments & orders",
+            desc: "MMTI role assignments & orders",
             badge: 0,
           },
         ]

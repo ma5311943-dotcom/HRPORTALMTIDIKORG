@@ -131,7 +131,7 @@ function LoginPanel() {
         <div className="absolute inset-0 z-0">
           <img
             src="/images/landing_hero_governance.jpg"
-            alt="DHQ Hospital Complex"
+            alt="MMTI Hospital Complex"
             className="h-full w-full object-cover object-center filter brightness-[0.55] contrast-[1.08]"
           />
           {/* Light-green emerald duotone tint overlay */}
@@ -162,7 +162,7 @@ function LoginPanel() {
           </div>
 
           <h2 className="text-xl font-extrabold leading-snug">
-            DHQ Teaching Hospital
+            MMTI Teaching Institute
             <span className="block text-pak-gold-soft">D.I. Khan</span>
           </h2>
           <p className="mt-2 text-[11px] leading-relaxed text-emerald-50/80">
@@ -172,7 +172,7 @@ function LoginPanel() {
           <ul className="mt-5 space-y-2 text-[10px] text-emerald-50/85">
             {[
               "NADRA CNIC verification & duplicate detection",
-              "9 DHQ staff roles across 5 D.I. Khan tehsils",
+              "9 MMTI staff roles across 5 D.I. Khan tehsils",
               "Single-click Word export for appointment orders",
             ].map((item) => (
               <li key={item} className="flex items-start gap-1.5">
