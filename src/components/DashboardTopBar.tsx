@@ -76,9 +76,9 @@ export default function DashboardTopBar({
         <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
           <span className="w-2 h-2 rounded-full bg-[#10b981] animate-pulse shrink-0" />
           <span className="font-bold text-white tracking-wide truncate">
-            <span className="sm:hidden">KPK • DHQ</span>
-            <span className="hidden sm:inline xl:hidden">GOVT OF KPK • DHQ HOSPITAL</span>
-            <span className="hidden xl:inline">GOVERNMENT OF KHYBER PAKHTUNKHWA • DHQ HOSPITAL HR SYSTEM</span>
+            <span className="sm:hidden">KPK • MMTI</span>
+            <span className="hidden sm:inline xl:hidden">GOVT OF KPK • HR MMTI D.I. KHAN</span>
+            <span className="hidden xl:inline">GOVERNMENT OF KHYBER PAKHTUNKHWA • HR MMTI D.I. KHAN</span>
           </span>
           <span className="text-emerald-500/40">|</span>
           <span className="truncate text-[10px] sm:text-[11px]">

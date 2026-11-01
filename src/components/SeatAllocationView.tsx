@@ -426,7 +426,7 @@ export default function SeatAllocationView({
                   <input
                     type="text"
                     required
-                    placeholder="e.g. DHQ Teaching Hospital D.I. Khan"
+                    placeholder="e.g. Mufti Mehmood Memorial Teaching Institute (MMTI) D.I. Khan"
                     value={department}
                     onChange={(e) => setDepartment(e.target.value)}
                     className="w-full text-xs p-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none"

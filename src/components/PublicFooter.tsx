@@ -30,10 +30,10 @@ export default function PublicFooter() {
             </div>
             <div>
               <h4 className="text-sm font-bold text-white">
-                DHQ Hospital HR System
+                HR MMTI D.I. Khan
               </h4>
               <p className="text-[11px] text-emerald-100/75">
-                DHQ Teaching Hospital • Dera Ismail Khan, KP
+                Mufti Mehmood Memorial Teaching Institute • Dera Ismail Khan, KP
               </p>
             </div>
           </div>
@@ -105,10 +105,10 @@ export default function PublicFooter() {
         </div>
 
         <div className="flex flex-col items-center justify-between gap-2 border-t border-white/15 pt-4 text-center text-[11px] text-emerald-100/60 sm:flex-row sm:text-left">
-          <p>© 2026 DHQ Hospital HR System • Government of Khyber Pakhtunkhwa • All Rights Reserved.</p>
+          <p>© 2026 HR MMTI D.I. Khan • Mufti Mehmood Memorial Teaching Institute • Government of Khyber Pakhtunkhwa • All Rights Reserved.</p>
           <p className="flex items-center gap-1.5 font-mono text-[10px]">
             <span className="h-1.5 w-1.5 rounded-full bg-pak-gold" />
-            DHQ-DI-KHAN-01 • Secured Session
+            MMTI-DI-KHAN-01 • Secured Session
           </p>
         </div>
       </div>

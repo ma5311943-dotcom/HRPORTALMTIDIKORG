@@ -10,7 +10,7 @@ export function exportStaffRosterToWord(
     candidate: Candidate;
     allocation?: Allocation;
   }>,
-  title = "DHQ Teaching Hospital D.I. Khan - Staff Recruitment & Appointment Roster"
+  title = "Mufti Mehmood Memorial Teaching Institute (MMTI) D.I. Khan - Staff Recruitment & Appointment Roster"
 ) {
   const currentDate = new Date().toLocaleDateString("en-GB", {
     day: "numeric",
@@ -151,7 +151,7 @@ export function exportStaffRosterToWord(
     </head>
     <body>
       <div class="header">
-        <h1>DHQ Teaching Hospital Dera Ismail Khan</h1>
+        <h1>Mufti Mehmood Memorial Teaching Institute Dera Ismail Khan</h1>
         <h2>Staff Recruitment, Verification & Appointment Official Ledger</h2>
         <div style="font-size: 11pt; color: #0284c7; font-weight: bold; margin-top: 5px;">
           ${title}
@@ -190,12 +190,12 @@ export function exportStaffRosterToWord(
         <div class="sig-box" style="float: left;">
           _______________________________<br/>
           <strong>Medical Superintendent (MS)</strong><br/>
-          DHQ Teaching Hospital D.I. Khan
+          Mufti Mehmood Memorial Teaching Institute (MMTI) D.I. Khan
         </div>
         <div class="sig-box" style="float: right;">
           _______________________________<br/>
           <strong>Hospital Director / Executive</strong><br/>
-          DHQ Teaching Hospital D.I. Khan
+          Mufti Mehmood Memorial Teaching Institute (MMTI) D.I. Khan
         </div>
         <div style="clear: both;"></div>
       </div>

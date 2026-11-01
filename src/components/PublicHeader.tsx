@@ -37,14 +37,14 @@ export default function PublicHeader({ activePage = "home" }: PublicHeaderProps)
             </span>
             <span className="hidden text-emerald-600 xl:inline">•</span>
             <span className="hidden text-[11px] text-emerald-200/80 xl:inline">
-              DHQ Teaching Hospital D.I. Khan
+              Mufti Mehmood Memorial Teaching Institute (MMTI) D.I. Khan
             </span>
           </div>
 
           <div className="flex shrink-0 items-center gap-3 font-mono text-[10px] sm:text-[11px]">
             <div className="flex items-center gap-1.5 text-emerald-200">
               <ShieldCheck className="h-3.5 w-3.5 shrink-0 text-[#10b981]" />
-              <span className="hidden sm:inline">DHQ Hospital Recruitment</span>
+              <span className="hidden sm:inline">HR MMTI Recruitment</span>
             </div>
             <span className="hidden text-emerald-700 sm:inline">|</span>
             <span className="hidden text-emerald-300/70 md:inline">Session 2026</span>
@@ -55,7 +55,7 @@ export default function PublicHeader({ activePage = "home" }: PublicHeaderProps)
       {/* Main Navigation Bar */}
       <header className="border-b border-slate-200 bg-white/95 backdrop-blur-md">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-2.5 sm:px-6 lg:px-8">
-          <Link href="/" className="group flex shrink-0 items-center gap-2.5" aria-label="DHQ Hospital HR Home">
+          <Link href="/" className="group flex shrink-0 items-center gap-2.5" aria-label="HR MMTI D.I. Khan Home">
             <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
               <img
                 src="/images/state_emblem.jpg"
@@ -66,14 +66,14 @@ export default function PublicHeader({ activePage = "home" }: PublicHeaderProps)
             <div>
               <div className="flex items-center gap-1.5">
                 <span className="text-sm font-bold tracking-tight text-slate-900 transition-colors group-hover:text-emerald-800 sm:text-lg">
-                  HR Portal <span className="text-emerald-700">MMTI</span>
+                  HR MMTI <span className="text-emerald-700">D.I. Khan</span>
                 </span>
                 <span className="hidden rounded-full border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wide text-emerald-800 sm:inline-block">
-                  D.I. Khan
+                  Official
                 </span>
               </div>
               <p className="hidden text-[11px] font-medium leading-none text-slate-500 md:block">
-                DHQ Teaching Hospital Staff Recruitment &amp; Management Portal
+                Mufti Mehmood Memorial Teaching Institute Staff Recruitment Portal
               </p>
             </div>
           </Link>

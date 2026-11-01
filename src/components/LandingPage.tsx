@@ -142,7 +142,7 @@ export default function LandingPage({
             <div className="space-y-5 text-center lg:col-span-7 lg:text-left">
               <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3.5 py-1.5 text-[11px] font-semibold text-emerald-50 backdrop-blur-sm">
                 <span className="h-2 w-2 animate-pulse rounded-full bg-pak-gold" />
-                <span>DHQ Teaching Hospital D.I. Khan • Staff Recruitment 2026</span>
+                <span>Mufti Mehmood Memorial Teaching Institute (MMTI) D.I. Khan • Staff Recruitment 2026</span>
               </div>
 
               <h1 className="text-3xl font-bold leading-tight tracking-tight text-white sm:text-4xl lg:text-[2.9rem] xl:text-5xl">

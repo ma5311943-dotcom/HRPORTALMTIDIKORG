@@ -190,14 +190,14 @@ export default function Sidebar({
                 <div className="truncate">
                   <div className="flex items-center gap-1.5">
                     <span className="font-extrabold text-sm tracking-tight text-white uppercase">
-                      HR Portal
+                      HR MMTI
                     </span>
                     <span className="bg-[#10b981] text-[#052e16] text-[9px] font-black px-1.5 py-0.5 rounded shadow-xs">
-                      MMTI
+                      D.I. KHAN
                     </span>
                   </div>
                   <p className="text-[10px] text-emerald-200/80 font-medium truncate">
-                    DHQ Teaching Hospital D.I. Khan
+                    Mufti Mehmood Memorial Teaching Institute
                   </p>
                 </div>
               </div>

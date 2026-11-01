@@ -187,7 +187,7 @@ export default function DashboardView({
     });
 
     const filterText = selectedRoleFilter === "All" ? "All DHQ Staff Categories" : `${selectedRoleFilter} Category`;
-    exportStaffRosterToWord(records, `DHQ Hospital D.I. Khan - ${filterText} Staff Roster`);
+    exportStaffRosterToWord(records, `MMTI D.I. Khan - ${filterText} Staff Roster`);
     toast.success("Single-Click Export Successful!", {
       description: `Downloaded formatted Word document with ${records.length} records.`,
     });
@@ -215,7 +215,7 @@ export default function DashboardView({
           <div className="space-y-3 max-w-2xl">
             <div className="inline-flex items-center gap-2 bg-[#0d3b28] border border-[#1b5e3f] px-3.5 py-1.5 rounded-full text-xs font-bold text-emerald-300">
               <Stethoscope className="w-4 h-4 text-[#10b981] animate-pulse" />
-              <span>DHQ Teaching Hospital D.I. Khan — Executive Staff Governance</span>
+              <span>Mufti Mehmood Memorial Teaching Institute (MMTI) D.I. Khan — Executive Staff Governance</span>
             </div>
 
             <h2 className="text-2xl sm:text-3xl font-black tracking-tight text-white">

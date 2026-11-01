@@ -258,14 +258,14 @@ export default function ReportsView({
           <div>
             <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[11px] font-semibold text-emerald-100 backdrop-blur-sm mb-2">
               <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-              <span>DHQ Hospital D.I. Khan • Audit &amp; Official Reporting</span>
+              <span>MMTI D.I. Khan • Audit &amp; Official Reporting</span>
             </div>
             <h2 className="text-xl sm:text-2xl font-extrabold text-white flex items-center gap-2">
               <FileText className="w-6 h-6 text-emerald-300" />
               Hospital Staff Recruitment Audit &amp; HR Reports
             </h2>
             <p className="text-xs text-emerald-100/80 mt-1 max-w-xl">
-              Official verifiable records, gazette appointment summaries, and press release documentation for DHQ Teaching Hospital D.I. Khan.
+              Official verifiable records, gazette appointment summaries, and press release documentation for Mufti Mehmood Memorial Teaching Institute (MMTI) D.I. Khan.
             </p>
           </div>
 
@@ -529,7 +529,7 @@ export default function ReportsView({
                 className="print:break-after-page mb-6 border border-slate-200 rounded-xl overflow-hidden shadow-2xs"
               >
                 <div className="bg-slate-100/80 px-4 py-2 border-b border-slate-200 text-[11px] font-bold text-slate-700 flex justify-between items-center">
-                  <span>DHQ Teaching Hospital D.I. Khan — Page {pageIdx + 1} of {Math.ceil((sortedGazette.length || 1) / printPageSize)}</span>
+                  <span>Mufti Mehmood Memorial Teaching Institute (MMTI) D.I. Khan — Page {pageIdx + 1} of {Math.ceil((sortedGazette.length || 1) / printPageSize)}</span>
                   <span>Category: {selectedRoleCategory}</span>
                 </div>
                 <div className="overflow-x-auto">

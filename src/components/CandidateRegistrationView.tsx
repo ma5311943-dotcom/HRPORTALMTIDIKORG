@@ -453,7 +453,7 @@ export default function CandidateRegistrationView({
             Staff Application Registry
           </h2>
           <p className="text-xs text-slate-500">
-            DHQ Hospital D.I. Khan — Staff registration with CNIC verification and document upload
+            MMTI D.I. Khan — Staff registration with CNIC verification and document upload
           </p>
         </div>
 

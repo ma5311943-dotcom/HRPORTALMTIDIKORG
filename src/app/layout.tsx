@@ -25,13 +25,13 @@ const jetbrains = JetBrains_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "HR Portal MMTI | DHQ Teaching Hospital D.I. Khan",
-    template: "%s | HR Portal MMTI",
+    default: "HR MMTI D.I. Khan | Mufti Mehmood Memorial Teaching Institute",
+    template: "%s | HR MMTI D.I. Khan",
   },
   description:
-    "HR Portal MMTI — Official Staff Recruitment, Verification, and Quota Ledger System for DHQ Teaching Hospital D.I. Khan | Government of Khyber Pakhtunkhwa",
-  applicationName: "HR Portal MMTI",
-  keywords: ["MMTI", "DHQ Hospital", "HR Portal", "Dera Ismail Khan", "Khyber Pakhtunkhwa"],
+    "HR MMTI D.I. Khan — Official Staff Recruitment, Verification, and Quota Ledger System for Mufti Mehmood Memorial Teaching Institute Dera Ismail Khan | Government of Khyber Pakhtunkhwa",
+  applicationName: "HR MMTI D.I. Khan",
+  keywords: ["HR MMTI D.I. Khan", "MMTI", "Mufti Mehmood Memorial Teaching Institute", "HR Portal", "Dera Ismail Khan", "Khyber Pakhtunkhwa"],
 };
 
 export const viewport: Viewport = {

@@ -601,7 +601,7 @@ export default function Home() {
                   </div>
                   <div>
                     <h4 className="font-bold text-slate-900 text-xs uppercase tracking-wide">
-                      HR Portal MMTI • DHQ Teaching Hospital
+                      HR MMTI D.I. Khan • DHQ Teaching Hospital
                     </h4>
                     <p className="text-[11px] text-slate-500">
                       Medical Teaching Institution • Government of Khyber Pakhtunkhwa
