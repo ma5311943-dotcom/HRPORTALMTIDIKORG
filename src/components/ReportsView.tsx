@@ -568,11 +568,10 @@ export default function ReportsView({
                           <td className="py-2 px-2.5 font-semibold text-emerald-700">{row.tehsil}</td>
                           <td className="py-2 px-2.5 font-medium text-slate-800">{row.roleTitle}</td>
                           <td className="py-2 px-2.5">
-                            <span className={`inline-block px-2 py-0.5 rounded text-[10px] font-bold font-mono ${
-                              row.reference === "Unassigned" || row.reference === "MERIT-OPEN"
-                                ? "bg-amber-100 text-amber-800"
-                                : "bg-emerald-100 text-emerald-800"
-                            }`}>
+                            <span className={`inline-block px-2 py-0.5 rounded text-[10px] font-bold font-mono ${row.reference === "Unassigned" || row.reference === "MERIT-OPEN"
+                              ? "bg-amber-100 text-amber-800"
+                              : "bg-emerald-100 text-emerald-800"
+                              }`}>
                               {row.reference}
                             </span>
                           </td>
